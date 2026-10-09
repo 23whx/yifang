@@ -1,0 +1,37 @@
+{
+  "finished": "2026-10-01T08:00:16.389Z",
+  "results": [
+    {
+      "file": "scripts/audit-mcr-unsupported.cjs",
+      "exitCode": 0,
+      "sourceSha256": "f7b5099239c33a101bc8920bc4db4691fc146edda4a9b62833ec9072dd1c756c",
+      "log": "audit-mcr-unsupported.cjs.log",
+      "logSha256": "010da90fa998409148a8366d842e04e7cd89af2969bcbb12410ba14d9eb61028",
+      "elapsedMs": 45071
+    },
+    {
+      "file": "scripts/audit-mcr-special-unsupported.cjs",
+      "exitCode": 0,
+      "sourceSha256": "f3bbc997b54b9075f2e8deb9419badb3ca73521dfb069d6ddf7939e86ad239fb",
+      "log": "audit-mcr-special-unsupported.cjs.log",
+      "logSha256": "8683d1dbb1e82abe26229253186c956f8c72c4820ecf597808b6386bf76a1e93",
+      "elapsedMs": 6441
+    },
+    {
+      "file": "docs/verification/mcr-final-rules-2026-10-01/claim-priority.cjs",
+      "exitCode": 0,
+      "sourceSha256": "dd7a76078046986130c6850506e2d4802aeb18ca3a9833b8273eb0805bde5433",
+      "log": "claim-priority.cjs.log",
+      "logSha256": "4a4dd652db5edb27c4b9d816301aa7c9780eaa8477d27574b62ec31b5524bcb7",
+      "elapsedMs": 2834
+    },
+    {
+      "file": "scripts/verify-static-export.cjs",
+      "exitCode": 0,
+      "sourceSha256": "95de7fdca7d57fc84ff0787d4aa553d7619403f40b977a5099c150c0490a4f69",
+      "log": "verify-static-export.cjs.log",
+      "logSha256": "bac81e77765d9da466ca9ea3ae08f7b3f793232e8ea3a2ef91c6d4b8d4be5c5b",
+      "elapsedMs": 2721
+    }
+  ]
+}

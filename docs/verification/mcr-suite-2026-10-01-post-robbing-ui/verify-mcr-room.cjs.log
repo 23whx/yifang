@@ -1,0 +1,1 @@
+PASS: MCR room complete hand 471 actions, 4787 frames; recipient views, duplicate/stale/extra-field rejection, four confirmations, next hand, disconnect and send failure. In-memory transport, not WebRTC or full rule coverage.

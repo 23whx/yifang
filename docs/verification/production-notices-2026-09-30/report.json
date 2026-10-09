@@ -1,0 +1,1933 @@
+{
+  "scope": "Installed production lock entries and top-level notice files only; includes packages not necessarily shipped to browsers. No inferred authors or permission.",
+  "warning": "NOT redistribution clearance, complete nested/transitive notices, source correspondence, media provenance or integration legal review. License metadata and textual keywords are evidence, not authorization.",
+  "packageLockSha256": "c65e21deb0fca5d928abbe2545d432099ffc4a599e71facc799daa6bbb2e347b",
+  "summary": {
+    "lockEntries": 130,
+    "installed": 100,
+    "notInstalled": 30,
+    "installedWithNotices": 89,
+    "installedWithoutNotices": 11,
+    "noticeFiles": 91
+  },
+  "rows": [
+    {
+      "entry": "node_modules/@babel/runtime",
+      "lockedVersion": "7.29.7",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1106,
+          "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@babel/runtime/LICENSE"
+        }
+      ],
+      "packageName": "@babel/runtime"
+    },
+    {
+      "entry": "node_modules/@dimforge/rapier3d-compat",
+      "lockedVersion": "0.12.0",
+      "licenseMetadata": "Apache-2.0",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 11343,
+          "sha256": "4c05555705e3efde601fb1252ae48f1d63992af8a8fb8947745b7fa834e8f519",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/@dimforge/rapier3d-compat/LICENSE"
+        }
+      ],
+      "packageName": "@dimforge/rapier3d-compat"
+    },
+    {
+      "entry": "node_modules/@emnapi/runtime",
+      "lockedVersion": "1.11.3",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1076,
+          "sha256": "2088f55c6731498410b20c95ebd345ed4a4a800bf74c0fba4d282fd2a021daaa",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@emnapi/runtime/LICENSE"
+        }
+      ],
+      "packageName": "@emnapi/runtime"
+    },
+    {
+      "entry": "node_modules/@fontsource-variable/big-shoulders",
+      "lockedVersion": "5.3.0",
+      "licenseMetadata": "OFL-1.1",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 4395,
+          "sha256": "bf3b5640d5d1d94a8d057bfa0232c6a405cad28ecaa28a0c17fdf879f5b91842",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@fontsource-variable/big-shoulders/LICENSE"
+        }
+      ],
+      "packageName": "@fontsource-variable/big-shoulders"
+    },
+    {
+      "entry": "node_modules/@fontsource-variable/literata",
+      "lockedVersion": "5.3.0",
+      "licenseMetadata": "OFL-1.1",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 4506,
+          "sha256": "9895ebc015226accf416b758ac1ca02a2fb4f83a89d316791ef697c3dc0852aa",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@fontsource-variable/literata/LICENSE"
+        }
+      ],
+      "packageName": "@fontsource-variable/literata"
+    },
+    {
+      "entry": "node_modules/@fontsource-variable/noto-sans-sc",
+      "lockedVersion": "5.3.0",
+      "licenseMetadata": "OFL-1.1",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 4314,
+          "sha256": "18aabf190848725e2576eefb5c29ba06aac1029d02132252a7f312eac2e50cf3",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@fontsource-variable/noto-sans-sc/LICENSE"
+        }
+      ],
+      "packageName": "@fontsource-variable/noto-sans-sc"
+    },
+    {
+      "entry": "node_modules/@fontsource-variable/noto-serif-sc",
+      "lockedVersion": "5.3.0",
+      "licenseMetadata": "OFL-1.1",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 4314,
+          "sha256": "18aabf190848725e2576eefb5c29ba06aac1029d02132252a7f312eac2e50cf3",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@fontsource-variable/noto-serif-sc/LICENSE"
+        }
+      ],
+      "packageName": "@fontsource-variable/noto-serif-sc"
+    },
+    {
+      "entry": "node_modules/@img/colour",
+      "lockedVersion": "1.1.0",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE.md",
+          "bytes": 4433,
+          "sha256": "e2eaa4603c14cb26f301e88648c12a853fa3f0f5da6d4b0972958c666e7f2ab8",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@img/colour/LICENSE.md"
+        }
+      ],
+      "packageName": "@img/colour"
+    },
+    {
+      "entry": "node_modules/@img/sharp-darwin-arm64",
+      "lockedVersion": "0.34.5",
+      "licenseMetadata": "Apache-2.0",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-darwin-x64",
+      "lockedVersion": "0.34.5",
+      "licenseMetadata": "Apache-2.0",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-libvips-darwin-arm64",
+      "lockedVersion": "1.2.4",
+      "licenseMetadata": "LGPL-3.0-or-later",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-libvips-darwin-x64",
+      "lockedVersion": "1.2.4",
+      "licenseMetadata": "LGPL-3.0-or-later",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-libvips-linux-arm",
+      "lockedVersion": "1.2.4",
+      "licenseMetadata": "LGPL-3.0-or-later",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-libvips-linux-arm64",
+      "lockedVersion": "1.2.4",
+      "licenseMetadata": "LGPL-3.0-or-later",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-libvips-linux-ppc64",
+      "lockedVersion": "1.2.4",
+      "licenseMetadata": "LGPL-3.0-or-later",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-libvips-linux-riscv64",
+      "lockedVersion": "1.2.4",
+      "licenseMetadata": "LGPL-3.0-or-later",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-libvips-linux-s390x",
+      "lockedVersion": "1.2.4",
+      "licenseMetadata": "LGPL-3.0-or-later",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-libvips-linux-x64",
+      "lockedVersion": "1.2.4",
+      "licenseMetadata": "LGPL-3.0-or-later",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-libvips-linuxmusl-arm64",
+      "lockedVersion": "1.2.4",
+      "licenseMetadata": "LGPL-3.0-or-later",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-libvips-linuxmusl-x64",
+      "lockedVersion": "1.2.4",
+      "licenseMetadata": "LGPL-3.0-or-later",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-linux-arm",
+      "lockedVersion": "0.34.5",
+      "licenseMetadata": "Apache-2.0",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-linux-arm64",
+      "lockedVersion": "0.34.5",
+      "licenseMetadata": "Apache-2.0",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-linux-ppc64",
+      "lockedVersion": "0.34.5",
+      "licenseMetadata": "Apache-2.0",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-linux-riscv64",
+      "lockedVersion": "0.34.5",
+      "licenseMetadata": "Apache-2.0",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-linux-s390x",
+      "lockedVersion": "0.34.5",
+      "licenseMetadata": "Apache-2.0",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-linux-x64",
+      "lockedVersion": "0.34.5",
+      "licenseMetadata": "Apache-2.0",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-linuxmusl-arm64",
+      "lockedVersion": "0.34.5",
+      "licenseMetadata": "Apache-2.0",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-linuxmusl-x64",
+      "lockedVersion": "0.34.5",
+      "licenseMetadata": "Apache-2.0",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-wasm32",
+      "lockedVersion": "0.34.5",
+      "licenseMetadata": "Apache-2.0 AND LGPL-3.0-or-later AND MIT",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-win32-arm64",
+      "lockedVersion": "0.34.5",
+      "licenseMetadata": "Apache-2.0 AND LGPL-3.0-or-later",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-win32-ia32",
+      "lockedVersion": "0.34.5",
+      "licenseMetadata": "Apache-2.0 AND LGPL-3.0-or-later",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@img/sharp-win32-x64",
+      "lockedVersion": "0.34.5",
+      "licenseMetadata": "Apache-2.0 AND LGPL-3.0-or-later",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 10464,
+          "sha256": "dc1f5d2d43c5531dfe0acaf4e950ea5dbe3e61e1850cf0e983bda7efc10d6693",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/@img/sharp-win32-x64/LICENSE"
+        }
+      ],
+      "packageName": "@img/sharp-win32-x64"
+    },
+    {
+      "entry": "node_modules/@kobalab/majiang-core",
+      "lockedVersion": "1.4.1",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1074,
+          "sha256": "db3e80443e9bd0a0dc69cde61d69792c5e1dc6c552cf6e34f376bfab96fe5c75",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@kobalab/majiang-core/LICENSE"
+        }
+      ],
+      "packageName": "@kobalab/majiang-core"
+    },
+    {
+      "entry": "node_modules/@mediapipe/tasks-vision",
+      "lockedVersion": "0.10.17",
+      "licenseMetadata": "Apache-2.0",
+      "installed": true,
+      "notices": [],
+      "packageName": "@mediapipe/tasks-vision"
+    },
+    {
+      "entry": "node_modules/@monogrid/gainmap-js",
+      "lockedVersion": "3.4.0",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1065,
+          "sha256": "7fb8f722609c6669a9c9a4865e2a86205c7760e7dc7a039b0fb9913c3e62c6cc",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@monogrid/gainmap-js/LICENSE"
+        }
+      ],
+      "packageName": "@monogrid/gainmap-js"
+    },
+    {
+      "entry": "node_modules/@msgpack/msgpack",
+      "lockedVersion": "2.8.0",
+      "licenseMetadata": "ISC",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 740,
+          "sha256": "d95a411bcdadac85d678a99367ff51719e53539fa5ee9994943cd760c4ae64e4",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/@msgpack/msgpack/LICENSE"
+        }
+      ],
+      "packageName": "@msgpack/msgpack"
+    },
+    {
+      "entry": "node_modules/@next/env",
+      "lockedVersion": "16.2.12",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [],
+      "packageName": "@next/env"
+    },
+    {
+      "entry": "node_modules/@next/swc-darwin-arm64",
+      "lockedVersion": "16.2.12",
+      "licenseMetadata": "MIT",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@next/swc-darwin-x64",
+      "lockedVersion": "16.2.12",
+      "licenseMetadata": "MIT",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@next/swc-linux-arm64-gnu",
+      "lockedVersion": "16.2.12",
+      "licenseMetadata": "MIT",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@next/swc-linux-arm64-musl",
+      "lockedVersion": "16.2.12",
+      "licenseMetadata": "MIT",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@next/swc-linux-x64-gnu",
+      "lockedVersion": "16.2.12",
+      "licenseMetadata": "MIT",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@next/swc-linux-x64-musl",
+      "lockedVersion": "16.2.12",
+      "licenseMetadata": "MIT",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@next/swc-win32-arm64-msvc",
+      "lockedVersion": "16.2.12",
+      "licenseMetadata": "MIT",
+      "installed": false,
+      "notices": []
+    },
+    {
+      "entry": "node_modules/@next/swc-win32-x64-msvc",
+      "lockedVersion": "16.2.12",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [],
+      "packageName": "@next/swc-win32-x64-msvc"
+    },
+    {
+      "entry": "node_modules/@react-three/drei",
+      "lockedVersion": "10.7.7",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1069,
+          "sha256": "2e36b208b403882158daf95cae207087bbb830db4d434a79ebafffca177244c8",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@react-three/drei/LICENSE"
+        }
+      ],
+      "packageName": "@react-three/drei"
+    },
+    {
+      "entry": "node_modules/@react-three/fiber",
+      "lockedVersion": "9.6.1",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [],
+      "packageName": "@react-three/fiber"
+    },
+    {
+      "entry": "node_modules/@swc/helpers",
+      "lockedVersion": "0.5.15",
+      "licenseMetadata": "Apache-2.0",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 10836,
+          "sha256": "d96eba1f1881334d50ffc144276dfa98e147a415e7c591ecdfcb81680361dc91",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/@swc/helpers/LICENSE"
+        }
+      ],
+      "packageName": "@swc/helpers"
+    },
+    {
+      "entry": "node_modules/@tweenjs/tween.js",
+      "lockedVersion": "23.1.3",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1166,
+          "sha256": "c95fecd88f2709bfc34e4d1f1ccc36d17048990e6ba26c283cfecdef0432936b",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@tweenjs/tween.js/LICENSE"
+        }
+      ],
+      "packageName": "@tweenjs/tween.js"
+    },
+    {
+      "entry": "node_modules/@types/draco3d",
+      "lockedVersion": "1.4.10",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1141,
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@types/draco3d/LICENSE"
+        }
+      ],
+      "packageName": "@types/draco3d"
+    },
+    {
+      "entry": "node_modules/@types/offscreencanvas",
+      "lockedVersion": "2019.7.3",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1141,
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@types/offscreencanvas/LICENSE"
+        }
+      ],
+      "packageName": "@types/offscreencanvas"
+    },
+    {
+      "entry": "node_modules/@types/react",
+      "lockedVersion": "19.2.17",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1141,
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@types/react/LICENSE"
+        }
+      ],
+      "packageName": "@types/react"
+    },
+    {
+      "entry": "node_modules/@types/react-reconciler",
+      "lockedVersion": "0.28.9",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1141,
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@types/react-reconciler/LICENSE"
+        }
+      ],
+      "packageName": "@types/react-reconciler"
+    },
+    {
+      "entry": "node_modules/@types/stats.js",
+      "lockedVersion": "0.17.4",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1141,
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@types/stats.js/LICENSE"
+        }
+      ],
+      "packageName": "@types/stats.js"
+    },
+    {
+      "entry": "node_modules/@types/three",
+      "lockedVersion": "0.185.1",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1141,
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@types/three/LICENSE"
+        }
+      ],
+      "packageName": "@types/three"
+    },
+    {
+      "entry": "node_modules/@types/webxr",
+      "lockedVersion": "0.5.24",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1141,
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@types/webxr/LICENSE"
+        }
+      ],
+      "packageName": "@types/webxr"
+    },
+    {
+      "entry": "node_modules/@use-gesture/core",
+      "lockedVersion": "10.3.1",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1083,
+          "sha256": "b99672ef9af57432e6d025a66d34f8b968564e4e0a1e2005ea9018457a7e38dc",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@use-gesture/core/LICENSE"
+        }
+      ],
+      "packageName": "@use-gesture/core"
+    },
+    {
+      "entry": "node_modules/@use-gesture/react",
+      "lockedVersion": "10.3.1",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1083,
+          "sha256": "b99672ef9af57432e6d025a66d34f8b968564e4e0a1e2005ea9018457a7e38dc",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/@use-gesture/react/LICENSE"
+        }
+      ],
+      "packageName": "@use-gesture/react"
+    },
+    {
+      "entry": "node_modules/base64-js",
+      "lockedVersion": "1.5.1",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1081,
+          "sha256": "5b37224c080cdcc97c871ada971c224e9926370fe74f11b539aa1cf9f3b1aca1",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/base64-js/LICENSE"
+        }
+      ],
+      "packageName": "base64-js"
+    },
+    {
+      "entry": "node_modules/baseline-browser-mapping",
+      "lockedVersion": "2.11.5",
+      "licenseMetadata": "Apache-2.0",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE.txt",
+          "bytes": 11357,
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/baseline-browser-mapping/LICENSE.txt"
+        }
+      ],
+      "packageName": "baseline-browser-mapping"
+    },
+    {
+      "entry": "node_modules/bidi-js",
+      "lockedVersion": "1.0.3",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE.txt",
+          "bytes": 1071,
+          "sha256": "49d4d143fed599deb502a0fe6e02f49832f87e9a3a4cd0502e469596d50faa6d",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/bidi-js/LICENSE.txt"
+        }
+      ],
+      "packageName": "bidi-js"
+    },
+    {
+      "entry": "node_modules/buffer",
+      "lockedVersion": "6.0.3",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "AUTHORS.md",
+          "bytes": 2788,
+          "sha256": "ca3d96437f69ceb38df1972db017fcd6303b02f57ea1f838ab9f9c3db3e789e0",
+          "validUtf8": true,
+          "hasCopyrightLiteral": false,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/buffer/AUTHORS.md"
+        },
+        {
+          "file": "LICENSE",
+          "bytes": 1106,
+          "sha256": "06bafa45fdad2579ba0e43b0c9b2c6290287c99c4203c300254a462b38a307f6",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/buffer/LICENSE"
+        }
+      ],
+      "packageName": "buffer"
+    },
+    {
+      "entry": "node_modules/camera-controls",
+      "lockedVersion": "3.1.2",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1065,
+          "sha256": "d175c34ca3b4fb17d0568627ef8fd9363ae6f63f9ffdc97d4da71f0d7f3473ee",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/camera-controls/LICENSE"
+        }
+      ],
+      "packageName": "camera-controls"
+    },
+    {
+      "entry": "node_modules/caniuse-lite",
+      "lockedVersion": "1.0.30001806",
+      "licenseMetadata": "CC-BY-4.0",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 18651,
+          "sha256": "fd3a263fe19ed8faa9068b43abaebafc02c77897b0c6fc09abc04bb592e5f16e",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/caniuse-lite/LICENSE"
+        }
+      ],
+      "packageName": "caniuse-lite"
+    },
+    {
+      "entry": "node_modules/client-only",
+      "lockedVersion": "0.0.1",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [],
+      "packageName": "client-only"
+    },
+    {
+      "entry": "node_modules/cross-env",
+      "lockedVersion": "7.0.3",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1079,
+          "sha256": "bf8fd38056b7606deccfcadb4d8ca1c210082d8ef5513426d2650daedc30bed3",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/cross-env/LICENSE"
+        }
+      ],
+      "packageName": "cross-env"
+    },
+    {
+      "entry": "node_modules/cross-spawn",
+      "lockedVersion": "7.0.6",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1105,
+          "sha256": "aaa78451b6fecd1b9c4594c796c133c0e90cad100372ff8bc6de615e9ef9adf1",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/cross-spawn/LICENSE"
+        }
+      ],
+      "packageName": "cross-spawn"
+    },
+    {
+      "entry": "node_modules/csstype",
+      "lockedVersion": "3.2.3",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1062,
+          "sha256": "11d55bd4541c75ee7879547ac49089c489163dae49551389713c3d026cab383e",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/csstype/LICENSE"
+        }
+      ],
+      "packageName": "csstype"
+    },
+    {
+      "entry": "node_modules/detect-gpu",
+      "lockedVersion": "5.0.70",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1077,
+          "sha256": "b7ec746220d05b353b6f05196599c50d0a8bf7b75eaf90de439d2152452d298e",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/detect-gpu/LICENSE"
+        }
+      ],
+      "packageName": "detect-gpu"
+    },
+    {
+      "entry": "node_modules/detect-libc",
+      "lockedVersion": "2.1.2",
+      "licenseMetadata": "Apache-2.0",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 11357,
+          "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/detect-libc/LICENSE"
+        }
+      ],
+      "packageName": "detect-libc"
+    },
+    {
+      "entry": "node_modules/draco3d",
+      "lockedVersion": "1.5.7",
+      "licenseMetadata": "Apache-2.0",
+      "installed": true,
+      "notices": [],
+      "packageName": "draco3d"
+    },
+    {
+      "entry": "node_modules/eventemitter3",
+      "lockedVersion": "4.0.7",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1082,
+          "sha256": "3aecc12b1cb28832b5f65ab64291de96568c3f236a74d646281b4491f7bcadbf",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/eventemitter3/LICENSE"
+        }
+      ],
+      "packageName": "eventemitter3"
+    },
+    {
+      "entry": "node_modules/fairy-stockfish-nnue.wasm",
+      "lockedVersion": "1.1.12",
+      "licenseMetadata": "GPL-3.0",
+      "installed": true,
+      "notices": [
+        {
+          "file": "AUTHORS",
+          "bytes": 4950,
+          "sha256": "55a0a4599358308af8349344d79176469f04119558e85595efe0a39b583cdf00",
+          "validUtf8": true,
+          "hasCopyrightLiteral": false,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/fairy-stockfish-nnue.wasm/AUTHORS"
+        },
+        {
+          "file": "Copying.txt",
+          "bytes": 35821,
+          "sha256": "0b383d5a63da644f628d99c33976ea6487ed89aaa59f0b3257992deac1171e6b",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/fairy-stockfish-nnue.wasm/Copying.txt"
+        }
+      ],
+      "packageName": "fairy-stockfish-nnue.wasm"
+    },
+    {
+      "entry": "node_modules/ffish-es6",
+      "lockedVersion": "0.7.10",
+      "licenseMetadata": "GPL-3.0",
+      "installed": true,
+      "notices": [],
+      "packageName": "ffish-es6"
+    },
+    {
+      "entry": "node_modules/fflate",
+      "lockedVersion": "0.8.3",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1069,
+          "sha256": "0a1df3a083d0c010560aa342e87959c8c1070e6fd54545741f083f22d0c8b551",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/fflate/LICENSE"
+        }
+      ],
+      "packageName": "fflate"
+    },
+    {
+      "entry": "node_modules/glsl-noise",
+      "lockedVersion": "0.0.0",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1129,
+          "sha256": "bce6c887104eda776ad5e3a2c0b249d1ef5adca91573b350e7147a59d65757f1",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/glsl-noise/LICENSE"
+        }
+      ],
+      "packageName": "glsl-noise"
+    },
+    {
+      "entry": "node_modules/hls.js",
+      "lockedVersion": "1.6.16",
+      "licenseMetadata": "Apache-2.0",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1338,
+          "sha256": "ca8773cf798c7ed997d4dd7c8e23c348699f8d5b7462636694cc14de6cda12db",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/hls.js/LICENSE"
+        }
+      ],
+      "packageName": "hls.js"
+    },
+    {
+      "entry": "node_modules/ieee754",
+      "lockedVersion": "1.2.1",
+      "licenseMetadata": "BSD-3-Clause",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1465,
+          "sha256": "18d45466ba3253deae04667e267a91ea8de8548f18c1125264d1c9db28194cc1",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/ieee754/LICENSE"
+        }
+      ],
+      "packageName": "ieee754"
+    },
+    {
+      "entry": "node_modules/immediate",
+      "lockedVersion": "3.0.6",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE.txt",
+          "bytes": 1115,
+          "sha256": "809e66de579fb7d92503848bbe6d1f348f4f6521a71e5d294fe7cc0c87a3b4ff",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/immediate/LICENSE.txt"
+        }
+      ],
+      "packageName": "immediate"
+    },
+    {
+      "entry": "node_modules/is-promise",
+      "lockedVersion": "2.2.2",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1058,
+          "sha256": "44191656d296391e0ec97e32f5385f0d02b6f2992694082d22ea04ba0f66f9e4",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/is-promise/LICENSE"
+        }
+      ],
+      "packageName": "is-promise"
+    },
+    {
+      "entry": "node_modules/isexe",
+      "lockedVersion": "2.0.0",
+      "licenseMetadata": "ISC",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 765,
+          "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/isexe/LICENSE"
+        }
+      ],
+      "packageName": "isexe"
+    },
+    {
+      "entry": "node_modules/its-fine",
+      "lockedVersion": "2.0.0",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1093,
+          "sha256": "506bca9e41227d2ae1fbea8342a1fcff853af8198e9e1f37693a635e86efc539",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/its-fine/LICENSE"
+        }
+      ],
+      "packageName": "its-fine"
+    },
+    {
+      "entry": "node_modules/lie",
+      "lockedVersion": "3.3.0",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "license.md",
+          "bytes": 1084,
+          "sha256": "5c81b0caa98593408b03125efa25efe622341ed87ae55561968828cd887d64a4",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/lie/license.md"
+        }
+      ],
+      "packageName": "lie"
+    },
+    {
+      "entry": "node_modules/maath",
+      "lockedVersion": "0.10.8",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [],
+      "packageName": "maath"
+    },
+    {
+      "entry": "node_modules/meshline",
+      "lockedVersion": "3.3.1",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1091,
+          "sha256": "60616aab1af71f2603d9d4ab3c29b5d80cc43cd9a62e2e8b3fa68c1c5597103f",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/meshline/LICENSE"
+        }
+      ],
+      "packageName": "meshline"
+    },
+    {
+      "entry": "node_modules/meshoptimizer",
+      "lockedVersion": "1.1.1",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE.md",
+          "bytes": 1079,
+          "sha256": "f03037ca7bad1e3eb7f4a63fa6084a8baabd5ba30d3c239a9a7f35705d873e26",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/meshoptimizer/LICENSE.md"
+        }
+      ],
+      "packageName": "meshoptimizer"
+    },
+    {
+      "entry": "node_modules/miaoda-game-mcr-mahjong-analysis-core",
+      "lockedVersion": "0.3.1",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [],
+      "packageName": "miaoda-game-mcr-mahjong-analysis-core"
+    },
+    {
+      "entry": "node_modules/miaoda-game-mcr-mahjong-rules",
+      "lockedVersion": "0.3.1",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [],
+      "packageName": "miaoda-game-mcr-mahjong-rules"
+    },
+    {
+      "entry": "node_modules/nanoid",
+      "lockedVersion": "3.3.16",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1095,
+          "sha256": "da4db1480d9beea3483a2eda5c53b22238d0827d57da162b48f122e04d2d9987",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/nanoid/LICENSE"
+        }
+      ],
+      "packageName": "nanoid"
+    },
+    {
+      "entry": "node_modules/next",
+      "lockedVersion": "16.2.12",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "license.md",
+          "bytes": 1079,
+          "sha256": "ee765244e2d59f5234d474f62e0766fa0c8b99af967fdd4c0cb8dcb0c76ea224",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/next/license.md"
+        }
+      ],
+      "packageName": "next"
+    },
+    {
+      "entry": "node_modules/next/node_modules/postcss",
+      "lockedVersion": "8.4.31",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1095,
+          "sha256": "c4630ac8b89cb317ac5bdd60ac5e4e185eab9bd5151a0c7b3afa41aa83d7ec9b",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/next/node_modules/postcss/LICENSE"
+        }
+      ],
+      "packageName": "postcss"
+    },
+    {
+      "entry": "node_modules/path-key",
+      "lockedVersion": "3.1.1",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "license",
+          "bytes": 1109,
+          "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/path-key/license"
+        }
+      ],
+      "packageName": "path-key"
+    },
+    {
+      "entry": "node_modules/peerjs",
+      "lockedVersion": "1.5.5",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1108,
+          "sha256": "9407807dba7f47a79bfb3ac55759d63d77c9371ebd0616d5a093e97d3e810397",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/peerjs/LICENSE"
+        }
+      ],
+      "packageName": "peerjs"
+    },
+    {
+      "entry": "node_modules/peerjs-js-binarypack",
+      "lockedVersion": "2.1.0",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1093,
+          "sha256": "9517e6f46b30231a62407f94a8c7adf8b4d14038c01807cd769f1d4de5911ba4",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/peerjs-js-binarypack/LICENSE"
+        }
+      ],
+      "packageName": "peerjs-js-binarypack"
+    },
+    {
+      "entry": "node_modules/picocolors",
+      "lockedVersion": "1.1.1",
+      "licenseMetadata": "ISC",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 787,
+          "sha256": "6582629e2979466878f6014313dcc2f3756c9616148682227ce3063dde310750",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/picocolors/LICENSE"
+        }
+      ],
+      "packageName": "picocolors"
+    },
+    {
+      "entry": "node_modules/potpack",
+      "lockedVersion": "1.0.2",
+      "licenseMetadata": "ISC",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 738,
+          "sha256": "2c620eaf6c3ee3e33b07f3b6ef0dfd0a9e0a52c93a46aa4ccf7773dbb562daec",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/potpack/LICENSE"
+        }
+      ],
+      "packageName": "potpack"
+    },
+    {
+      "entry": "node_modules/promise-worker-transferable",
+      "lockedVersion": "1.0.4",
+      "licenseMetadata": "Apache-2.0",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 11391,
+          "sha256": "0f0ba7a9d825b6cac29a3c949860dcfc0b87f2f0f57a078199520a3cd03896f6",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/promise-worker-transferable/LICENSE"
+        }
+      ],
+      "packageName": "promise-worker-transferable"
+    },
+    {
+      "entry": "node_modules/react",
+      "lockedVersion": "19.2.4",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1088,
+          "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/react/LICENSE"
+        }
+      ],
+      "packageName": "react"
+    },
+    {
+      "entry": "node_modules/react-dom",
+      "lockedVersion": "19.2.4",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1088,
+          "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/react-dom/LICENSE"
+        }
+      ],
+      "packageName": "react-dom"
+    },
+    {
+      "entry": "node_modules/react-use-measure",
+      "lockedVersion": "2.1.7",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1093,
+          "sha256": "1f9038eff8dbd6505a26f9d6830cc6da2b87ab1a9305d1100884986e9c11a31a",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/react-use-measure/LICENSE"
+        }
+      ],
+      "packageName": "react-use-measure"
+    },
+    {
+      "entry": "node_modules/require-from-string",
+      "lockedVersion": "2.0.2",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "license",
+          "bytes": 1128,
+          "sha256": "6ee0feb1f6ef996ff5a68600f8cf98909cf412d39ef3cdceaefd87d636fa1b7f",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/require-from-string/license"
+        }
+      ],
+      "packageName": "require-from-string"
+    },
+    {
+      "entry": "node_modules/scheduler",
+      "lockedVersion": "0.27.0",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1088,
+          "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/scheduler/LICENSE"
+        }
+      ],
+      "packageName": "scheduler"
+    },
+    {
+      "entry": "node_modules/sdp",
+      "lockedVersion": "3.2.2",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1058,
+          "sha256": "798e82590af6a84bfbde3d6bb0fb9162c519edf16122404fea00acefdc55cbd9",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/sdp/LICENSE"
+        }
+      ],
+      "packageName": "sdp"
+    },
+    {
+      "entry": "node_modules/sharp",
+      "lockedVersion": "0.34.5",
+      "licenseMetadata": "Apache-2.0",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 10273,
+          "sha256": "73ba74dfaa520b49a401b5d21459a8523a146f3b7518a833eea5efa85130bf68",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/sharp/LICENSE"
+        }
+      ],
+      "packageName": "sharp"
+    },
+    {
+      "entry": "node_modules/sharp/node_modules/semver",
+      "lockedVersion": "7.8.5",
+      "licenseMetadata": "ISC",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 765,
+          "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/sharp/node_modules/semver/LICENSE"
+        }
+      ],
+      "packageName": "semver"
+    },
+    {
+      "entry": "node_modules/shebang-command",
+      "lockedVersion": "2.0.0",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "license",
+          "bytes": 1116,
+          "sha256": "69dee148a2cc470554dfa7142e830662062394d0fe67cddd379aba90dc60d6b3",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/shebang-command/license"
+        }
+      ],
+      "packageName": "shebang-command"
+    },
+    {
+      "entry": "node_modules/shebang-regex",
+      "lockedVersion": "3.0.0",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "license",
+          "bytes": 1109,
+          "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/shebang-regex/license"
+        }
+      ],
+      "packageName": "shebang-regex"
+    },
+    {
+      "entry": "node_modules/source-map-js",
+      "lockedVersion": "1.2.1",
+      "licenseMetadata": "BSD-3-Clause",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1526,
+          "sha256": "6cb0631f71c7749763fd3dd1d5bee52dd1070ec17f2edc1710079ad070bd2fbd",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/source-map-js/LICENSE"
+        }
+      ],
+      "packageName": "source-map-js"
+    },
+    {
+      "entry": "node_modules/stats-gl",
+      "lockedVersion": "2.4.2",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [],
+      "packageName": "stats-gl"
+    },
+    {
+      "entry": "node_modules/stats-gl/node_modules/three",
+      "lockedVersion": "0.170.0",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1081,
+          "sha256": "4c40a1ef62450b857c3b2aaf294936304cd552d965fbcd9d32d4c5bcf4ba4454",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/stats-gl/node_modules/three/LICENSE"
+        }
+      ],
+      "packageName": "three"
+    },
+    {
+      "entry": "node_modules/stats.js",
+      "lockedVersion": "0.17.0",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1082,
+          "sha256": "9d23ed2d037cc4b97860dc61dc3787ca2c1faac8b11402064a6fa90e91360adc",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/stats.js/LICENSE"
+        }
+      ],
+      "packageName": "stats.js"
+    },
+    {
+      "entry": "node_modules/styled-jsx",
+      "lockedVersion": "5.1.6",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "license.md",
+          "bytes": 1077,
+          "sha256": "24d4a4580df855c345705b3016404f0c9da7e7674dc3b21a3ce7d0e5d0c37e2d",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/styled-jsx/license.md"
+        }
+      ],
+      "packageName": "styled-jsx"
+    },
+    {
+      "entry": "node_modules/suspend-react",
+      "lockedVersion": "0.1.3",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1070,
+          "sha256": "997e79b828d8b85d6f18730c8dbf58074811360a199506bd84e1263e17c227a2",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/suspend-react/LICENSE"
+        }
+      ],
+      "packageName": "suspend-react"
+    },
+    {
+      "entry": "node_modules/three",
+      "lockedVersion": "0.185.1",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1081,
+          "sha256": "8b378ebe60e2fe500158cb0ac71cb5e8b7d92953c2abcc63a0eb90499653b5bc",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/three/LICENSE"
+        }
+      ],
+      "packageName": "three"
+    },
+    {
+      "entry": "node_modules/three-mesh-bvh",
+      "lockedVersion": "0.8.3",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1072,
+          "sha256": "b106ef6198a9862ed2b5b873e944ecf3583c631a84a7462d400ecc1910ce7fee",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/three-mesh-bvh/LICENSE"
+        }
+      ],
+      "packageName": "three-mesh-bvh"
+    },
+    {
+      "entry": "node_modules/three-stdlib",
+      "lockedVersion": "2.36.1",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1072,
+          "sha256": "28eb7edf059a39094aa3d169db1fec46ac4a6279c921a90f965828d92ec86e79",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/three-stdlib/LICENSE"
+        }
+      ],
+      "packageName": "three-stdlib"
+    },
+    {
+      "entry": "node_modules/three-stdlib/node_modules/fflate",
+      "lockedVersion": "0.6.11",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1069,
+          "sha256": "62249119bb7df6e54300f37a37145c26a6d4420410aac8881a119c5b427cf751",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/three-stdlib/node_modules/fflate/LICENSE"
+        }
+      ],
+      "packageName": "fflate"
+    },
+    {
+      "entry": "node_modules/troika-three-text",
+      "lockedVersion": "0.52.5",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1102,
+          "sha256": "c514829145810d3bf5730a78b5054250bd1b711b2823f2fc58c2ba89930bce5c",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/troika-three-text/LICENSE"
+        }
+      ],
+      "packageName": "troika-three-text"
+    },
+    {
+      "entry": "node_modules/troika-three-utils",
+      "lockedVersion": "0.52.5",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1102,
+          "sha256": "c514829145810d3bf5730a78b5054250bd1b711b2823f2fc58c2ba89930bce5c",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/troika-three-utils/LICENSE"
+        }
+      ],
+      "packageName": "troika-three-utils"
+    },
+    {
+      "entry": "node_modules/troika-worker-utils",
+      "lockedVersion": "0.52.0",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1102,
+          "sha256": "c514829145810d3bf5730a78b5054250bd1b711b2823f2fc58c2ba89930bce5c",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/troika-worker-utils/LICENSE"
+        }
+      ],
+      "packageName": "troika-worker-utils"
+    },
+    {
+      "entry": "node_modules/tslib",
+      "lockedVersion": "2.8.1",
+      "licenseMetadata": "0BSD",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE.txt",
+          "bytes": 655,
+          "sha256": "210b19e543130388c68654b7497e967119ce17145f66ab7d85688fbd70f08751",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/tslib/LICENSE.txt"
+        }
+      ],
+      "packageName": "tslib"
+    },
+    {
+      "entry": "node_modules/tunnel-rat",
+      "lockedVersion": "0.1.2",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1067,
+          "sha256": "cd14add33d47bcecae9fed5559224ae135c5ec41e1d3a126601f5fbd82291834",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/tunnel-rat/LICENSE"
+        }
+      ],
+      "packageName": "tunnel-rat"
+    },
+    {
+      "entry": "node_modules/tunnel-rat/node_modules/zustand",
+      "lockedVersion": "4.5.7",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1070,
+          "sha256": "c1e6e266563517467b1bf874817d23e426f3149252bd7d42758cd697514b8417",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/tunnel-rat/node_modules/zustand/LICENSE"
+        }
+      ],
+      "packageName": "zustand"
+    },
+    {
+      "entry": "node_modules/use-sync-external-store",
+      "lockedVersion": "1.6.0",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1088,
+          "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/use-sync-external-store/LICENSE"
+        }
+      ],
+      "packageName": "use-sync-external-store"
+    },
+    {
+      "entry": "node_modules/utility-types",
+      "lockedVersion": "3.11.0",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1124,
+          "sha256": "eba0c3a8b90636744cc57e1a90f2d87767a57cccc86578a8168130f96896c9a9",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/utility-types/LICENSE"
+        }
+      ],
+      "packageName": "utility-types"
+    },
+    {
+      "entry": "node_modules/webgl-constants",
+      "lockedVersion": "1.1.1",
+      "licenseMetadata": null,
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1077,
+          "sha256": "0969fa65680b694452c2c65981df14af5c192da24f2b1f87bdd51d8ed24efcfa",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/webgl-constants/LICENSE"
+        }
+      ],
+      "packageName": "webgl-constants"
+    },
+    {
+      "entry": "node_modules/webgl-sdf-generator",
+      "lockedVersion": "1.1.1",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE.txt",
+          "bytes": 1071,
+          "sha256": "49d4d143fed599deb502a0fe6e02f49832f87e9a3a4cd0502e469596d50faa6d",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/webgl-sdf-generator/LICENSE.txt"
+        }
+      ],
+      "packageName": "webgl-sdf-generator"
+    },
+    {
+      "entry": "node_modules/webrtc-adapter",
+      "lockedVersion": "9.0.6",
+      "licenseMetadata": "BSD-3-Clause",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE.md",
+          "bytes": 1584,
+          "sha256": "00a46c6cfc219593b97586398b477e188391556e70487225d3ff9d60ccda6dce",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/webrtc-adapter/LICENSE.md"
+        }
+      ],
+      "packageName": "webrtc-adapter"
+    },
+    {
+      "entry": "node_modules/which",
+      "lockedVersion": "2.0.2",
+      "licenseMetadata": "ISC",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 765,
+          "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": false,
+          "archive": "node_modules/which/LICENSE"
+        }
+      ],
+      "packageName": "which"
+    },
+    {
+      "entry": "node_modules/zustand",
+      "lockedVersion": "5.0.14",
+      "licenseMetadata": "MIT",
+      "installed": true,
+      "notices": [
+        {
+          "file": "LICENSE",
+          "bytes": 1070,
+          "sha256": "c1e6e266563517467b1bf874817d23e426f3149252bd7d42758cd697514b8417",
+          "validUtf8": true,
+          "hasCopyrightLiteral": true,
+          "hasPermissionLiteral": true,
+          "archive": "node_modules/zustand/LICENSE"
+        }
+      ],
+      "packageName": "zustand"
+    }
+  ]
+}

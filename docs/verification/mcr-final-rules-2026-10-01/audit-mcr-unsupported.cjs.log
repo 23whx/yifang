@@ -1,0 +1,23 @@
+{
+  "counts": {
+    "ok": 7718,
+    "below-minimum": 7282,
+    "unsupported": 0,
+    "not-winning": 0,
+    "invalid-input": 0
+  },
+  "samples": [],
+  "expanded": {
+    "hands": 15000,
+    "contexts": 129292,
+    "ok": 104165,
+    "below-minimum": 25127,
+    "concealedKongVariants": 7756,
+    "wall": 45512,
+    "discard": 45512,
+    "kong-replacement": 15512,
+    "flower-replacement": 22756,
+    "lastWall": 45512
+  }
+}
+Scorer-only finite structural/event sweep, including immutable inputs, eight-flower gate invariance and independent payments. Not an oracle for all fan values/exclusions, actual event histories or browser play.

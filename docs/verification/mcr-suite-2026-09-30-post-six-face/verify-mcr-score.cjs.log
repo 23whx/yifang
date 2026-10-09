@@ -1,0 +1,7 @@
+PASS: 544 independent wind/dragon family hands, all seat/round winds, pung/kong substitutions and lower-fan exclusions.
+PASS: 151 full-hand All Green positives, 426 qualifying non-green negatives, no-dragon and chow/kong coverage. Not all fan-combination exclusions.
+PASS: full-hand edge/closed/single waits and both completions of two-sided/multiple-pair waits; no local-shape-only wait points.
+PASS: 5116 actual-hand seven/eight-point threshold and flower/payment cases, all 256 flower subsets and all payer seats.
+PASS: 6048 greater-honors knitted completions, 216 duplicate-single rejections, and 14 ordinary seven-pair completions.
+PASS: 152 actual-hand special-event settlements across winner/payer seats and flower counts, plus invalid source guards. Seat permutation evidence, not independent proof of all fan values.
+PASS: pinned MCR scorer mapping, exact thirteen-orphans/shifted-pairs exclusions, self-draw/flowers and independent payments; malformed/illegal inputs. Not all 81 fans or full-round proof.

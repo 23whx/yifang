@@ -1,0 +1,22 @@
+const fs=require('node:fs'),ts=require('typescript'),assert=require('node:assert/strict');
+require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,f);
+const {newSichuanLedger,postSichuanPayments:post,refundSichuanKongs:refund,sichuanWinPayments:win}=require('../lib/mahjong/sichuan-ledger.ts');
+let s=newSichuanLedger();const initial=structuredClone(s);
+s=post(s,'kong:1',[1,2,3].map(from=>({from,to:0,amount:2,kind:'kong'})));
+assert.deepEqual(s.balances,[6,-2,-2,-2]);assert.deepEqual(initial,newSichuanLedger());
+s=post(s,'win:2',win([0,1,2,3],[{seat:1,amount:4},{seat:2,amount:8}],0,false));
+assert.deepEqual(s.balances,[-6,2,6,-2]);
+// Retired winners 1 and 2 pay no later self-draw, but receive their refund.
+s=post(s,'win:3',win([0,3],[{seat:3,amount:4}],3,true));
+assert.deepEqual(s.balances,[-10,2,6,2]);
+s=refund(s,'refund:4',[0]);assert.deepEqual(s.balances,[-16,4,8,4]);
+assert.equal(s.balances.reduce((a,b)=>a+b,0),0);
+assert.throws(()=>refund(s,'refund:4',[0]));
+const count=s.entries.length;s=refund(s,'refund:5',[0]);assert.equal(s.entries.length,count);
+const before=structuredClone(s);
+assert.throws(()=>post(s,'bad',[{from:0,to:1,amount:1,kind:'not-ready'},{from:1,to:1,amount:1,kind:'not-ready'}]));assert.deepEqual(s,before);
+assert.throws(()=>post(s,'bad-refund',[{from:0,to:1,amount:2,kind:'kong-refund',refundOf:0}]));
+assert.throws(()=>win([0,3],[{seat:1,amount:4}],0,false));
+assert.throws(()=>win([0,1],[{seat:0,amount:4}],0,false));
+assert.throws(()=>post(s,'overflow',[{from:0,to:1,amount:Number.MAX_SAFE_INTEGER,kind:'discard-win'}]));
+console.log('PASS: multi-win payer routing, retired-seat exclusion, original-payer kong refunds, zero-sum points, atomic rejection, duplicate settlement/refund and overflow guards. Amount calculation is a separate layer.');

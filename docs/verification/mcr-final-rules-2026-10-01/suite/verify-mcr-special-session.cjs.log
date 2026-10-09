@@ -1,0 +1,11 @@
+PASS: 26 thirteen-orphans, 14 seven-pairs, 12 seven-honors knitted and 48 lesser-honors knitted/combination-dragon action chains.
+PASS: 36 declared combination-dragon real action chains: six suit permutations, pung/chow/kong, self-draw/discard claim, exact fan exclusions and settlement.
+PASS: 12 combination-dragon added-kong action chains: three peer responses, replacement with/without flower, mutually exclusive event fan and exact settlement.
+PASS: six combination-dragon robbed-added-kong action chains: uncommitted kong, transferred tile, fan 47 versus last-copy exclusion and exact payer.
+PASS: one actual clear-straight self-draw retains the absorbed Old Young Pair explanation in the terminal result and exact settlement.
+PASS: 96 actual three-wind self-draw/discard-claim endings retain absorbed wind-pung explanation, independent terminal point and four-seat settlement.
+PASS: 36 actual Outside Hand compound / Three-Suited Terminal Chows upgraded endings retain exact fans, explicit lower-fan causes and four-seat settlement.
+PASS: 144 actual Triple Pung / Outside Hand combination and middle-pair counterexample endings retain four independent fan contributions and settlement.
+PASS: 288 actual concealed Knitted Straight + All Types + Dragon Pung endings distinguish pair-wait from dragon completion and self-draw from discard settlement.
+PASS: 72 actual multi-decomposition high-score endings retain Four Concealed / Three Concealed Pungs, Four Pure Shifted Pungs and lower-fan exclusions.
+Eight broken-shape self-draw/claim refusals; 144 physical IDs, revision, exclusion and four-seat settlement checked. Authored mid-hands, not random-opening or browser proof.

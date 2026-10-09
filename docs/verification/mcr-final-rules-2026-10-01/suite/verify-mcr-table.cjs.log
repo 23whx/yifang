@@ -1,0 +1,2 @@
+PASS: six localized initial Mahjong remote panels expose create/join, disconnected status and no spurious pending action. SSR only.
+PASS: 7552 bilingual four-seat table renders across flower,discard,claim,draw,replacement,finished, remote seat identity, no bots/local restart, locked buttons. Not browser acceptance.

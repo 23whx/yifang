@@ -1,0 +1,1 @@
+PASS MCR private recovery: 947 live actions across two hands, 12 restore-and-continue checkpoints including result/partial confirmations/next hand, all four exact views, zero-sum nonduplicated ledger, historical projections and malformed archives. No transport authentication or page recovery claim.

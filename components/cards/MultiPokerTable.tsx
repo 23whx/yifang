@@ -1,0 +1,24 @@
+"use client";
+import { useState } from 'react';
+import type { Action } from '@/lib/holdem';
+import { cardText } from '@/lib/holdem';
+import type { MultiView } from '@/lib/holdem-multi-session';
+import { multiResultText } from '@/lib/holdem-multi-teaching';
+import ResultDialog from '@/components/ui/ResultDialog';
+
+export default function MultiPokerTable({view:v,locale,onAction,disabled=false}:{view:MultiView;locale:'zh'|'en';onAction:(action:Action)=>void;disabled?:boolean}) {
+  const zh=locale==='zh',[amount,setAmount]=useState(''),a=v.legal;
+  const raiseTo=Number(amount);
+  const validRaise=!!a?.canRaise && amount.trim()!=='' && Number.isSafeInteger(raiseTo) && raiseTo<=a.maxTo && (raiseTo>=a.minTo || raiseTo===a.maxTo);
+  const invalidAmount=amount!=='' && !!a?.canRaise && !validRaise;
+  const cards=(values:number[],count=values.length)=><div className="my-3 flex flex-wrap gap-2">{Array.from({length:count},(_,i)=>{const label=values[i]===undefined?(zh?'暗牌':'Hidden card'):cardText(values[i]);return <span key={i} aria-label={label} className={`grid h-20 w-14 place-items-center rounded border border-[#ae8550] bg-[#fff8e8] text-lg font-bold ${/[♥♦]/.test(label)?'text-[#9b3026]':'text-[#392616]'}`}>{values[i]===undefined?'?':label}</span>;})}</div>;
+  const reason=multiResultText(v,locale);
+  return <div className="min-w-0 space-y-5">
+    <p role="status" className="font-bold">{zh?`第 ${v.hand} 手 · ${['翻牌前','翻牌','转牌','河牌'][v.street]} · ${v.over?'本手结束':`轮到座位 ${v.actor+1}`} · 按钮在座位 ${v.button+1}`:`Hand ${v.hand} · ${['Pre-flop','Flop','Turn','River'][v.street]} · ${v.over?'Hand ended':`Seat ${v.actor+1} to act`} · Button: seat ${v.button+1}`}</p>
+    <p>{zh?`公共牌（所有人共用），${v.over?'已结算投入':'当前底池'} ${v.committed.reduce((x,y)=>x+y,0)}。`:`Community cards (shared by all); ${v.over?'settled contributions':'current pot'} ${v.committed.reduce((x,y)=>x+y,0)}.`}</p>{cards(v.community)}
+    <div className="grid gap-4 sm:grid-cols-2">{v.stacks.map((stack,i)=><section key={i} className={`min-w-0 border p-4 ${v.actor===i?'border-[#803d2b]':'border-[#ae8550]'}`}><h3 className="font-bold">{zh?`座位 ${i+1}${i===v.seat?'（你）':''}`:`Seat ${i+1}${i===v.seat?' (you)':''}`}</h3>{cards(v.cards[i],v.cardCounts[i])}<p>{zh?`余额 ${stack} · 本轮投入 ${v.bets[i]} · 本手投入 ${v.committed[i]}`:`Balance ${stack} · Street ${v.bets[i]} · Hand ${v.committed[i]}`}</p><p>{v.folded[i]?(zh?'已弃牌／未参与':'Folded / sitting out'):!v.over&&stack===0?(zh?'已全下，仍可争夺符合资格的底池':'All-in; still eligible for matching pots'):''}</p></section>)}</div>
+    {a&&<fieldset disabled={disabled} className="min-w-0 space-y-4 border-t border-rule pt-4"><p>{zh?`跟注只补差额 ${a.call}；加到表示本轮累计投入，不是额外再付。最低加到 ${a.minTo}，最多 ${a.maxTo}。筹码不足完整加注时只能全下。`:`Call adds only ${a.call}. Raise-to means total street contribution, not extra payment. Minimum ${a.minTo}, maximum ${a.maxTo}; a smaller raise is allowed only as an all-in.`}</p><div className="flex flex-wrap gap-3"><button className="btn-sign btn-sign-outline" onClick={()=>onAction({kind:'fold'})}>{zh?'弃牌：放弃本手':'Fold: give up this hand'}</button><button className="btn-sign" onClick={()=>onAction(a.canCheck?{kind:'check'}:{kind:'call'})}>{a.canCheck?(zh?'过牌：不加筹码':'Check: add no chips'):(zh?`跟注 ${a.call}`:`Call ${a.call}`)}</button></div><label className="block">{zh?'本轮加到总额':'Raise-to street total'}<input className="ml-3 w-28 border border-ink p-2" inputMode="numeric" type="number" step="1" aria-invalid={invalidAmount} min={Math.min(a.minTo,a.maxTo)} max={a.maxTo} value={amount} onChange={e=>setAmount(e.target.value)} disabled={!a.canRaise}/></label>{invalidAmount&&<p role="status" className="leading-7">{zh?`请输入 ${Math.min(a.minTo,a.maxTo)} 到 ${a.maxTo} 的整数；如果余额不够最低加注，只能填写全下总额 ${a.maxTo}。当前金额不会提交。`:`Enter a whole number from ${Math.min(a.minTo,a.maxTo)} to ${a.maxTo}. If a full raise is unaffordable, only the all-in total ${a.maxTo} is allowed. This amount will not be submitted.`}</p>}<div className="flex flex-wrap gap-3"><button className="btn-sign" disabled={!validRaise} onClick={()=>{if(validRaise&&!disabled)onAction({kind:'raise',to:raiseTo});}}>{zh?'按填写金额加注':'Raise to entered amount'}</button><button className="btn-sign btn-sign-outline" disabled={!a.canRaise} onClick={()=>onAction({kind:'raise',to:a.maxTo})}>{zh?`全下：本轮累计 ${a.maxTo}`:`All-in: street total ${a.maxTo}`}</button></div></fieldset>}
+    <details><summary className="cursor-pointer font-bold">{zh?'逐步行动记录':'Action history'}</summary><ol className="list-decimal pl-6">{v.actions.map((x,i)=><li key={i}>{zh?`座位 ${x.seat+1}：${({fold:'弃牌',check:'过牌',call:'跟注',raise:'下注／加注'} as Record<string,string>)[x.kind]}，本次扣 ${x.paid}，本轮累计 ${x.to}。`:`Seat ${x.seat+1}: ${x.kind}, paid ${x.paid}, street total ${x.to}.`}</li>)}</ol></details>
+    {v.over&&<><p className="whitespace-pre-line leading-8">{reason}</p><ResultDialog key={v.hand} locale={locale} title={zh?'本手结算':'Hand settlement'} reason={reason}/></>}
+  </div>;
+}

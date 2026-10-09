@@ -1,0 +1,70 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),ts=require('typescript');
+require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,f);
+const {scoreRiichi,toRiichiTile,fromRiichiTile}=require('../lib/mahjong/riichi-score.ts');
+const tiles=s=>s.split(' ').map(fromRiichiTile);
+const ctx={seat:1,roundWind:0,from:2};
+const pinfu=tiles('m1 m2 m3 m4 m5 m6 p2 p3 p4 s6 s7 p5 p5');
+const win=fromRiichiTile('s8');
+for(let t=0;t<34;t++)assert.equal(fromRiichiTile(toRiichiTile(t)),t);
+assert.equal(toRiichiTile(31),'z7');assert.equal(toRiichiTile(33),'z5');
+assert.throws(()=>fromRiichiTile('m0'));assert.throws(()=>toRiichiTile(34));
+const ron=scoreRiichi(pinfu,win,[],ctx);
+assert.equal(ron.fu,30);assert.equal(ron.fanshu,1);assert.equal(ron.defen,1000);
+assert.deepEqual(ron.fenpei,[0,1000,-1000,0]);
+for(let seat=0;seat<4;seat++)for(let from=0;from<4;from++)if(from!==seat){
+  const score=scoreRiichi(pinfu,win,[],{...ctx,seat,from});
+  const amount=seat===0?1500:1000;
+  assert.deepEqual(score.fenpei,[0,1,2,3].map(i=>i===seat?amount:i===from?-amount:0));
+}
+const tsumo=scoreRiichi(pinfu,win,[],{...ctx,from:null});
+assert.equal(tsumo.fu,20);assert.equal(tsumo.fanshu,2);assert.equal(tsumo.defen,1500);
+assert.deepEqual(tsumo.fenpei,[-700,1500,-400,-400]);
+const dealer=scoreRiichi(pinfu,win,[],{...ctx,seat:0,from:null});
+assert.deepEqual(dealer.fenpei,[2100,-700,-700,-700]);
+const counters=scoreRiichi(pinfu,win,[],{...ctx,honba:2,riichiSticks:3});
+assert.deepEqual(counters.fenpei,[0,4600,-1600,0]);
+assert.equal(counters.fenpei.reduce((a,b)=>a+b,0),3000,'previously deposited pot is awarded, not deducted again');
+// A discard of either end of a two-sided wait prohibits ron on BOTH ends.
+assert.equal(scoreRiichi(pinfu,win,[],{...ctx,ownDiscards:[fromRiichiTile('s5')]}),null);
+assert.equal(scoreRiichi(pinfu,win,[],{...ctx,temporaryFuriten:true}),null);
+assert.equal(scoreRiichi(pinfu,win,[],{...ctx,riichiFuriten:true}),null);
+assert.ok(scoreRiichi(pinfu,win,[],{...ctx,from:null,ownDiscards:[win],temporaryFuriten:true,riichiFuriten:true}),'furiten does not prohibit tsumo');
+const chow={kind:'chow',tiles:tiles('m1 m2 m3'),open:true,from:0,called:fromRiichiTile('m2')};
+const open=tiles('m4 m5 m6 p2 p3 p4 s6 s7 s8 z1');
+assert.equal(scoreRiichi(open,27,[chow],ctx),null,'complete open hand without yaku is not a win');
+assert.equal(scoreRiichi(open,27,[chow],{...ctx,doraIndicators:[26]}),null,'dora alone is not a yaku');
+assert.throws(()=>scoreRiichi(open,27,[chow],{...ctx,riichi:1}));
+assert.throws(()=>scoreRiichi(open,27,[{...chow,from:2}],ctx));
+// Each dragon pung must retain its atlas identity when translated to library notation.
+for(const dragon of [31,32,33]){
+  const pung={kind:'pung',tiles:[dragon,dragon,dragon],open:true,from:3,called:dragon};
+  const scored=scoreRiichi(open,27,[pung],ctx);
+  assert.equal(scored.fanshu,1);assert.equal(scored.defen,1000);
+  assert.ok(scored.hupai.some(y=>y.name.includes(({31:'中',32:'發',33:'白'})[dragon])));
+}
+const pairs=tiles('m1 m1 m4 m4 m7 m7 p2 p2 p5 p5 p8 p8 z1');
+const seven=scoreRiichi(pairs,27,[],ctx);
+assert.equal(seven.fu,25);assert.equal(seven.fanshu,2);assert.equal(seven.defen,1600);
+const riichi=scoreRiichi(pinfu,win,[],{...ctx,riichi:1});
+assert.equal(riichi.fanshu,2);
+const noUra=scoreRiichi(pinfu,win,[],{...ctx,uraIndicators:[fromRiichiTile('p4')]});
+assert.equal(noUra.fanshu,1,'ura indicators are ignored without riichi');
+const ura=scoreRiichi(pinfu,win,[],{...ctx,riichi:1,uraIndicators:[fromRiichiTile('p4')]});
+assert.equal(ura.fanshu,4,'two p5 tiles add two ura dora only after riichi');
+const kong={kind:'kong',tiles:[33,33,33,33],open:false};
+const concealedKong=scoreRiichi(open,27,[kong],ctx);
+assert.equal(concealedKong.fu,70,'concealed honor kong adds 32 fu and closed ron adds 10');
+assert.equal(concealedKong.fanshu,1);assert.equal(concealedKong.defen,2300);
+const orphans=tiles('m1 m9 p1 p9 s1 s9 z1 z2 z3 z4 z5 z6 z7');
+const yakuman=scoreRiichi(orphans,0,[],ctx);
+assert.equal(yakuman.damanguan,1,'declared preset disables double yakuman');
+assert.equal(yakuman.defen,32000);
+assert.throws(()=>scoreRiichi(pinfu,win,[],{...ctx,from:1}));
+assert.throws(()=>scoreRiichi(pinfu,win,[],{...ctx,ippatsu:true}));
+assert.throws(()=>scoreRiichi(pinfu,win,[],{...ctx,replacementDraw:true}));
+assert.throws(()=>scoreRiichi(pinfu,win,[],{...ctx,honba:-1}));
+assert.equal(scoreRiichi(pinfu.slice(1),win,[],ctx),null);
+const snapshot=JSON.stringify({pinfu,chow,open,ctx});
+scoreRiichi(pinfu,win,[],ctx);scoreRiichi(open,27,[chow],ctx);
+assert.equal(JSON.stringify({pinfu,chow,open,ctx}),snapshot);
+console.log('Riichi score adapter PASS: tile mapping, pinfu ron/tsumo, dealer payments, deposits, furiten, no-yaku/dora-only rejection, calls, dragons, seven pairs and yakuman. Not a full-round test.');

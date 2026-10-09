@@ -1,0 +1,17 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),ts=require('typescript');
+require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,f);
+const {validRiichiPayload:valid}=require('../lib/mahjong/riichi-wire.ts');
+const view={seat:1,roundWind:0,handNumber:0,honba:0,pot:0,scores:[25000,25000,25000,25000],ids:[0,1,2,3],turn:0,remaining:69,indicators:['z1'],hands:['_'.repeat(14),'m123456789p1234','_'.repeat(13),'_'.repeat(13)],rivers:[[],[],[],[]]};
+assert.ok(valid({kind:'state',view},1));
+for(const patch of [{seat:0},{ids:[0,1,1,3]},{scores:[NaN,0,0,0]},{remaining:999},{hands:['invalid']},{indicators:['z9']},{rivers:[[],[],[],['oops']]}])assert.equal(valid({kind:'state',view:{...view,...patch}},1),false);
+assert.equal(valid({kind:'event',event:{hule:{l:0}}},1),false);
+assert.equal(valid({kind:'event',event:{zimo:{l:4,p:'m1'}}},1),false);
+assert.equal(valid({kind:'event',event:{jieju:{defen:[0,0,0,0],rank:[1,2,3,4],point:['0','0','0','0'],log:[]}}},1),false);
+assert.equal(valid({kind:'decision',decision:{revision:1,choices:[{id:'x',kind:'pass'},{id:'x',kind:'pass'}]}},1),false);
+assert.equal(valid({kind:'decision',decision:{revision:1,choices:[{id:'x',kind:'steal'}]}},1),false);
+assert.equal(valid({kind:'finished',summary:{scores:[1,2,3,4],ranks:[1,1,3,4]}},1),false);
+assert.equal(valid({kind:'ack',request:0,accepted:true},1),false);
+assert.equal(valid({kind:'state',view:{...view,hands:['','z8','','']}},1),false);
+assert.equal(valid({kind:'decision',decision:{revision:1,choices:[{id:'discard:m1',kind:'discard'}]}},1),false);
+assert.ok(valid({kind:'decision',decision:{revision:1,choices:[{id:'call:m1-23',kind:'chi',value:'m1-23'}]}},1));
+console.log('Riichi wire validation PASS: malformed state/event/decision/summary/ack rejection and valid call representation. Schema checks do not prove host fairness.');

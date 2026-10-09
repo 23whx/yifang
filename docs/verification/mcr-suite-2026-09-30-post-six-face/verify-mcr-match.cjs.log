@@ -1,0 +1,2 @@
+PASS: actual completed-match component markup names the cumulative winner, distinguishes match from final-hand result, uses full wind names; bilingual single/two-way/four-way ties verified. Server rendering only, not modal interaction evidence.
+PASS: complete fixed-seat 16-hand MCR match, 7244 actions, 4 wins; four wind/dealer cycles, exactly-once zero-sum ledger, unanimous consent, retained final results, stale next-hand rejection and private seed. Headless, not full rule/UI/network proof.

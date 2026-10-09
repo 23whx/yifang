@@ -1,26 +1,176 @@
 @import "tailwindcss";
+@import "./rpg.css";
+@import "./go.css";
+@import "./desk.css";
+@import "./seo.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-display-latin: "Big Shoulders Variable";
+  --font-body-latin: "Literata Variable";
+  --font-display-cjk: "Noto Serif SC Variable";
+  --font-body-cjk: "Noto Sans SC Variable";
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/*
+  弈方 · Yifang — 视觉令牌
+  世界：街头残局招牌 × 棋谱刊物。平涂朱红、墨黑、纸白；印刷格线；巨型标题。
+*/
+@theme {
+  --color-paper: #f3e7cd;
+  --color-paper-2: #e9d7b6;
+  --color-ink: #16130f;
+  --color-ink-2: #3d3832;
+  --color-ink-3: #6f6961;
+  --color-rule: rgb(22 19 15 / 0.14);
+  --color-vermilion: #803d2b;
+  --color-vermilion-deep: #a82412;
+  --color-ochre: #f0b400;
+  --color-indigo: #22306d;
+
+  --font-display: var(--font-display-latin), var(--font-display-cjk), serif;
+  --font-body: var(--font-body-latin), var(--font-body-cjk), system-ui, sans-serif;
+  --font-serif-cjk: var(--font-display-cjk), serif;
+
+  --shadow-print: 0 14px 40px -18px rgb(22 19 15 / 0.35);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}
+
+::selection {
+  background: var(--color-vermilion);
+  color: var(--color-paper);
+}
+
+/* 印刷格线：像棋谱纸的底纹 */
+.ruled {
+  background-image:
+    linear-gradient(to right, var(--color-rule) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-rule) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center top;
+}
+
+.ruled-fine {
+  background-image:
+    linear-gradient(to right, var(--color-rule) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-rule) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* 招牌大字 */
+.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+
+.display-cjk {
+  font-family: var(--font-serif-cjk);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1.02;
+}
+
+/* 招牌按钮：实心色块，按下有位移 */
+.btn-sign {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.5rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  border: 2px solid var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  transition:
+    transform 0.28s var(--ease-out-expo),
+    background-color 0.2s,
+    color 0.2s;
+}
+.btn-sign:hover {
+  background: var(--color-vermilion);
+  border-color: var(--color-vermilion);
+}
+.btn-sign:active {
+  transform: translateY(2px);
+}
+.btn-sign:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.btn-sign-outline {
+  background: transparent;
+  color: var(--color-ink);
+}
+.btn-sign-outline:hover {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-paper);
+}
+.btn-sign-paper {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  border-color: var(--color-paper);
+}
+.btn-sign-paper:hover {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  border-color: var(--color-ink);
+}
+
+/* 正文阅读 */
+.prose-yf {
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  color: var(--color-ink-2);
+  max-width: 68ch;
+}
+.prose-yf p + p {
+  margin-top: 1.1em;
+}
+
+/* 记谱 */
+.notation {
+  font-family: var(--font-display-latin), monospace;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 0.9s var(--ease-out-expo) both;
+}
+.rise-2 {
+  animation-delay: 0.12s;
+}
+.rise-3 {
+  animation-delay: 0.24s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
 }

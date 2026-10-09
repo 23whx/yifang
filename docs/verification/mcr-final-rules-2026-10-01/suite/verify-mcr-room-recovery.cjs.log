@@ -1,0 +1,1 @@
+PASS 5 MCR room restores including opening, midhand, result and half-confirmed result, continued actions and second restore, stable identity/fresh epoch, precise seat prefixes, credential/tamper/ahead/old-message rejection and no secrets in frames. Direct room API, not authenticated transport or browser.

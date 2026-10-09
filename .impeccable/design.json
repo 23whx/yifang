@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-02T02:50:00+08:00",
+  "title": "Design System: 弈方 · Yifang",
+  "extensions": {
+    "colorMeta": {
+      "vermilion": { "role": "primary", "displayName": "朱红 Vermilion", "canonical": "#d8321a", "tonalRamp": ["oklch(22% 0.09 32)", "oklch(32% 0.13 32)", "oklch(42% 0.17 32)", "oklch(52% 0.20 32)", "oklch(58% 0.21 32)", "oklch(68% 0.16 32)", "oklch(82% 0.09 32)", "oklch(94% 0.03 32)"] },
+      "vermilion-deep": { "role": "primary", "displayName": "深朱红 Vermilion Deep", "canonical": "#a82412", "tonalRamp": ["oklch(20% 0.08 32)", "oklch(28% 0.11 32)", "oklch(36% 0.14 32)", "oklch(44% 0.16 32)", "oklch(52% 0.18 32)", "oklch(64% 0.14 32)", "oklch(80% 0.08 32)", "oklch(93% 0.03 32)"] },
+      "ochre": { "role": "tertiary", "displayName": "赭黄 Ochre", "canonical": "#f0b400", "tonalRamp": ["oklch(25% 0.06 85)", "oklch(38% 0.09 85)", "oklch(50% 0.12 85)", "oklch(62% 0.15 85)", "oklch(74% 0.17 85)", "oklch(82% 0.17 85)", "oklch(90% 0.10 85)", "oklch(96% 0.04 85)"] },
+      "paper": { "role": "neutral", "displayName": "纸白 Paper", "canonical": "#ffffff", "tonalRamp": ["oklch(15% 0 0)", "oklch(30% 0 0)", "oklch(45% 0 0)", "oklch(60% 0 0)", "oklch(75% 0 0)", "oklch(88% 0 0)", "oklch(96% 0 0)", "oklch(100% 0 0)"] },
+      "paper-2": { "role": "neutral", "displayName": "次纸 Paper 2", "canonical": "#f3f2ee", "tonalRamp": ["oklch(15% 0.005 90)", "oklch(30% 0.005 90)", "oklch(45% 0.005 90)", "oklch(60% 0.005 90)", "oklch(75% 0.005 90)", "oklch(88% 0.005 90)", "oklch(96% 0.005 90)", "oklch(99% 0.003 90)"] },
+      "ink": { "role": "neutral", "displayName": "墨 Ink", "canonical": "#16130f", "tonalRamp": ["oklch(15% 0.01 70)", "oklch(25% 0.01 70)", "oklch(35% 0.01 70)", "oklch(45% 0.01 70)", "oklch(55% 0.01 70)", "oklch(70% 0.01 70)", "oklch(85% 0.01 70)", "oklch(95% 0.005 70)"] },
+      "ink-2": { "role": "neutral", "displayName": "墨二 Ink 2", "canonical": "#3d3832", "tonalRamp": ["oklch(15% 0.01 70)", "oklch(25% 0.01 70)", "oklch(35% 0.01 70)", "oklch(45% 0.01 70)", "oklch(55% 0.01 70)", "oklch(70% 0.01 70)", "oklch(85% 0.01 70)", "oklch(95% 0.005 70)"] },
+      "ink-3": { "role": "neutral", "displayName": "墨三 Ink 3", "canonical": "#6f6961", "tonalRamp": ["oklch(15% 0.01 70)", "oklch(25% 0.01 70)", "oklch(35% 0.01 70)", "oklch(45% 0.01 70)", "oklch(55% 0.01 70)", "oklch(70% 0.01 70)", "oklch(85% 0.01 70)", "oklch(95% 0.005 70)"] },
+      "rule": { "role": "neutral", "displayName": "格线 Rule", "canonical": "rgb(22 19 15 / 0.14)", "tonalRamp": ["rgb(22 19 15 / 0.9)", "rgb(22 19 15 / 0.7)", "rgb(22 19 15 / 0.5)", "rgb(22 19 15 / 0.35)", "rgb(22 19 15 / 0.24)", "rgb(22 19 15 / 0.14)", "rgb(22 19 15 / 0.08)", "rgb(22 19 15 / 0.04)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display（拉丁）", "purpose": "英文 h1、巨型步号、站名。Big Shoulders 800，行高 0.92。" },
+      "display-cjk": { "displayName": "Display（中文）", "purpose": "所有中文 h1 与小尺寸招牌字。Noto Serif SC 900，行高 1.02。" },
+      "headline": { "displayName": "Headline", "purpose": "页面内二级板块标题。" },
+      "title": { "displayName": "Title", "purpose": "教程步骤标题、条目标题。" },
+      "body": { "displayName": "Body", "purpose": ".prose-yf 长文，68ch，行高 1.85。" },
+      "label": { "displayName": "Label", "purpose": "12px 大写栏目标签，字距 0.18em。" },
+      "notation": { "displayName": "Notation", "purpose": "魔方公式与两位步号，tabular-nums。" }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "ease-out-expo", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "唯一缓动：rise 入场与按钮按压位移。" },
+      { "name": "rise", "value": "rise 0.9s var(--ease-out-expo) both; stagger 0.12s / 0.24s", "purpose": "首页首屏一次性入场；prefers-reduced-motion 下关闭。" },
+      { "name": "color-transition", "value": "0.2s", "purpose": "按钮与导航的颜色切换。" },
+      { "name": "press", "value": "transform 0.28s var(--ease-out-expo); active translateY(2px)", "purpose": "招牌按钮按下位移。" }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ],
+    "grids": [
+      { "name": "ruled", "value": "48px", "purpose": "棋具承载区格线底纹。" },
+      { "name": "ruled-fine", "value": "24px", "purpose": "吸顶魔方板的细格线。" }
+    ]
+  },
+  "components": [
+    {
+      "name": "招牌按钮 Primary",
+      "kind": "button",
+      "refersTo": "button-sign",
+      "description": "墨黑实心色块按钮，hover 切朱红，按下位移 2px。",
+      "html": "<button class=\"ds-btn-sign\">从魔方开始 →</button>",
+      "css": ".ds-btn-sign { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.9rem 1.5rem; font-family: var(--font-body, Literata, 'Noto Sans SC', system-ui, sans-serif); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.01em; border: 2px solid var(--color-ink, #16130f); border-radius: 0; background: var(--color-ink, #16130f); color: var(--color-paper, #fff); cursor: pointer; transition: transform 0.28s cubic-bezier(0.16,1,0.3,1), background-color 0.2s, color 0.2s; } .ds-btn-sign:hover { background: var(--color-vermilion, #d8321a); border-color: var(--color-vermilion, #d8321a); } .ds-btn-sign:active { transform: translateY(2px); } .ds-btn-sign:focus-visible { outline: 2px solid var(--color-vermilion, #d8321a); outline-offset: 2px; } .ds-btn-sign:disabled { opacity: 0.4; pointer-events: none; }"
+    },
+    {
+      "name": "招牌按钮 Outline",
+      "kind": "button",
+      "refersTo": "button-sign-outline",
+      "description": "透明底墨边，hover 反转为墨黑底。",
+      "html": "<button class=\"ds-btn-sign-outline\">复位</button>",
+      "css": ".ds-btn-sign-outline { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.9rem 1.5rem; font-family: var(--font-body, Literata, 'Noto Sans SC', system-ui, sans-serif); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.01em; border: 2px solid var(--color-ink, #16130f); border-radius: 0; background: transparent; color: var(--color-ink, #16130f); cursor: pointer; transition: transform 0.28s cubic-bezier(0.16,1,0.3,1), background-color 0.2s, color 0.2s; } .ds-btn-sign-outline:hover { background: var(--color-ink, #16130f); color: var(--color-paper, #fff); } .ds-btn-sign-outline:active { transform: translateY(2px); } .ds-btn-sign-outline:focus-visible { outline: 2px solid var(--color-vermilion, #d8321a); outline-offset: 2px; }"
+    },
+    {
+      "name": "招牌按钮 Paper（深底用）",
+      "kind": "button",
+      "refersTo": "button-sign-paper",
+      "description": "纸白底墨字，放在朱红或墨黑区域上；hover 反转为墨黑底。",
+      "html": "<div class=\"ds-field-vermilion\"><button class=\"ds-btn-sign-paper\">浏览项目</button></div>",
+      "css": ".ds-field-vermilion { background: var(--color-vermilion, #d8321a); padding: 24px; } .ds-btn-sign-paper { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.9rem 1.5rem; font-family: var(--font-body, Literata, 'Noto Sans SC', system-ui, sans-serif); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.01em; border: 2px solid var(--color-paper, #fff); border-radius: 0; background: var(--color-paper, #fff); color: var(--color-ink, #16130f); cursor: pointer; transition: transform 0.28s cubic-bezier(0.16,1,0.3,1), background-color 0.2s, color 0.2s; } .ds-btn-sign-paper:hover { background: var(--color-ink, #16130f); border-color: var(--color-ink, #16130f); color: var(--color-paper, #fff); } .ds-btn-sign-paper:active { transform: translateY(2px); } .ds-btn-sign-paper:focus-visible { outline: 2px solid var(--color-paper, #fff); outline-offset: 2px; }"
+    },
+    {
+      "name": "赭黄标签",
+      "kind": "chip",
+      "refersTo": "tag-ochre",
+      "description": "小面积记号：可玩状态、当前步号。",
+      "html": "<span class=\"ds-tag-ochre\">可玩</span> <span class=\"ds-tag-ochre ds-notation\">03</span>",
+      "css": ".ds-tag-ochre { display: inline-block; background: var(--color-ochre, #f0b400); color: var(--color-ink, #16130f); padding: 4px 8px; font-size: 12px; font-weight: 700; border-radius: 0; } .ds-notation { font-family: var(--font-display-latin, 'Big Shoulders', monospace); letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "格线面板",
+      "kind": "card",
+      "refersTo": "panel-ruled",
+      "description": "承载棋具与示意图的纸面：2px 墨边 + 48px 格线，无圆角无阴影。",
+      "html": "<div class=\"ds-panel-ruled\"><div class=\"ds-panel-head\"><span class=\"ds-tag-ochre ds-notation\">01</span> 认识魔方</div><div class=\"ds-panel-body\"></div><div class=\"ds-panel-bar\"><button class=\"ds-bar-left\">摆出局面</button><button class=\"ds-bar-right\">▶ 演示公式</button></div></div>",
+      "css": ".ds-panel-ruled { border: 2px solid var(--color-ink, #16130f); background: var(--color-paper, #fff); color: var(--color-ink, #16130f); border-radius: 0; font-family: var(--font-body, Literata, 'Noto Sans SC', system-ui, sans-serif); } .ds-panel-head { display: flex; align-items: baseline; gap: 8px; padding: 12px 16px; border-bottom: 2px solid var(--color-ink, #16130f); font-size: 14px; font-weight: 700; } .ds-panel-body { height: 200px; background-color: var(--color-paper, #fff); background-image: linear-gradient(to right, var(--color-rule, rgb(22 19 15 / 0.14)) 1px, transparent 1px), linear-gradient(to bottom, var(--color-rule, rgb(22 19 15 / 0.14)) 1px, transparent 1px); background-size: 24px 24px; } .ds-panel-bar { display: grid; grid-template-columns: 1fr 1fr; border-top: 2px solid var(--color-ink, #16130f); font-size: 14px; font-weight: 700; } .ds-panel-bar button { padding: 12px; border: 0; border-radius: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; transition: background-color 0.2s, color 0.2s; } .ds-bar-left { border-right: 1px solid var(--color-rule, rgb(22 19 15 / 0.14)); } .ds-bar-left:hover { background: var(--color-paper-2, #f3f2ee); } .ds-bar-right { background: var(--color-ink, #16130f) !important; color: var(--color-paper, #fff) !important; } .ds-bar-right:hover { background: var(--color-vermilion, #d8321a) !important; } .ds-tag-ochre { display: inline-block; background: var(--color-ochre, #f0b400); color: var(--color-ink, #16130f); padding: 2px 6px; font-size: 12px; font-weight: 700; } .ds-notation { font-family: var(--font-display-latin, 'Big Shoulders', monospace); letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "顶栏导航",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "纸白顶栏，2px 墨线收底；项间 1px 格线，hover 整项反转为墨黑。",
+      "html": "<header class=\"ds-header\"><a class=\"ds-brand\" href=\"#\"><span class=\"ds-brand-mark\">弈</span><span><span class=\"ds-brand-name\">弈方</span><span class=\"ds-brand-sub\">YIFANG</span></span></a><nav class=\"ds-nav\"><a href=\"#\">魔方</a><a href=\"#\">国际象棋</a><a href=\"#\">中国象棋</a><a href=\"#\">将棋</a><a href=\"#\">围棋</a><a class=\"ds-nav-lang\" href=\"#\">EN</a></nav></header>",
+      "css": ".ds-header { display: flex; align-items: stretch; justify-content: space-between; border-bottom: 2px solid var(--color-ink, #16130f); background: var(--color-paper, #fff); color: var(--color-ink, #16130f); font-family: var(--font-body, Literata, 'Noto Sans SC', system-ui, sans-serif); padding: 0 20px; } .ds-brand { display: flex; align-items: center; gap: 12px; padding: 16px 0; text-decoration: none; color: inherit; line-height: 1; } .ds-brand-mark { display: grid; place-items: center; width: 40px; height: 40px; background: var(--color-vermilion, #d8321a); color: var(--color-paper, #fff); font-family: var(--font-display-cjk, 'Noto Serif SC', serif); font-weight: 900; font-size: 22px; } .ds-brand-name { display: block; font-family: var(--font-display-latin, 'Big Shoulders', sans-serif); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; } .ds-brand-sub { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-ink-3, #6f6961); } .ds-nav { display: flex; align-items: stretch; } .ds-nav a { display: flex; align-items: center; padding: 0 20px; border-left: 1px solid var(--color-rule, rgb(22 19 15 / 0.14)); font-size: 14px; font-weight: 600; color: var(--color-ink-2, #3d3832); text-decoration: none; transition: background-color 0.15s, color 0.15s; } .ds-nav a:hover { background: var(--color-ink, #16130f); color: var(--color-paper, #fff); } .ds-nav a.ds-nav-lang { background: var(--color-paper-2, #f3f2ee); color: var(--color-ink, #16130f); } .ds-nav a.ds-nav-lang:hover { background: var(--color-vermilion, #d8321a); color: var(--color-paper, #fff); }"
+    },
+    {
+      "name": "条目行",
+      "kind": "custom",
+      "refersTo": "list-row",
+      "description": "刊物式横排条目：顶 2px 墨线，行间 1px 格线，标题 hover 切朱红。",
+      "html": "<ol class=\"ds-list\"><li class=\"ds-row\"><a class=\"ds-row-title\" href=\"#\">中国象棋</a><p class=\"ds-row-sub\">河界两岸，将帅不见面。</p></li><li class=\"ds-row\"><a class=\"ds-row-title\" href=\"#\">围棋</a><p class=\"ds-row-sub\">十九路，黑白两色。</p></li></ol>",
+      "css": ".ds-list { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--color-ink, #16130f); font-family: var(--font-body, Literata, 'Noto Sans SC', system-ui, sans-serif); color: var(--color-ink, #16130f); } .ds-row { padding: 28px 0; border-bottom: 1px solid var(--color-rule, rgb(22 19 15 / 0.14)); } .ds-row-title { font-family: var(--font-display-cjk, 'Noto Serif SC', serif); font-weight: 900; font-size: 32px; line-height: 1; letter-spacing: 0.02em; color: inherit; text-decoration: none; transition: color 0.2s; } .ds-row-title:hover { color: var(--color-vermilion, #d8321a); } .ds-row-sub { margin: 8px 0 0; font-size: 14px; color: var(--color-ink-3, #6f6961); }"
+    },
+    {
+      "name": "棋具示意图（中国象棋）",
+      "kind": "custom",
+      "refersTo": "game-diagram",
+      "description": "五种棋具共用的印刷语法：currentColor 单色线 + 朱红/墨黑实心子。",
+      "html": "<svg class=\"ds-diagram\" viewBox=\"0 0 100 100\" fill=\"none\" role=\"img\" aria-hidden=\"true\"><g stroke=\"currentColor\" stroke-width=\"1.1\"><path d=\"M14 14h72M14 23h72M14 32h72M14 41h72M14 50h72M14 59h72M14 68h72M14 77h72M14 86h72M14 95h72\"/><path d=\"M14 14v36M23 14v36M32 14v36M41 14v36M50 14v36M59 14v36M68 14v36M77 14v36M86 14v36\"/><path d=\"M14 59v36M23 59v36M32 59v36M41 59v36M50 59v36M59 59v36M68 59v36M77 59v36M86 59v36\"/><path d=\"M41 14L59 32M59 14L41 32M41 95L59 77M59 95L41 77\"/></g><circle cx=\"50\" cy=\"95\" r=\"4.2\" fill=\"#d8321a\"/><circle cx=\"50\" cy=\"14\" r=\"4.2\" fill=\"currentColor\"/><circle cx=\"23\" cy=\"77\" r=\"4.2\" fill=\"#d8321a\"/><circle cx=\"77\" cy=\"32\" r=\"4.2\" fill=\"currentColor\"/></svg>",
+      "css": ".ds-diagram { width: 180px; height: 180px; color: var(--color-ink, #16130f); display: block; background-image: linear-gradient(to right, var(--color-rule, rgb(22 19 15 / 0.14)) 1px, transparent 1px), linear-gradient(to bottom, var(--color-rule, rgb(22 19 15 / 0.14)) 1px, transparent 1px); background-size: 48px 48px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "街头残局招牌（Streetside Endgame Poster）",
+    "overview": "弈方的视觉世界来自两样印刷品的叠合：街边棋摊挂出的残局招牌（巨字、平涂朱红、墨黑硬边）与一本排版克制的棋谱刊物（纸白、格线、长文阅读）。整个界面只有一种材质——纸——和印在纸上的三种东西：墨、朱、赭。没有玻璃、没有渐变、没有投影、没有圆角。区块之间靠 2px 墨线分隔，而不是靠卡片和间距；整块区域可以被朱红完全占据，而不是给一个小图标点颜色。\n\n密度是\"刊物级\"的：标题巨大（首页中文标题最大 88px，项目页最大 150px），正文宽度锁在 68ch，行高 1.85。信息以横排条目（<ol> + 细格线）而不是卡片网格组织。五种棋具（魔方、国际象棋、中国象棋、将棋、围棋）共用一套 SVG 示意图语法：单色线条 + 实心块，viewBox 统一 100×100。\n\n明确拒绝：深色\"俱乐部工具\"式 UI；奶油纸 + 意大利体衬线的\"书卷气\"默认；圆角卡片 + 柔和阴影的通用 SaaS 外观。",
+    "keyCharacteristics": [
+      "纸白底（纯 #ffffff，非奶油色），墨黑 2px 硬边作为唯一的区块分隔手段",
+      "朱红以整块区域出现（首屏左栏、项目页\"实战\"段），不做点缀",
+      "赭黄只做标记：可玩标签、当前步骤序号底色、深色底上的链接 hover",
+      "中文招牌字 Noto Serif SC 900，拉丁招牌字 Big Shoulders 800–900，正文 Literata / Noto Sans SC",
+      "印刷格线（48px / 24px）作为棋具承载区的底纹",
+      "零圆角、零阴影、零渐变；唯一动效是首屏的一次 rise 入场"
+    ],
+    "rules": [
+      { "name": "整块占据规则（The Whole-Field Rule）", "body": "朱红要么占据一整块区域（一栏、一段、一个按钮），要么不出现。不给图标上色、不给边框上色、不做 10% 透明度的朱红底。", "section": "colors" },
+      { "name": "赭黄只做记号规则（The Marker-Only Rule）", "body": "赭黄只能出现在小面积的记号位置：标签、序号底、hover 色。不做背景、不做按钮主色、不做大字色。", "section": "colors" },
+      { "name": "深底反白规则（The Reverse-Print Rule）", "body": "在朱红或墨黑底上，文字与线条统一切到纸白（text-paper / border-paper）；示意图通过 currentColor 自动跟随。不在深底上用 ink-2 / ink-3 灰阶。", "section": "colors" },
+      { "name": "双字规则（The Two-Face Rule）", "body": "中文标题只用 Noto Serif SC 900；拉丁标题只用 Big Shoulders。不在中文标题里混入 Big Shoulders 之外的拉丁字，不给中文用 Literata 做大字。", "section": "typography" },
+      { "name": "无意大利体规则（The No-Italic Rule）", "body": "整个系统不使用斜体/意大利体，包括引言与强调。强调用字重（font-bold）或朱红色。", "section": "typography" },
+      { "name": "两位步号规则（The Two-Digit Rule）", "body": "步骤序号统一 padStart(2,\"0\")，用 .notation 排版。", "section": "typography" },
+      { "name": "墨线分隔规则（The Ink-Rule Rule）", "body": "区块之间用 2px 墨线，条目之间用 1px 格线。不用留白、不用背景色差、不用卡片去区分区块。", "section": "layout" },
+      { "name": "贴边规则（The Bleed Rule）", "body": "首屏与刊头这类整块色区一律通到视口边缘；只有文字内容受 1400px 容器约束。", "section": "layout" },
+      { "name": "无阴影规则（The No-Shadow Rule）", "body": "任何表面在任何状态下都不加阴影。需要强调\"浮起\"的元素（吸顶板、弹层）用 2px 墨边 + 纸白底。", "section": "elevation" },
+      { "name": "直角规则（The Square-Corner Rule）", "body": "不使用任何 rounded-*。圆只出现在棋子里。", "section": "shapes" },
+      { "name": "两种线宽规则（The Two-Weight Rule）", "body": "UI 线条只有 2px 墨黑与 1px 格线两种；不出现 3px、不出现虚线、不出现彩色边框（朱红底上的边框切为纸白，仍是 2px）。", "section": "shapes" }
+    ],
+    "dos": [
+      "Do 用 2px 墨线（border-ink）分隔区块，用 1px 格线（border-rule）分隔条目。",
+      "Do 让朱红整块出现：一栏、一段、一个按钮。朱红底上的文字与边框全部切纸白。",
+      "Do 中文大字只用 .display-cjk（Noto Serif SC 900），拉丁大字只用 .display（Big Shoulders）；标题尺寸用 clamp()，最小 32px、最大 150px。",
+      "Do 长文套 .prose-yf（68ch / 1.85 行高 / ink-2）。",
+      "Do 棋具与示意图放在 .ruled / .ruled-fine 格线纸面上，不加卡片。",
+      "Do 新棋盘（国际象棋 / 中国象棋 / 将棋 / 围棋）沿用 GameDiagram 语法：单色线 + 朱红 / 墨黑实心棋子，currentColor 跟随容器。",
+      "Do 序号用两位 .notation（01），当前步用赭黄底墨字标记。",
+      "Do 新表面（谜题、术语、名局）复用条目行结构：<ol> 顶 2px 墨线 + 行间 1px 格线，标题 hover 切朱红。"
+    ],
+    "donts": [
+      "Don't 使用任何圆角、阴影、渐变、毛玻璃或半透明白色底。",
+      "Don't 用奶油/米色做底色（底色是纯 #ffffff），不用意大利体。",
+      "Don't 做深色主题或深色工具面板；墨黑只作页脚底与按钮底。",
+      "Don't 用赭黄做背景、大字或按钮主色；它只是记号。",
+      "Don't 用图标库（Lucide / Heroicons）；系统只有一个内联 PlayIcon，其余用文字与 → ← ·。",
+      "Don't 给示意图或棋盘加木纹、贴图、拟真阴影。",
+      "Don't 用卡片网格排列内容条目；用横排条目行。",
+      "Don't 增加新的入场动画或滚动触发动效；rise 只属于首页首屏。"
+    ]
+  }
+}

@@ -1,0 +1,226 @@
+.go-board-shell,
+.go-board-viewport {
+  min-width: 0;
+  width: 100%;
+  max-width: 640px;
+}
+.go-board-viewport {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.go-board-viewport:focus-visible {
+  outline: 3px solid #803d2b;
+  outline-offset: 3px;
+}
+.go-board-pan-hint {
+  display: none;
+}
+.go-board {
+  display: grid;
+  aspect-ratio: 1;
+  padding: 6px;
+  background: linear-gradient(105deg, #ddbb7c, #c69751);
+  border: 8px solid #76502b;
+  box-shadow: 0 6px 20px #38291733;
+  width: 100%;
+  max-width: 640px;
+}
+.go-grid-line {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.go-point {
+  position: relative;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 0;
+  padding: 0;
+  min-width: 0;
+  background: none;
+}
+.go-lines {
+  position: absolute;
+  background:
+    linear-gradient(
+      90deg,
+      transparent calc(50% - 0.5px),
+      #50391f calc(50% - 0.5px),
+      #50391f calc(50% + 0.5px),
+      transparent calc(50% + 0.5px)
+    ),
+    linear-gradient(
+      transparent calc(50% - 0.5px),
+      #50391f calc(50% - 0.5px),
+      #50391f calc(50% + 0.5px),
+      transparent calc(50% + 0.5px)
+    );
+  pointer-events: none;
+}
+.go-stone {
+  position: relative;
+  width: 88%;
+  height: 88%;
+  border-radius: 50%;
+  box-shadow: 2px 3px 3px #0005;
+  display: grid;
+  place-items: center;
+}
+.black .go-stone {
+  background: radial-gradient(circle at 32% 28%, #666, #1d1a17 55%, #090807);
+}
+.white .go-stone {
+  background: radial-gradient(circle at 32% 28%, #fff, #f1e8d5 60%, #b4a78e);
+}
+.go-stone i {
+  width: 25%;
+  height: 25%;
+  border: 1.5px solid #ba692c;
+  border-radius: 50%;
+}
+.go-point.dead .go-stone {
+  opacity: 0.35;
+}
+.go-point:hover:enabled {
+  outline: 1px solid #59391680;
+}
+.go-point:focus-visible {
+  outline: 3px solid #803d2b;
+  z-index: 2;
+}
+@media (max-width: 600px) {
+  .go-board-viewport {
+    max-height: min(65svh, 620px);
+    touch-action: pan-x pan-y;
+  }
+  .go-board {
+    padding: 3px;
+    border-width: 5px;
+    width: max(100%, var(--go-mobile-board-size));
+    max-width: none;
+  }
+  .go-board-pan-hint {
+    display: block;
+    margin-top: 8px;
+    color: #674d2d;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+}
+.go-coordinate {
+  display: grid;
+  place-items: center;
+  font:
+    12px/1 Georgia,
+    serif;
+  color: #382714;
+}
+.go-target {
+  outline: 2px solid #b57919;
+  outline-offset: -2px;
+}
+.go-liberty-mark {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 65%;
+  height: 65%;
+  border-radius: 50%;
+  background: #edf4d9;
+  border: 1px solid #365537;
+  color: #1e4423;
+  font: bold 12px/1 sans-serif;
+}
+.go-lesson {
+  margin: 32px 0 48px;
+  padding: 24px;
+  border: 1px solid #a28458;
+  background: #f0e3c7;
+}
+.go-lesson h2 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.go-lesson h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 20px 0 12px;
+}
+.go-lesson p,
+.go-lesson li {
+  font-size: 14px;
+  line-height: 1.9;
+}
+.go-lesson-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+.go-lesson-tabs,
+.go-lesson-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0;
+}
+.go-lesson button {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #9e8054;
+}
+.go-lesson .go-point {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+}
+.go-lesson button[aria-pressed="true"] {
+  background: #603c22;
+  color: #fff0d1;
+}
+.go-lesson button:disabled {
+  opacity: 0.4;
+}
+.go-lesson ol {
+  list-style: decimal;
+  padding-left: 22px;
+}
+.go-case-select {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+}
+.go-case-select select {
+  min-height: 44px;
+  width: 100%;
+  padding: 8px;
+  background: #fcf4e3;
+  border: 1px solid #9e8054;
+}
+.go-feedback,
+.go-explanation {
+  margin-top: 16px;
+  padding: 12px;
+  border-left: 3px solid #8f642c;
+  background: #fff7e5;
+}
+.go-explanation h4 {
+  font-weight: 700;
+}
+.go-board-caption {
+  margin-top: 10px;
+  color: #674d2d;
+}
+@media (max-width: 800px) {
+  .go-lesson-layout {
+    grid-template-columns: 1fr;
+  }
+  .go-lesson {
+    padding: 16px;
+  }
+}

@@ -1,0 +1,2 @@
+PASS: three original channels -> 12 actions -> interrupted recovery -> authenticated continuation -> 7310 actions to completed 16-hand match -> four authenticated terminal restores, exact projections, no next hand or duplicate settlement.
+PASS: no plaintext bearer in proofs, forged host/reflection/nonce replay/seat/view tampering rejected. Mock data channels + real WebCrypto, not native RTC or persistent browser storage.

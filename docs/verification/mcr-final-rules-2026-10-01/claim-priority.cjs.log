@@ -1,0 +1,1 @@
+PASS: 168 inventory-valid actual match arbitration paths; all 4 source seats and 6 response orders; 2/3 simultaneous wins use nearest turn order; wins beat chow/pung/kong; no early settlement, losing meld, duplicate confirmation payment or input mutation. Authored middle hands, not browser/network or full-history replays.

@@ -1,0 +1,455 @@
+/* The desktop is stationary; only the paper map and its destinations move. */
+.atlas-shell {
+  height: 100svh;
+  min-height: 700px;
+  max-height: none;
+  padding: 0;
+  background: #24150d url("/atlas/desk-scene-v2.webp") center / 100% 100%
+    no-repeat;
+  isolation: isolate;
+}
+body:has(.atlas-shell) .rpg-header {
+  position: absolute;
+  top: 24px;
+  right: 2.5%;
+  width: 200px;
+  height: 64px;
+  padding: 10px 16px;
+  background: linear-gradient(115deg, #291b10e8, #120d08e8);
+  border: 1px solid #806037;
+  box-shadow:
+    inset 0 0 0 4px #1a120b,
+    0 8px 18px #0008;
+}
+body:has(.atlas-shell) .rpg-header nav,
+body:has(.atlas-shell) .rpg-brand small,
+body:has(.atlas-shell) .rpg-brand > span {
+  display: none;
+}
+body:has(.atlas-shell) .rpg-brand {
+  font-size: 20px;
+}
+.atlas-masthead {
+  top: 3%;
+  left: 30%;
+  right: 17%;
+  height: 20%;
+  padding: 24px 7% 18px;
+  background: url("/atlas/title-parchment-v2.webp") center / 100% 100% no-repeat;
+  clip-path: none;
+  box-shadow: none;
+  filter: drop-shadow(0 8px 5px #0006);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.atlas-crown {
+  font:
+    28px/1 Georgia,
+    serif;
+  color: #40280f;
+}
+.atlas-masthead .atlas-eyebrow {
+  font-size: 8px;
+  letter-spacing: 3px;
+}
+.atlas-masthead h1 {
+  font-size: clamp(24px, 2.65vw, 45px);
+  letter-spacing: 3px;
+  margin: 3px 0 6px;
+  white-space: nowrap;
+}
+.atlas-masthead p {
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.atlas-ornament {
+  margin-top: 3px;
+}
+.atlas-sidebar {
+  display: flex;
+  flex-direction: column;
+  top: 25%;
+  left: -1%;
+  bottom: auto;
+  width: 20%;
+  height: 51%;
+  max-height: none;
+  padding: 0;
+  background: url("/atlas/menu-scroll-v2.webp") center / 100% 100% no-repeat;
+  box-shadow: none;
+  border: 0;
+  filter: drop-shadow(7px 12px 7px #0008);
+}
+.atlas-sidebar > a {
+  margin: 0 18%;
+  min-height: 44px;
+  padding: 10px 2px;
+  font: 14px/1.4 var(--font-serif-cjk);
+  flex-shrink: 0;
+}
+.atlas-sidebar > a.active {
+  margin-top: 55%;
+  color: #f5dfb5;
+  background: linear-gradient(90deg, #6e2817bb, #762716, #722818cc);
+  clip-path: polygon(
+    3% 0,
+    98% 4%,
+    100% 25%,
+    97% 50%,
+    100% 78%,
+    97% 100%,
+    0 96%,
+    3% 72%,
+    0 50%
+  );
+  box-shadow: none;
+}
+.atlas-sidebar-note {
+  margin: 12px 20% 4px;
+  font-size: 11px;
+  line-height: 1.8;
+  font-style: italic;
+}
+.atlas-sidebar small {
+  font-size: 8px;
+  letter-spacing: 2px;
+}
+.atlas-toolbar {
+  position: absolute;
+  z-index: 5;
+  left: 20%;
+  right: 5%;
+  top: 22%;
+  margin: 0;
+}
+.atlas-filters button {
+  padding: 7px 12px;
+  min-height: 38px;
+  background: #302015e8;
+  box-shadow: inset 0 0 0 2px #4b321c;
+}
+.atlas-search {
+  background: #24170dde;
+  padding: 8px 12px;
+  border: 1px solid #8b6a3c;
+}
+.atlas-viewport {
+  position: absolute;
+  top: 25%;
+  bottom: 15%;
+  left: 16%;
+  right: 3%;
+  width: auto;
+  height: auto;
+  min-height: 0;
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  background: #c2a174;
+  clip-path: polygon(
+    1% 2%,
+    9% 0,
+    17% 1%,
+    28% 0,
+    35% 2%,
+    44% 0,
+    53% 1%,
+    64% 0,
+    72% 2%,
+    84% 0,
+    97% 1%,
+    99% 8%,
+    98% 18%,
+    100% 29%,
+    99% 42%,
+    100% 53%,
+    99% 68%,
+    100% 79%,
+    98% 89%,
+    99% 97%,
+    91% 99%,
+    80% 97%,
+    69% 100%,
+    58% 98%,
+    49% 100%,
+    39% 97%,
+    28% 100%,
+    19% 98%,
+    8% 100%,
+    1% 97%,
+    2% 84%,
+    0 71%,
+    1% 58%,
+    0 45%,
+    1% 32%,
+    0 20%
+  );
+}
+.atlas-viewport:focus-visible {
+  filter: drop-shadow(0 0 4px #ffd285);
+}
+.atlas-plane {
+  will-change: auto;
+  transition: transform 380ms cubic-bezier(0.18, 0.72, 0.22, 1);
+  background: #c9af7f;
+  isolation: isolate;
+}
+.atlas-plane:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: url("/atlas/northern-atlas-v3.webp") center / 100% 100% no-repeat;
+  filter: none;
+}
+.atlas-plane:after {
+  box-shadow: inset 0 0 45px 12px #6740167a;
+}
+.atlas-viewport[data-gesturing="true"] .atlas-plane {
+  transition: none;
+}
+.atlas-site {
+  width: 9%;
+}
+.atlas-site-name {
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 700;
+  color: #26170b;
+  text-shadow: none;
+  background: url("/atlas/title-parchment-v2.webp") center / 100% 100% no-repeat;
+  border: none;
+  box-shadow: none;
+  padding: 6px 10px;
+  filter: none;
+}
+.atlas-site small {
+  font-size: 10px;
+  line-height: 1.5;
+  color: #fff0d0;
+}
+.atlas-desk-motto {
+  position: absolute;
+  bottom: 5%;
+  left: 43%;
+  width: 30%;
+  padding: 13px 8px;
+  text-align: center;
+  color: #d8b775;
+  font:
+    11px/1.5 Georgia,
+    var(--font-serif-cjk);
+  letter-spacing: 3px;
+  background: linear-gradient(#342315, #1d140d);
+  border: 1px solid #987340;
+  box-shadow:
+    inset 0 0 0 3px #281b10,
+    inset 0 0 0 4px #74522b,
+    0 7px 10px #0008;
+  clip-path: polygon(
+    3% 0,
+    97% 0,
+    100% 25%,
+    100% 75%,
+    97% 100%,
+    3% 100%,
+    0 75%,
+    0 25%
+  );
+}
+.atlas-bottom {
+  position: absolute;
+  left: 24%;
+  right: 5%;
+  bottom: 9%;
+  padding: 0;
+  z-index: 5;
+}
+.atlas-bottom > p {
+  padding: 6px 10px;
+  background: #26190edb;
+  font-size: 10px;
+}
+.atlas-controls {
+  box-shadow:
+    0 4px 8px #0006,
+    inset 0 0 0 2px #50361d;
+}
+.atlas-controls button {
+  min-height: 44px;
+}
+@media (min-width: 1500px) {
+  .atlas-sidebar > a {
+    font-size: 17px;
+    padding-block: 14px;
+  }
+  .atlas-sidebar-note {
+    font-size: 13px;
+    margin-top: 20px;
+  }
+}
+@media (max-width: 1000px) and (min-width: 601px) {
+  .atlas-shell {
+    min-height: 740px;
+  }
+  .atlas-sidebar {
+    width: 25%;
+    height: 47%;
+    left: -3%;
+    top: 30%;
+  }
+  .atlas-sidebar-note,
+  .atlas-sidebar small {
+    display: none;
+  }
+  .atlas-sidebar > a {
+    font-size: 12px;
+  }
+  .atlas-masthead {
+    left: 23%;
+    right: 18%;
+    padding-inline: 5%;
+  }
+  .atlas-masthead h1 {
+    font-size: 23px;
+    letter-spacing: 1px;
+  }
+  .atlas-masthead p {
+    font-size: 9px;
+  }
+  body:has(.atlas-shell) .rpg-header {
+    width: 135px;
+    padding: 8px;
+  }
+  body:has(.atlas-shell) .rpg-brand {
+    font-size: 15px;
+  }
+  body:has(.atlas-shell) .rpg-language {
+    padding-left: 8px;
+  }
+  .atlas-viewport {
+    left: 18%;
+  }
+  .atlas-search input {
+    width: 125px;
+  }
+}
+@media (max-width: 600px) {
+  .atlas-shell {
+    height: auto;
+    min-height: 980px;
+    padding: 235px 12px 150px;
+    background-size: auto 100%;
+    background-position: 20% center;
+  }
+  body:has(.atlas-shell) .rpg-header {
+    top: 10px;
+    right: 12px;
+    width: 132px;
+    height: 44px;
+    padding: 3px 10px;
+    gap: 10px;
+  }
+  body:has(.atlas-shell) .rpg-brand {
+    font-size: 16px;
+  }
+  body:has(.atlas-shell) .rpg-language {
+    padding-left: 8px;
+    font-size: 10px;
+  }
+  .atlas-masthead {
+    top: 63px;
+    left: 2%;
+    right: 2%;
+    height: 138px;
+    padding: 15px 25px;
+  }
+  .atlas-crown {
+    font-size: 22px;
+  }
+  .atlas-masthead h1 {
+    font-size: clamp(21px, 6vw, 27px);
+    letter-spacing: 1px;
+  }
+  .atlas-masthead p {
+    font-size: 9px;
+  }
+  .atlas-masthead .atlas-eyebrow {
+    font-size: 6px;
+  }
+  .atlas-ornament {
+    display: none;
+  }
+  .atlas-sidebar {
+    top: 193px;
+    left: 4%;
+    width: 92%;
+    height: 60px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-image: url("/atlas/title-parchment-v2.webp");
+    padding: 0 16px;
+  }
+  .atlas-sidebar > a,
+  .atlas-sidebar > a.active {
+    margin: 0;
+    padding: 8px 9px;
+    min-height: 38px;
+    font-size: 12px;
+    border: 0;
+  }
+  .atlas-sidebar-note,
+  .atlas-sidebar small {
+    display: none;
+  }
+  .atlas-toolbar {
+    position: relative;
+    inset: auto;
+    margin: 25px 4px 12px;
+  }
+  .atlas-filters button {
+    font-size: 11px;
+    min-height: 40px;
+  }
+  .atlas-viewport {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 400px;
+    min-height: 0;
+  }
+  .atlas-plane {
+    width: 900px;
+    height: 450px;
+  }
+  .atlas-site {
+    width: 9%;
+  }
+  .atlas-bottom {
+    position: relative;
+    inset: auto;
+    margin-top: 12px;
+    gap: 8px;
+  }
+  .atlas-bottom > p {
+    max-width: 135px;
+  }
+  .atlas-mobile-destinations {
+    padding: 14px 0 10px;
+  }
+  .atlas-desk-motto {
+    left: 34%;
+    width: 62%;
+    bottom: 33px;
+    font-size: 9px;
+    letter-spacing: 2px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .atlas-plane {
+    transition: none;
+  }
+}

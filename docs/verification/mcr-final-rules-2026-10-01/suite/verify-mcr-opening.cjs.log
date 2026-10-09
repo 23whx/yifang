@@ -1,0 +1,1 @@
+PASS: 200 real shuffled openings, 495 one-flower transitions, 23 chains; 80 session openings with actor-only stepping, stale/invalid guards, no future view, freeze and dealer handoff. Browser acceptance pending.

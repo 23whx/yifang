@@ -1,0 +1,667 @@
+{
+  "started": "2026-09-30T13:29:38.944Z",
+  "finished": "2026-09-30T13:48:03.141Z",
+  "total": 82,
+  "completed": 82,
+  "failures": 0,
+  "sourceUnchanged": true,
+  "changed": [],
+  "results": [
+    {
+      "name": "verify-mcr-all-chows-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 826
+    },
+    {
+      "name": "verify-mcr-all-green-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 698
+    },
+    {
+      "name": "verify-mcr-ambiguous-seven-pairs-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 768
+    },
+    {
+      "name": "verify-mcr-associated-optimizer-oracle.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 375
+    },
+    {
+      "name": "verify-mcr-basic-combination-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 6437
+    },
+    {
+      "name": "verify-mcr-basic-fans.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 395
+    },
+    {
+      "name": "verify-mcr-chicken-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 438
+    },
+    {
+      "name": "verify-mcr-chow-composition-oracle.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 130567
+    },
+    {
+      "name": "verify-mcr-chow-families.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 11773
+    },
+    {
+      "name": "verify-mcr-chow-overlaps.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 990
+    },
+    {
+      "name": "verify-mcr-composition-oracle.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 290671
+    },
+    {
+      "name": "verify-mcr-concealed-pung-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 1254
+    },
+    {
+      "name": "verify-mcr-concealed-pungs.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 449
+    },
+    {
+      "name": "verify-mcr-decomposition-choice.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 419
+    },
+    {
+      "name": "verify-mcr-double-concealed-kong-transitions.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 432
+    },
+    {
+      "name": "verify-mcr-event-transitions.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 591
+    },
+    {
+      "name": "verify-mcr-fan-help.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 605
+    },
+    {
+      "name": "verify-mcr-fan-labels.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 236
+    },
+    {
+      "name": "verify-mcr-four-chow-exhaustive.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 469
+    },
+    {
+      "name": "verify-mcr-four-kong-opening.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 1007
+    },
+    {
+      "name": "verify-mcr-four-pung-exhaustive.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 9343
+    },
+    {
+      "name": "verify-mcr-four-shifted-terminal.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 2330
+    },
+    {
+      "name": "verify-mcr-four-shifted-ui.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 1213
+    },
+    {
+      "name": "verify-mcr-green-pairs-alphabet.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 17813
+    },
+    {
+      "name": "verify-mcr-high-chow-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 714
+    },
+    {
+      "name": "verify-mcr-high-kong-transitions.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 457
+    },
+    {
+      "name": "verify-mcr-honor-high-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 907
+    },
+    {
+      "name": "verify-mcr-honor-oracle-exhaustive.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 23923
+    },
+    {
+      "name": "verify-mcr-knitted-closed.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 1225
+    },
+    {
+      "name": "verify-mcr-last-copy-claimed-meld.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 815
+    },
+    {
+      "name": "verify-mcr-last-copy.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 527
+    },
+    {
+      "name": "verify-mcr-last-wall-opening.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 2444
+    },
+    {
+      "name": "verify-mcr-low-fans-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 824
+    },
+    {
+      "name": "verify-mcr-manual.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 3049
+    },
+    {
+      "name": "verify-mcr-match.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 23785
+    },
+    {
+      "name": "verify-mcr-melded-hand-kong-transitions.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 669
+    },
+    {
+      "name": "verify-mcr-melded-kong-opening.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 32824
+    },
+    {
+      "name": "verify-mcr-melded-kong-transitions.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 1018
+    },
+    {
+      "name": "verify-mcr-mid-pattern-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 9792
+    },
+    {
+      "name": "verify-mcr-mixed-triple-opening.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 1524
+    },
+    {
+      "name": "verify-mcr-native-seed.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 112989
+    },
+    {
+      "name": "verify-mcr-nine-gates-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 4950
+    },
+    {
+      "name": "verify-mcr-opening.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 673
+    },
+    {
+      "name": "verify-mcr-order-invariance.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 1662
+    },
+    {
+      "name": "verify-mcr-outside-combinations.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 1059
+    },
+    {
+      "name": "verify-mcr-payment-ui.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 575
+    },
+    {
+      "name": "verify-mcr-pung-families.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 459
+    },
+    {
+      "name": "verify-mcr-pure-straight-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 638
+    },
+    {
+      "name": "verify-mcr-rank-families.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 461
+    },
+    {
+      "name": "verify-mcr-rank-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 659
+    },
+    {
+      "name": "verify-mcr-reconnect.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 43981
+    },
+    {
+      "name": "verify-mcr-recovery-ui.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 10657
+    },
+    {
+      "name": "verify-mcr-recovery.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 9469
+    },
+    {
+      "name": "verify-mcr-reversible-mixed-oracle.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 19224
+    },
+    {
+      "name": "verify-mcr-reversible.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 508
+    },
+    {
+      "name": "verify-mcr-robbing-kong-opening.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 14822
+    },
+    {
+      "name": "verify-mcr-room-recovery.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 6310
+    },
+    {
+      "name": "verify-mcr-room.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 1736
+    },
+    {
+      "name": "verify-mcr-save.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 438
+    },
+    {
+      "name": "verify-mcr-score.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 5941
+    },
+    {
+      "name": "verify-mcr-seeded-round-sweep.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 46409
+    },
+    {
+      "name": "verify-mcr-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 7996
+    },
+    {
+      "name": "verify-mcr-settlement.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 219
+    },
+    {
+      "name": "verify-mcr-setup.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 238
+    },
+    {
+      "name": "verify-mcr-seven-shifted-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 579
+    },
+    {
+      "name": "verify-mcr-six-face-pairs-exclusion.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 1412
+    },
+    {
+      "name": "verify-mcr-small-kongs.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 389
+    },
+    {
+      "name": "verify-mcr-special-boundaries.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 450
+    },
+    {
+      "name": "verify-mcr-special-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 4476
+    },
+    {
+      "name": "verify-mcr-table.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 15505
+    },
+    {
+      "name": "verify-mcr-terminal-families.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 499
+    },
+    {
+      "name": "verify-mcr-terminal-wind-oracle.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 135649
+    },
+    {
+      "name": "verify-mcr-three-one-exhaustive.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 11552
+    },
+    {
+      "name": "verify-mcr-three-winds-overlap.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 16256
+    },
+    {
+      "name": "verify-mcr-tile-hog-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 5110
+    },
+    {
+      "name": "verify-mcr-triple-pung-outside.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 885
+    },
+    {
+      "name": "verify-mcr-two-chow-two-pung-exhaustive.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 967
+    },
+    {
+      "name": "verify-mcr-two-kong-transitions.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 693
+    },
+    {
+      "name": "verify-mcr-two-pung-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 1333
+    },
+    {
+      "name": "verify-mcr-wait-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 1315
+    },
+    {
+      "name": "verify-mcr-win-affordance-audit.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 9669
+    },
+    {
+      "name": "verify-mcr-wind-context-session.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "elapsedMs": 1774
+    }
+  ]
+}

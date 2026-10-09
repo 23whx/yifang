@@ -1,0 +1,847 @@
+.rpg-header {
+  height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 4%;
+  background: #21170f;
+  color: #ead5aa;
+  border-bottom: 1px solid #866336;
+  box-shadow: 0 3px 16px #0005;
+  position: relative;
+  z-index: 10;
+}
+.rpg-brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-family: var(--font-serif-cjk);
+  font-size: 24px;
+  white-space: nowrap;
+}
+.rpg-brand > span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 46px;
+  border: 1px solid #b88a46;
+  outline: 1px solid #755029;
+  outline-offset: 3px;
+  color: #e6b96c;
+}
+.rpg-brand small {
+  display: block;
+  font:
+    9px/1.8 Georgia,
+    serif;
+  letter-spacing: 2px;
+  color: #bca37d;
+}
+.rpg-header nav {
+  display: flex;
+  gap: 36px;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+.rpg-header a:hover {
+  color: #ffc978;
+}
+.rpg-language {
+  font-size: 12px;
+  border-left: 1px solid #80603d;
+  padding-left: 20px;
+}
+.atlas-shell {
+  position: relative;
+  padding: 170px 30px 20px 235px;
+  min-height: 790px;
+  height: calc(100svh - 82px);
+  max-height: 1100px;
+  background:
+    radial-gradient(ellipse at 50% 0, #91623a55, transparent 60%),
+    repeating-linear-gradient(
+      2deg,
+      #27180f 0,
+      #301f14 4px,
+      #21160f 7px,
+      #342217 9px
+    );
+  overflow: hidden;
+  color: #392616;
+}
+.atlas-masthead {
+  position: absolute;
+  top: 22px;
+  left: 26%;
+  right: 13%;
+  text-align: center;
+  background: radial-gradient(ellipse, #f3dfb1, #c29a63);
+  padding: 17px 20px 10px;
+  box-shadow: 0 12px 24px #0007;
+  clip-path: polygon(
+    1% 3%,
+    14% 0,
+    27% 3%,
+    42% 0,
+    64% 2%,
+    81% 0,
+    97% 3%,
+    100% 90%,
+    87% 97%,
+    69% 94%,
+    44% 100%,
+    26% 95%,
+    0 98%
+  );
+  z-index: 3;
+}
+.atlas-eyebrow {
+  font:
+    10px/1.8 Georgia,
+    serif;
+  letter-spacing: 3px;
+}
+.atlas-masthead h1 {
+  font-family: var(--font-serif-cjk);
+  font-size: clamp(25px, 3vw, 48px);
+  margin: 5px 0 9px;
+  letter-spacing: 5px;
+  line-height: 1.35;
+}
+.atlas-masthead p {
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+.atlas-ornament {
+  color: #836030;
+  font-size: 11px;
+  display: block;
+  margin-top: 6px;
+}
+.atlas-sidebar {
+  position: absolute;
+  left: 27px;
+  top: 135px;
+  width: 184px;
+  bottom: 68px;
+  max-height: 590px;
+  padding: 25px 12px;
+  text-align: center;
+  background: linear-gradient(
+    95deg,
+    #b88c50,
+    #e8ce96 16%,
+    #e5c895 80%,
+    #bc914f
+  );
+  box-shadow: 0 10px 20px #0008;
+  border-top: 7px solid #785021;
+  border-bottom: 7px solid #785021;
+  z-index: 4;
+}
+.atlas-seal {
+  display: grid;
+  place-items: center;
+  margin: -13px auto 22px;
+  width: 72px;
+  height: 81px;
+  background: #702719;
+  color: #dbb16e;
+  font: 35px var(--font-serif-cjk);
+  border: 2px solid #b68c47;
+  clip-path: polygon(0 0, 100% 0, 100% 83%, 50% 100%, 0 83%);
+}
+.atlas-sidebar .atlas-eyebrow {
+  font-size: 8px;
+  letter-spacing: 1px;
+}
+.atlas-sidebar h2 {
+  font: 24px var(--font-serif-cjk);
+  margin: 8px 0 25px;
+}
+.atlas-sidebar > a {
+  display: block;
+  padding: 16px 4px;
+  font-size: 15px;
+  border-bottom: 1px solid #9473426b;
+}
+.atlas-sidebar .active {
+  background: #792f21;
+  color: #f2dbac;
+  box-shadow: inset 0 0 8px #36150d;
+}
+.atlas-sidebar-note {
+  font: 13px/1.8 var(--font-serif-cjk);
+  margin: 24px 10px 10px;
+}
+.atlas-compass {
+  display: block;
+  font-size: 75px;
+  line-height: 1.2;
+  color: #85622e;
+}
+.atlas-sidebar small {
+  font: 10px Georgia;
+  letter-spacing: 3px;
+}
+.atlas-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 15px;
+  color: #dac395;
+}
+.atlas-filters {
+  display: flex;
+  gap: 6px;
+}
+.atlas-filters button {
+  font-size: 12px;
+  padding: 8px 15px;
+  border: 1px solid #82603c;
+  background: #2f2117;
+}
+.atlas-filters button[aria-pressed="true"] {
+  background: #6f3525;
+  border-color: #d3a460;
+  color: #ffdeb0;
+}
+.atlas-search {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border-bottom: 1px solid #96713e;
+  padding: 5px 0;
+}
+.atlas-search input {
+  width: 175px;
+  font-size: 12px;
+  outline: none;
+  background: transparent;
+  color: #f5dcae;
+}
+.atlas-search:focus-within {
+  outline: 2px solid #cba267;
+  outline-offset: 5px;
+}
+.atlas-viewport {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: calc(100% - 112px);
+  min-height: 450px;
+  border: 7px solid #a37842;
+  outline: 1px solid #c4a06b;
+  box-shadow: 0 8px 40px #0009;
+  touch-action: none;
+  cursor: grab;
+  background: #bca77a;
+}
+.atlas-viewport:active {
+  cursor: grabbing;
+}
+.atlas-plane {
+  position: absolute;
+  inset: 0;
+  transform-origin: center;
+  background: url("/atlas/northern-atlas.webp") center/100% 100% no-repeat;
+  will-change: transform;
+  user-select: none;
+}
+.atlas-plane:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 55px #56381870;
+}
+.atlas-routes {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.atlas-site {
+  position: absolute;
+  width: 17%;
+  transform: translate(-50%, -62%);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  cursor: pointer;
+  z-index: 2;
+  border: 0;
+  background: none;
+  color: #352414;
+  isolation: isolate;
+}
+.atlas-building {
+  display: block;
+  background-image: url("/atlas/buildings.webp");
+  background-size: 400% 200%;
+  background-repeat: no-repeat;
+  width: 100%;
+  aspect-ratio: 1.2;
+  filter: drop-shadow(0 8px 4px #3a27165c);
+  transition:
+    filter 0.2s,
+    transform 0.2s;
+}
+.atlas-site:hover .atlas-building,
+.atlas-site:focus-visible .atlas-building {
+  filter: drop-shadow(0 0 9px #f8d682);
+  transform: translateY(-4px);
+}
+.atlas-site-name {
+  margin-top: -8px;
+  display: block;
+  position: relative;
+  white-space: nowrap;
+  font-family: var(--font-serif-cjk);
+  font-size: clamp(10px, 1.05vw, 18px);
+  padding: 6px 14px;
+  background: linear-gradient(
+    90deg,
+    #c5a166,
+    #f4dfb1 20%,
+    #e7c58d 85%,
+    #b38a50
+  );
+  border-block: 1px solid #7b572c;
+  box-shadow: 0 4px 5px #3c281854;
+}
+.atlas-site small {
+  font-size: clamp(7px, 0.7vw, 11px);
+  margin-top: 4px;
+  background: #382617dd;
+  color: #f5deb1;
+  padding: 3px 7px;
+  white-space: nowrap;
+}
+.ocean-label {
+  position: absolute;
+  font: italic 11px Georgia;
+  letter-spacing: 4px;
+  color: #5e66538f;
+  pointer-events: none;
+}
+.atlantic {
+  left: 32%;
+  top: 60%;
+  transform: rotate(-28deg);
+}
+.pacific {
+  left: 4%;
+  top: 73%;
+  transform: rotate(12deg);
+}
+.atlas-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  color: #c4aa7e;
+  padding: 17px 0 0;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.atlas-controls {
+  display: flex;
+  align-items: center;
+  border: 1px solid #9d7946;
+  background: #241a12;
+  color: #e7c895;
+}
+.atlas-controls button {
+  width: 40px;
+  height: 36px;
+  font-size: 19px;
+}
+.atlas-controls output {
+  min-width: 49px;
+  text-align: center;
+  font: 12px Georgia;
+}
+.atlas-controls button:disabled {
+  opacity: 0.35;
+}
+.atlas-controls button:hover:enabled {
+  background: #714e29;
+}
+.atlas-empty {
+  position: absolute;
+  inset: 40% 10% auto;
+  background: #f1dcb6;
+  padding: 20px;
+  text-align: center;
+}
+.atlas-mobile-destinations {
+  display: none;
+}
+.atlas-dialog {
+  padding: 0;
+  border: 2px solid #997042;
+  max-width: 760px;
+  width: calc(100% - 32px);
+  max-height: 90svh;
+  overflow: auto;
+  margin: auto;
+  background: #eddbb5;
+  color: #39291d;
+  box-shadow: 0 25px 100px #0008;
+}
+.atlas-dialog[open] {
+  display: grid;
+  grid-template-columns: 270px 1fr;
+}
+.atlas-dialog::backdrop {
+  background: #170e08bb;
+  backdrop-filter: blur(5px);
+}
+.atlas-dialog-art {
+  display: flex;
+  align-items: center;
+  background:
+    radial-gradient(#88633360, #c7a570),
+    url("/atlas/northern-atlas.webp") center/cover;
+  padding: 10px;
+}
+.atlas-dialog-copy {
+  padding: 36px 25px;
+}
+.atlas-dialog-copy h2 {
+  font: 30px/1.5 var(--font-serif-cjk);
+  margin: 8px 0 12px;
+}
+.atlas-dialog-copy p {
+  font-size: 14px;
+  line-height: 1.9;
+  margin-bottom: 14px;
+}
+.atlas-game-name {
+  font-weight: bold;
+}
+.atlas-dialog-copy dl {
+  display: flex;
+  gap: 20px;
+  border-block: 1px solid #9c774e66;
+  padding: 15px 0;
+  margin: 22px 0;
+}
+.atlas-dialog-copy dt {
+  font-size: 10px;
+  color: #70593d;
+}
+.atlas-dialog-copy dd {
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: bold;
+}
+.atlas-close {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  width: 36px;
+  height: 36px;
+  font-size: 25px;
+  background: #f4e1bb;
+  z-index: 2;
+}
+.atlas-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+}
+.rpg-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  background: linear-gradient(#765030, #342316);
+  color: #f2d5a0;
+  border: 1px solid #ae8550;
+  box-shadow: inset 0 0 0 3px #3e291a;
+  font-size: 13px;
+}
+.rpg-button.secondary {
+  background: transparent;
+  box-shadow: none;
+  color: #49321e;
+}
+.atlas-more {
+  display: block;
+  margin-top: 20px;
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.rpg-directory {
+  padding: 65px 5%;
+  max-width: 1440px;
+  margin: auto;
+}
+.rpg-directory > h1 {
+  font: clamp(30px, 4vw, 52px)/1.5 var(--font-serif-cjk);
+  margin: 10px 0 15px;
+}
+.rpg-directory > p {
+  max-width: 650px;
+  font-size: 15px;
+  line-height: 1.9;
+  color: #6c5133;
+}
+.rpg-game-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+  margin-top: 40px;
+}
+.rpg-game-card {
+  padding: 15px 20px 25px;
+  background: linear-gradient(#e4c895, #f1e1bf);
+  border: 1px solid #ae8658;
+  box-shadow: 0 6px 18px #573b1614;
+  text-align: center;
+}
+.rpg-game-card .atlas-building {
+  max-width: 250px;
+  margin: auto;
+}
+.rpg-game-card small {
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.rpg-game-card h2 {
+  font: 24px var(--font-serif-cjk);
+  margin: 13px 0;
+}
+.rpg-game-card p {
+  font-size: 12px;
+  line-height: 1.8;
+  min-height: 45px;
+}
+.rpg-game-card > span:last-child {
+  display: block;
+  font-size: 12px;
+  margin-top: 15px;
+  border-top: 1px solid #ad8e61;
+  padding-top: 15px;
+}
+.rpg-game-card:hover {
+  border-color: #693a24;
+}
+.academy-list {
+  margin-top: 40px;
+}
+.academy-list section {
+  margin-bottom: 40px;
+}
+.academy-list h2 {
+  font: 26px var(--font-serif-cjk);
+  margin-bottom: 15px;
+}
+.academy-list a {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+  padding: 22px 10px;
+  border-bottom: 1px solid #b1956b;
+}
+.academy-list a > span {
+  font: 28px Georgia;
+  color: #9b6037;
+}
+.academy-list a > div {
+  flex: 1;
+}
+.academy-list h3 {
+  font-size: 17px;
+  font-weight: bold;
+}
+.academy-list p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #725d41;
+  margin-top: 5px;
+}
+.academy-list small {
+  white-space: nowrap;
+}
+.atlas-shell :focus-visible,
+.rpg-header :focus-visible {
+  outline: 3px solid #c49945;
+  outline-offset: 4px;
+}
+button,
+a,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+}
+@media (min-width: 1700px) {
+  .atlas-shell {
+    padding-left: 270px;
+  }
+  .atlas-sidebar {
+    width: 205px;
+    left: 35px;
+  }
+  .atlas-masthead {
+    left: 29%;
+    right: 17%;
+  }
+}
+@media (max-width: 1000px) {
+  .atlas-shell {
+    padding-left: 25px;
+    height: 850px;
+  }
+  .atlas-sidebar {
+    display: none;
+  }
+  .atlas-masthead {
+    left: 14%;
+    right: 14%;
+  }
+  .atlas-viewport {
+    min-height: 440px;
+  }
+  .rpg-header nav {
+    gap: 20px;
+    letter-spacing: 0;
+  }
+  .rpg-game-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .rpg-header {
+    height: 106px;
+    flex-wrap: wrap;
+    padding: 14px 20px 0;
+    gap: 8px;
+  }
+  .rpg-brand {
+    font-size: 20px;
+  }
+  .rpg-brand > span {
+    width: 30px;
+    height: 33px;
+  }
+  .rpg-brand small {
+    font-size: 7px;
+  }
+  .rpg-header nav {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 10px 0;
+  }
+  .rpg-language {
+    font-size: 11px;
+  }
+  .atlas-shell {
+    padding: 154px 12px 20px;
+    height: auto;
+    min-height: 0;
+  }
+  .atlas-masthead {
+    top: 18px;
+    left: 4%;
+    right: 4%;
+    padding: 14px 12px 9px;
+  }
+  .atlas-masthead h1 {
+    font-size: 26px;
+    letter-spacing: 2px;
+  }
+  .atlas-masthead p {
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+  .atlas-toolbar {
+    align-items: stretch;
+    gap: 8px;
+    flex-direction: column;
+    margin-bottom: 12px;
+  }
+  .atlas-filters button {
+    flex: 1;
+    padding: 9px 6px;
+  }
+  .atlas-search {
+    padding: 5px 10px;
+  }
+  .atlas-search input {
+    width: 100%;
+    font-size: 14px;
+  }
+  .atlas-viewport {
+    height: 420px;
+    min-height: 0;
+    border-width: 4px;
+  }
+  .atlas-plane {
+    width: 900px;
+    height: 450px;
+    left: 50%;
+    top: 50%;
+    inset: auto;
+    translate: -50% -50%;
+  }
+  .atlas-site-name {
+    font-size: 12px;
+    padding: 5px 9px;
+  }
+  .atlas-site small {
+    font-size: 8px;
+  }
+  .atlas-bottom {
+    align-items: center;
+    padding-top: 14px;
+  }
+  .atlas-bottom > p {
+    max-width: 140px;
+    font-size: 10px;
+    line-height: 1.9;
+  }
+  .atlas-controls button {
+    width: 36px;
+    height: 42px;
+  }
+  .atlas-mobile-destinations {
+    display: flex;
+    overflow: auto;
+    gap: 8px;
+    padding-top: 18px;
+    color: #efcea0;
+    scrollbar-width: thin;
+  }
+  .atlas-mobile-destinations button {
+    white-space: nowrap;
+    font-size: 12px;
+    padding: 10px 14px;
+    border: 1px solid #8e683c;
+    background: #39271a;
+  }
+  .atlas-dialog[open] {
+    display: block;
+  }
+  .atlas-dialog-art {
+    height: 170px;
+    justify-content: center;
+  }
+  .atlas-dialog-art .atlas-building {
+    width: 225px;
+  }
+  .atlas-dialog-copy {
+    padding: 22px;
+  }
+  .atlas-dialog-copy h2 {
+    font-size: 26px;
+  }
+  .rpg-directory {
+    padding: 38px 20px;
+  }
+  .rpg-game-grid {
+    gap: 12px;
+    margin-top: 25px;
+  }
+  .rpg-game-card {
+    padding: 10px;
+  }
+  .rpg-game-card h2 {
+    font-size: 18px;
+  }
+  .rpg-game-card small {
+    font-size: 9px;
+  }
+  .academy-list a {
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .academy-list h3 {
+    font-size: 15px;
+  }
+  .academy-list small {
+    font-size: 10px;
+  }
+  .academy-list a > span {
+    font-size: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .atlas-building {
+    transition: none;
+  }
+  .atlas-plane {
+    will-change: auto;
+  }
+}
+.rpg-hub-hero {
+  background: linear-gradient(100deg, #efdfbc, #ddbd87);
+}
+.rpg-hub-art {
+  background: radial-gradient(ellipse, #a8885166, transparent 70%);
+}
+.rpg-footer {
+  background: #21170f;
+  color: #e7d3af;
+}
+.rpg-footer > div {
+  padding-top: 32px;
+  padding-bottom: 32px;
+}
+.atlas-building {
+  aspect-ratio: 1;
+}
+.go-point:disabled {
+  opacity: 1;
+}
+.atlas-site-name {
+  max-width: 180px;
+  text-align: center;
+}
+.rpg-header a,
+.atlas-sidebar a {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.atlas-sidebar a {
+  justify-content: center;
+}
+.rpg-brand {
+  display: flex !important;
+}
+@media (max-width: 600px) {
+  .atlas-plane {
+    inset: auto;
+    left: 50%;
+    top: 50%;
+  }
+  .atlas-dialog-art .atlas-building {
+    height: 170px;
+    width: 170px;
+  }
+  .rpg-header nav a {
+    min-height: 30px;
+  }
+  .atlas-filters button {
+    min-height: 40px;
+  }
+  .atlas-controls button {
+    min-height: 44px;
+  }
+}

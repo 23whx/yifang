@@ -1,0 +1,3 @@
+PASS: identical 144-tile inventory relocated into opponent open pung versus private hand; only public pung earns +4.
+PASS: physical-inventory-valid self-draw transition with 2 versus 3 publicly visible copies, exact +4 Last Tile points and unchanged prior state. Authored mid-hand fixture, not a replayed opening.
+PASS: physical-inventory-valid discard, win claim and two passes with 2 versus 3 previously visible copies; exact +4 fan points and discarder-only +4 payment. Authored mid-hand fixture, not a replayed opening.

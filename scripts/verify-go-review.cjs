@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),ts=require('typescript');
+require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,f);
+const {newGo}=require('../lib/go/rules.ts');const {newReview,changeReview,reviewDone,validReview}=require('../lib/go/review.ts');
+const b=newGo();b.board[0]=b.board[1]=1;b.board[4]=2;b.passes=2;
+let r=changeReview(b,newReview(),0,{kind:'toggle',point:0},0);assert.deepEqual(r.dead,[0,1]);
+r=changeReview(b,r,0,{kind:'confirm'},r.revision);assert.deepEqual(r.approved,[true,false]);
+assert.throws(()=>changeReview(b,r,1,{kind:'confirm'},0));
+r=changeReview(b,r,1,{kind:'toggle',point:4},r.revision);assert.deepEqual(r.approved,[false,false]);
+assert.ok(validReview(r,b));assert.equal(validReview({...r,dead:[0]},b),false);assert.equal(validReview({...r,dead:[90]},b),false);
+r=changeReview(b,r,0,{kind:'confirm'},r.revision);r=changeReview(b,r,1,{kind:'confirm'},r.revision);assert.ok(reviewDone(r));
+assert.throws(()=>changeReview(b,r,1,{kind:'resume'},r.revision));
+const resumed=changeReview(b,newReview(),1,{kind:'resume'},0);assert.ok(resumed.resumed);assert.deepEqual(resumed.dead,[]);
+b.passes=0;assert.throws(()=>changeReview(b,newReview(),0,{kind:'confirm'},0));
+console.log('PASS: whole-group proposals, stale revision rejection, edits revoke consent, dual confirmation, resume and closed review guards.');

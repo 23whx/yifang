@@ -1,0 +1,4 @@
+PASS: 21 basic/context fan definitions, 78 positive/counterexample checks, repeatable Tile Hog, zero-fan ron/flowers and one-point self-draw rejection.
+PASS: All Simples suppresses its inherent No Honors point with an explicit exclusion cause; a terminal-bearing suited hand retains No Honors.
+PASS: Outside Hand + All Chows combine, with pair/chow/pung counterexamples and conserved payments.
+PASS: three-suit Full Flush/All Chows imply No Honors; removing either upper pattern restores its independent point and exact self-draw payment.
