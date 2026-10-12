@@ -25,9 +25,9 @@ export default async function Collection({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const zh = locale === "zh";
-  return (
+  return (<>
+    <Breadcrumbs locale={locale} items={[{name:zh?'弈方首页':'Yifang home',path:`/${locale}`},{name:pageCopy[locale].title,path:`/${locale}/collection`}]} />
     <div className="rpg-directory">
-      <Breadcrumbs locale={locale} items={[{name:zh?'弈方首页':'Yifang home',path:`/${locale}`},{name:pageCopy[locale].title,path:`/${locale}/collection`}]} />
       <PageSchema locale={locale} path="/collection" name={pageCopy[locale].title} description={pageCopy[locale].description} type="CollectionPage"
         items={games.map(g => ({name:g.name[locale],path:`/${locale}/${g.slug}`}))} />
       <span className="atlas-eyebrow">THE EXPLORER’S COLLECTION</span>
@@ -65,5 +65,5 @@ export default async function Collection({
         })}
       </div>
     </div>
-  );
+  </>);
 }

@@ -18,8 +18,8 @@ export const cubeTutorials: Tutorial[] = [
         title: { zh: "六个面，六个字母", en: "Six faces, six letters" },
         body: {
           zh: [
-            "把魔方拿在手里，正对你的那一面叫 F（Front，前），对面是 B（Back，后）；上面是 U（Up），下面是 D（Down）；右手边是 R（Right），左手边是 L（Left）。注意：字母指的是相对你的方位，不是颜色。你换个方向拿，F 就变成另一种颜色。",
-            "一个单独的字母表示把那一面顺时针转 90°——「顺时针」以你正对着那个面看为准。这一点最容易出错：B 面的顺时针，从正面看过去其实是逆时针。演示一下 R，看右面怎么动。",
+            "把魔方拿在手里：正对你的那一面叫 F（Front，前），它对面的叫 B（Back，后）；上面是 U（Up），下面是 D（Down）；右手边是 R（Right），左手边是 L（Left）。字母表示的是相对你的方位，不是颜色。换个方向拿，F 就会变成另一种颜色。",
+            "只写一个字母，表示把那一面顺时针转 90°。“顺时针”要以正对那一面看为准，这是最容易出错的地方：比如 B 面的顺时针，从正面看过去其实是逆时针。演示一下 R，看看右面是怎么转的。",
           ],
           en: [
             "Hold the cube. The face towards you is F (Front), its opposite is B (Back); U (Up) and D (Down) are top and bottom; R (Right) and L (Left) are your two sides. The letters mean position relative to you, not colour — turn the cube and F becomes another colour.",
@@ -31,11 +31,11 @@ export const cubeTutorials: Tutorial[] = [
       },
       {
         id: "suffixes",
-        title: { zh: "撇与 2：方向和角度", en: "Prime and 2: direction and angle" },
+        title: { zh: "撇号和 2：方向和角度", en: "Prime and 2: direction and angle" },
         body: {
           zh: [
-            "字母后面加一撇（R'，读作「R 撇」或 R prime）表示逆时针 90°；加 2（R2）表示 180°，方向无所谓。所以每个面只有三种转法：R、R'、R2。",
-            "这里的 U' R2 是先把顶面逆时针转 90°，再把右面转 180°。公式永远从左往右按顺序做，中间不要停下来重新拿魔方。",
+            "字母后面加一撇（R'，读作“R 撇”或 R prime）表示逆时针转 90°；加 2（R2）表示转 180°，往哪边转都一样。所以每个面只有三种转法：R、R'、R2。",
+            "这里的 U' R2 意思是：先把顶面逆时针转 90°，再把右面转 180°。公式永远从左往右按顺序做，中途不要停下来换拿法。",
           ],
           en: [
             "An apostrophe (R', said \"R prime\") means 90° counter-clockwise; a 2 (R2) means 180°, direction irrelevant. So each face has exactly three moves: R, R', R2.",
@@ -66,7 +66,7 @@ export const cubeTutorials: Tutorial[] = [
         body: {
           zh: [
             "R' F R F' 叫 sledgehammer（大锤），和 sexy move 一样是 CFOP 公式里出镜最多的四步之一。左手镜像是 L F' L' F。",
-            "到这里，你练习的是六个外层面的基础记号，不是全部三阶记号。遇到 r、Rw 等双层转动、M/E/S 中层转动或 x/y/z 整颗转体时，请先查该资料的定义、观察方向和演示，再开始操作；不要把它们猜成普通 R/U/F。换一篇教程时也要先核对它的起点与持握方向。",
+            "到这里，你学的是六个外层面的基础记号，还不是三阶魔方的全部记号。别的资料里如果出现 r、Rw 这样的双层转动，M、E、S 这样的中层转动，或者 x、y、z 这样的整体转动，请先查清那份资料的定义和看的方向，不要把它们当成普通的 R、U、F。换一篇教程时，也要先核对它的起始状态和拿法。",
           ],
           en: [
             "R' F R F' is the sledgehammer — with the sexy move, one of the two most common four-move phrases in CFOP. Its left-hand mirror is L F' L' F.",
@@ -104,13 +104,13 @@ export const cubeTutorials: Tutorial[] = [
       },
       {
         id: "cross",
-        title: { zh: "先认清白色十字：把最后一条白棱放回底面", en: "Recognise the white cross: place its last edge" },
+        title: { zh: "先认清白十字：把最后一个白棱放回底面", en: "Recognise the white cross: place its last edge" },
         body: {
           zh: [
-            "先知道目标：白中心周围的四条棱都要白色朝下，而且每条棱的另一种颜色要对齐侧面中心。棱块有两张贴纸，角块有三张；白色角块暂时不算十字。只看到底面有白色加号还不够，侧面也要检查。本页用黄色中心朝上、白色中心朝下、绿色中心朝前的持握方向。",
-            "选择本案例后先不要转：白绿棱在前上方，白贴纸朝上，绿贴纸朝前，与绿中心对齐；其余三条白棱已经在底面正确位置。看六面图的底面，中心旁还缺一个白色格。现在只需要把前面的白绿棱送到底面，不必移动整颗魔方。",
-            "点击一次下一步，执行 F2：只把前面转半圈（180°），不是连续点两次。完成后停下来，核对底面中心及四个相邻格都是白色，前后左右的底部中间贴纸分别对齐各自中心，另外三条白棱仍正确。这个预设起点做完恰好整颗复原；真实打乱完成十字后通常还要处理角块和中层棱。",
-            "这是一条白棱的定位案例，不是任意打乱都能用 F2 解决。实体练习时先找到一条白棱，读出它的另一种颜色和目标中心，再判断当前摆放是否与本例一致。若白色朝向或位置不同，不要硬套 F2；回到入门层先法的白十字步骤练习对应情形。先允许停顿和看底面，能解释每次移动后再练习提前规划，不设闭眼或步数要求。",
+            "先知道目标：白色中心周围的四个棱块都要白色朝下，而且每个棱块的另一种颜色要和侧面中心对齐。棱块有两张贴纸，角块有三张；白色角块暂时不算在十字里。光看到底面有个白色“十”字还不够，侧面也要检查。本页的拿法是黄色中心朝上、白色中心朝下、绿色中心朝前。",
+            "选择本案例后先别转：白绿棱块在前上方，白色朝上，绿色朝前并对准绿色中心；另外三个白棱已经在底面放好了。看六面图的底面，中心旁边还缺一个白色格。现在只需要把前面这个白绿棱送到底面，不用转动整个魔方。",
+            "点一次“下一步”，执行 F2：只把前面转半圈（180°），不是连点两次。做完停下来检查：底面中心和旁边四格都是白色，前后左右四个侧面最下面中间那格都和各自的中心同色，另外三个白棱也还在原位。这个预设起点做完正好整个魔方都还原了；真实打乱时，做完十字通常还要处理角块和中层棱块。",
+            "这只是一个白棱的定位案例，不是说任何打乱都能用 F2 解决。用实体魔方练习时，先找到一个白棱，说出它的另一种颜色和目标中心，再看它现在的位置和方向是不是和本例一样。不一样就不要硬套 F2，回到层先法的白十字那一节，按对应的情况处理。可以随时停下来看底面；先做到能解释每一步，再练提前规划，没有闭眼或步数的要求。",
           ],
           en: [
             "The goal is four white edges around the white center, with white facing down AND each edge's other color matching its side center. An edge has two stickers; a corner has three. White corners do not count towards the cross. A white plus sign alone is not enough: check the sides too. Hold yellow center up, white down and green facing you.",
@@ -127,8 +127,8 @@ export const cubeTutorials: Tutorial[] = [
         title: { zh: "F2L 的核心：配对再插入", en: "The heart of F2L: pair, then insert" },
         body: {
           zh: [
-            "F2L 每次处理一个「槽」——底层一个角块加它上方的中层棱块。思路只有一句话：先在顶层把角块和棱块拼成一对，再把这一对一起送进槽里。四个槽，四次。",
-            "先找到白绿橙角块和绿橙棱块。本例它们已经在顶层配好：角在左前上，棱在前上；两块的绿贴纸都朝上、橙贴纸都朝前。目标槽是绿中心与橙中心之间的右前槽。点 R 抬起槽口；点 U' 把这一对送到右侧；点 R' 把它们一起放回槽中。每一步都停下来对照六面图。",
+            "F2L 每次处理一个“槽”：底层的一个角块，加上它正上方的中层棱块。核心思路只有一句话：先在顶层把角块和棱块拼成一对，再把这一对一起送进槽里。四个槽，做四次。",
+            "先找到白绿橙角块和绿橙棱块。本例中它们已经在顶层配好了：角块在左前上方，棱块在前上方；两块的绿色贴纸都朝上，橙色贴纸都朝前。目标槽是绿色中心和橙色中心之间的右前槽。点 R 把槽口抬起来；点 U' 把这一对送到右边；点 R' 把它们一起放回槽里。每一步都停下来对照六面图。",
           ],
           en: [
             "F2L handles one slot at a time — a bottom corner and the middle edge above it. The whole idea in one sentence: pair the corner and edge in the top layer, then insert the pair into the slot together. Four slots, four times.",
@@ -143,8 +143,8 @@ export const cubeTutorials: Tutorial[] = [
         title: { zh: "同一对换了位置：先转顶层再插入", en: "The same pair in a new position: align, then insert" },
         body: {
           zh: [
-            "本节只练一种明确的起点，不是四种公式的合集。目标仍是把同一对放进右前槽；与上一例相比，这一对在顶层的位置变了，所以先用一步 U 对齐，再用已经学过的三步插入。U 表示只转顶层，不是把整颗魔方转向。保持黄中心朝上、绿中心朝前。",
-            "本例仍处理白绿橙角和绿橙棱：角在右前上、白色朝前；棱在右上，两块绿色都朝上、橙色都朝右。它们已经配对，不是要拆开。第一步 U 把整对移到左前上与前上，然后执行上一节的 R U' R'。完成时白角在底层右前、绿橙棱在它上方，侧面颜色对齐中心。",
+            "本节只练一种明确的起始位置，不是四个公式的合集。目标还是把同一对块放进右前槽；和上一例相比，这一对在顶层的位置变了，所以先用一步 U 对齐，再用学过的三步插入。U 是只转顶层，不是转动整个魔方。保持黄色中心朝上、绿色中心朝前。",
+            "本例还是白绿橙角块和绿橙棱块：角块在右前上方，白色朝前；棱块在右上方，两块的绿色都朝上，橙色都朝右。它们已经配成一对，不用拆开。第一步 U 把整对移到左前上和前上，然后执行上一节的 R U' R'。做完后，白角在底层右前，绿橙棱块在它正上方，侧面颜色都和中心对齐。",
           ],
           en: [
             "This section teaches one specific starting position, not a collection of four formulas. The same pair still belongs in the front-right slot, but it starts elsewhere on top. First align it with U, then use the three-move insertion you already learned. U turns only the top layer, not the whole cube. Keep the yellow center up and the green center facing you.",
@@ -155,11 +155,11 @@ export const cubeTutorials: Tutorial[] = [
       },
       {
         id: "split-pair",
-        title: { zh: "分开的角块和棱块", en: "Corner and edge apart" },
+        title: { zh: "角块和棱块分开时", en: "When the corner and edge are apart" },
         body: {
           zh: [
-            "更常见的情况是角块和棱块都在顶层但不相邻。原则：用 U 层把棱块转到角块的对面或旁边，再用一次 R 或 R' 把角块提起来接住棱块，形成配对，然后三步插入。",
-            "本例白绿橙角在右前上，白色朝上；绿橙棱在后上，绿色朝上、橙色朝后。它们现在分开。前五步 U R U2 R' U 完成配对；执行到第 5 步时，暂停找出左前上角与前上棱：绿色一起朝上，橙色一起朝前。最后 R U' R' 把配好的一对插入右前槽。不要只记“前五步”，要亲眼确认目标两块已经连接。",
+            "更常见的情况是：角块和棱块都在顶层，但没挨在一起。思路是：先用 U 把棱块转到角块的对面或旁边，再用一次 R 或 R' 把角块提起来“接住”棱块，配成一对，最后用三步插入。",
+            "本例开始时，白绿橙角块在右前上方，白色朝上；绿橙棱块在后上方，绿色朝上、橙色朝后，两块是分开的。前五步 U R U2 R' U 把它们配成一对；做到第 5 步时停一下，找到左前上的角块和前上的棱块：绿色一起朝上，橙色一起朝前。最后用 R U' R' 把这一对插入右前槽。不要只记“前五步”，要亲眼确认这两块确实连在一起了。",
           ],
           en: [
             "More often the corner and edge are both on top but apart. The principle: use the U layer to bring the edge next to or opposite the corner, then lift the corner with R or R' to catch the edge and form the pair, then insert with three moves.",
@@ -174,8 +174,8 @@ export const cubeTutorials: Tutorial[] = [
         title: { zh: "F2L 真正的难点：预判", en: "The real skill: lookahead" },
         body: {
           zh: [
-            "「预判」是指处理当前一对时，留意下一对在哪里；它不是新手现在必须同时完成的任务。先只盯住本例的白绿橙角块和绿橙棱块。看不清就停下来，找到两块、确认贴纸方向后再点下一步，不要为了连续转动而猜公式。",
-            "第一轮：每步说出哪个面转了、目标块去了哪里。第二轮：在插入前停下，指出右前槽，并检查这对块的绿、橙贴纸是否与本例相符。最后核对白角在底层、绿橙棱在它上方，侧色对齐中心，其他已经复原的槽没有被破坏。能独立解释并完成后，才在实体魔方的多个槽之间练习寻找下一对；本页三个预设案例不等于所有 F2L 情况。",
+            "“预判”是指处理当前这一对时，同时留意下一对在哪里；新手现在还不需要两件事同时做。先只盯住本例的白绿橙角块和绿橙棱块。看不清就停下来，找到这两块、确认贴纸方向后再点下一步，不要为了连着转而乱猜公式。",
+            "第一遍：每一步都说出转的是哪个面、目标块去了哪里。第二遍：在插入之前停下来，指出右前槽，并检查这对块的绿色、橙色贴纸是否和本例一致。最后检查：白角在底层，绿橙棱块在它上方，侧面颜色和中心对齐，其他已经还原的槽也没有被破坏。能独立解释并做完之后，再用实体魔方练习在几个槽之间找下一对。本页这三个预设案例并不包括所有 F2L 情况。",
           ],
           en: [
             "Lookahead means noticing the next pair while working on the current one. You do not need to do both at once yet. Focus only on this case's white-green-orange corner and green-orange edge. Pause whenever you lose track, find both pieces and check their sticker directions before pressing Next. Do not guess a formula just to keep moving.",
@@ -212,11 +212,11 @@ export const cubeTutorials: Tutorial[] = [
       },
       {
         id: "eo",
-        title: { zh: "OLL 第一步：棱块朝向", en: "OLL look 1: edge orientation" },
+        title: { zh: "OLL 第一步：让黄色棱块朝上", en: "OLL look 1: edge orientation" },
         body: {
           zh: [
-            "目标是让顶面的四条黄棱都朝上，和黄中心组成十字；此时暂时不要求黄角朝上。本演示起点是横线：顶面图中左中、中心、右中三格黄色相连，前中和后中还不是黄。保持绿中心朝前，逐步执行 F R U R' U' F'。结束后检查顶面中心与上下左右五格都是黄，下方两层没有被破坏。L 形和点形需要不同摆放或分阶段处理，不能不看方向地把同一公式机械重复。",
-            "可分成三段理解：F 暂时打开前面；R U R' U' 是四步转动组合；F' 把前面放回。初学不追求速度，每次点击只转一个面，确认之后再继续。",
+            "目标是让顶面四个黄色棱块都朝上，和黄色中心组成十字；这时黄色角块还不用管。本演示的起点是“横线”：顶面图里左中、中心、右中三格是黄色，前中和后中还不是。保持绿色中心朝前，一步一步做 F R U R' U' F'。做完检查：顶面中心和上下左右五格都是黄色，下面两层没有被破坏。L 形和点形需要别的摆法或分两段处理，不能不看方向就反复套同一个公式。",
+            "可以把它分成三段理解：F 暂时把前面打开；R U R' U' 是一组四步；F' 再把前面放回去。初学不追求速度，每点一次只转一个面，看清了再继续。",
           ],
           en: [
             "The goal is four yellow edge stickers facing up around the yellow center; ignore corner orientation for now. This example starts with a horizontal line: left-middle, center and right-middle are yellow in the top diagram, while front-middle and back-middle are not. Keep the green center at front and step through F R U R' U' F'. Finish by checking the five cross stickers and the preserved lower two layers. L and dot cases need their own alignment or staged treatment; blindly repeating without inspecting orientation is not a general solution.",
@@ -230,9 +230,9 @@ export const cubeTutorials: Tutorial[] = [
         title: { zh: "独立案例：黄色 L 形变十字", en: "Separate case: yellow L to cross" },
         body: {
           zh: [
-            "先只看顶面中心和四条棱，不数四个角。黄色中心、左中、后中连成一个 L：在顶面展开图中是中心的左边和上边。前中、右中不是黄。这就是本例的起点，不是把任意两个黄色格都当成 L。保持黄中心朝上、绿中心朝前；若已有四条黄棱朝上，跳过翻棱，不要再套本公式。",
-            "选择案例后先暂停观察，再逐个点击 F、U、R、U'、R'、F'。注意中间四步是 U R U' R'，与横线案例的 R U R' U' 顺序不同。每点一次只执行一步，不需要转动整个魔方。",
-            "第六步后停下来：顶面中心与前后左右四个相邻格应全部黄色，下两层恢复。只完成黄色十字并不等于整个顶面或整颗魔方完成。本例的预设恰好复原整颗；真实局面通常还需要翻角和换位。若实体魔方的 L 朝右前方，先转顶层把它摆成左后方，再对照本例，而不是随意重复公式。",
+            "先只看顶面中心和四个棱块，不看四个角。黄色中心、左中、后中连成一个 L，在顶面展开图中就是中心的左边和上边；前中、右中不是黄色。这是本例的起点，不是说随便两个黄色格子都算 L。保持黄色中心朝上、绿色中心朝前。如果四个黄色棱块已经都朝上了，就跳过这一步，不要再套这个公式。",
+            "选择案例后先停下来观察，再依次点 F、U、R、U'、R'、F'。注意中间四步是 U R U' R'，和横线案例的 R U R' U' 顺序不一样。每点一次只做一步，不需要转动整个魔方。",
+            "第六步做完停下来：顶面中心和前后左右四个相邻格都应该是黄色，下两层也恢复了。只拼出黄十字，不等于整个顶面或整个魔方完成。本例的预设正好整个复原；真实局面通常还需要翻角和换位。如果你实物上的 L 朝向右前方，先只转顶层把它摆到左后方，再对照本例，不要随意重复公式。",
           ],
           en: [
             "Look only at the top center and four edges, not the corners. Yellow at the center, left-middle and back-middle forms an L: left and above the center in the top diagram. Front-middle and right-middle are not yellow. This is the starting pattern; two arbitrary yellow squares do not define it. Keep yellow up and green front. If all four yellow edges already face up, skip edge orientation instead of applying another algorithm.",
@@ -247,10 +247,10 @@ export const cubeTutorials: Tutorial[] = [
         title: { zh: "独立案例：点形分两段变十字", en: "Separate case: dot to cross in two stages" },
         body: {
           zh: [
-            "点形指四条顶棱都没有黄色朝上，中心仍是黄。角上即使有黄色，也不计入判断；所以不是要求顶面九格中只有一格黄色。本例下两层已完成，黄上绿前。目标是先把四条黄棱翻到上面，不是先让所有黄色角归位。",
-            "前六次点击依次执行 F R U R' U' F'。第六步后停下来检查：黄色棱出现在右中和前中，与中心形成右前方的 L。下两层已经恢复，但十字还没完成，不要点重新开始。",
-            "第七次点击 U2，只把顶层转半圈，算一次按钮操作。现在黄色 L 移到左中和后中，正好是上一节 L 形案例的方向。然后第八至十三次点击执行 F U R U' R' F'。两段的中间四步顺序不同，请按按钮逐步走，不要凭记忆加步。",
-            "最后停在第十三步，检查顶面中心和四条棱全部黄色，下两层恢复。这个预设最后整颗复原，但本阶段的通用目标只是十字；其它打乱可能仍要翻角和换位。全过程只转指定层，不转整个魔方。若起点只有两条黄棱朝上，应选择横线或 L 形案例，不要从点形流程开始。",
+            "“点形”是指顶面四个棱块都没有黄色朝上，只有中心是黄色。角上有没有黄色不影响判断，所以并不是要求顶面九格里只有一格黄色。本例下两层已经完成，黄上绿前。目标是先把四个黄色棱块翻到上面，不是先让黄色角块归位。",
+            "前六次点击依次做 F R U R' U' F'。第六步后停下来检查：黄色棱块出现在右中和前中，和中心组成一个朝右前方的 L。下两层已经恢复，但十字还没完成，不要点“重新开始”。",
+            "第七次点击 U2：只把顶层转半圈，算一次按钮操作。现在黄色 L 移到了左中和后中，正好是上一节 L 形案例的方向。然后第八到第十三次点击做 F U R U' R' F'。两段中间的四步顺序不同，请按按钮一步步走，不要凭记忆加步。",
+            "最后停在第十三步，检查顶面中心和四个棱块都是黄色、下两层已恢复。这个预设最后整个复原了，但这一阶段的一般目标只是十字，其他打乱可能还需要翻角和换位。整个过程只转指定的层，不转整个魔方。如果起点已经有两个黄色棱块朝上，应该用横线或 L 形案例，不要从点形流程开始。",
           ],
           en: [
             "A dot means none of the four top edges shows yellow upward; the center is still yellow. Ignore yellow corners: the term does not require exactly one yellow square among all nine. The lower two layers are finished. Hold yellow up and green front. The goal is to orient four yellow edges, not solve the corners first.",
@@ -266,8 +266,8 @@ export const cubeTutorials: Tutorial[] = [
         title: { zh: "OLL 第二步：Sune 与 Anti-Sune", en: "OLL look 2: Sune and Anti-Sune" },
         body: {
           zh: [
-            "先检查黄色十字已完成，再数顶面四个角中有几个黄色朝上。本例是 Sune：只有左前角黄色朝上，前面的右上角贴纸也是黄色。保持黄色中心朝上、绿色中心朝前，选择此案例后逐步执行 R U R' U R U2 R'。只有一个黄角朝上还不足以决定公式；Anti-Sune 的摆放不同，请使用下一节独立案例。",
-            "先用六面图检查三个线索：黄十字已经在、唯一朝上的黄角在左前、前面右上贴纸为黄。三项都对才执行本例。完成后检查顶面九格黄色及下面两层，不要因为看见‘小鱼’就忽略拿法。先学会这一种右手公式；本课没有演示它的左手镜像，不要求自行把 R 改成 L。",
+            "先确认黄十字已经完成，再数顶面四个角有几个黄色朝上。本例是 Sune：只有左前角黄色朝上，前面那一面的右上角贴纸也是黄色。保持黄色中心朝上、绿色中心朝前，选择本案例后一步步做 R U R' U R U2 R'。只有一个黄角朝上还不足以决定用哪个公式；Anti-Sune 的摆法不同，请看下一节的独立案例。",
+            "先用六面图检查三个线索：黄十字已经有了、唯一朝上的黄角在左前、前面右上那张贴纸是黄色。三项都对才执行本例。做完后检查顶面九格都是黄色、下面两层没有被破坏；不要只看到“小鱼”形状就忽略拿法。先学会这个右手公式；本课没有演示它的左手镜像，不要自己把 R 改成 L。",
           ],
           en: [
             "First check the yellow cross, then count yellow-facing top corners. This Sune case has only the front-left corner yellow on top, plus a yellow sticker at the front face’s top-right. Keep yellow up and green front, select this case and step through R U R' U R U2 R'. One yellow corner alone does not select an algorithm: Anti-Sune uses a different alignment in the next separate case.",
@@ -279,12 +279,12 @@ export const cubeTutorials: Tutorial[] = [
       },
       {
         id: "co-antisune",
-        title: { zh: "独立案例：Anti-Sune 的摆放", en: "Separate case: align Anti-Sune" },
+        title: { zh: "独立案例：Anti-Sune 的摆法", en: "Separate case: aligning Anti-Sune" },
         body: {
           zh: [
-            "目标仍是让九张顶面贴纸全部黄色朝上，同时保住下面两层。先看顶面图：上方代表后面，下方代表前面。本例只有右后角（顶面图右上格）黄色朝上；前面左上角和右面左上角有黄色。不要沿用上一例的左前黄角摆放。",
-            "选择案例，先不要转。对照顶面图确认黄色十字和右后黄角。然后每点一次下一步，只做一个记号：R、U2、R'、U'、R、U'、R'。U2 是一次半圈，算一次按钮操作。中途十字暂时变化是正常的，不要自行加步或转动整个魔方。",
-            "第七步后停下来：检查顶面九格全黄、底面全白、四个侧面的下两行与各自中心同色。本例为便于核对，完成时整个魔方恰好复原；真实打乱可能还需 PLL 调整顶层位置。这里学的是朝向，不是承诺所有顶层都一步复原。",
+            "目标还是让顶面九张贴纸全部黄色朝上，同时保住下面两层。先看顶面图：图的上方代表后面，下方代表前面。本例只有右后角（顶面图右上格）黄色朝上；前面那一面的左上角、右面那一面的左上角各有一张黄色贴纸。不要沿用上一例“左前黄角”的摆法。",
+            "选择案例，先别转。对照顶面图确认黄十字和右后的黄角，然后每点一次下一步只做一个记号：R、U2、R'、U'、R、U'、R'。U2 是转半圈，只算一次按钮操作。中途十字暂时变乱是正常的，不要自己加步或转动整个魔方。",
+            "第七步后停下来检查：顶面九格全黄、底面全白、四个侧面的下两排都和各自中心同色。本例为了方便核对，做完正好整个复原；真实打乱可能还需要 PLL 来调整顶层的位置。这里学的是“朝向”，不保证所有顶层都能一步复原。",
           ],
           en: [
             "The goal is nine yellow top stickers while preserving the lower two layers. In the top diagram, back is above and front below. Only the back-right corner (upper-right diagram cell) faces yellow up. Yellow also appears at the top-left of the front and right faces. Do not reuse the previous front-left alignment.",
@@ -296,11 +296,11 @@ export const cubeTutorials: Tutorial[] = [
       },
       {
         id: "co-rest",
-        title: { zh: "OLL 第二步：H、Pi、车灯", en: "OLL look 2: H, Pi, headlights" },
+        title: { zh: "OLL 第二步：H、Pi 和“车灯”", en: "OLL look 2: H, Pi and headlights" },
         body: {
           zh: [
-            "零个或两个黄角朝上时，可以像层先法那样先做一次 Sune 转成一个黄角，也可以直接记对应公式一次解决。零个黄角有两种：H 形（两侧各一对「车灯」相对）用 R U R' U R U' R' U R U2 R'；Pi 形用 R U2 R2 U' R2 U' R2 U2 R。",
-            "这里的「黄色车灯」是同一侧面的左上角和右上角都露出黄色。先在本例的两侧找出这两对黄色，再逐步执行。下一节把 Pi 和相邻双黄角分别做成独立案例。不同情况需要重新观察和摆放，不能把“做两次 Sune”当成不看方向的通用解法。",
+            "顶面有零个或两个黄角朝上时，可以像层先法那样先做一次 Sune，变成只有一个黄角的情况；也可以直接记对应的公式一次解决。零个黄角有两种形状：H 形（两侧各有一对相对的“车灯”）用 R U R' U R U' R' U R U2 R'；Pi 形用 R U2 R2 U' R2 U' R2 U2 R。",
+            "这里的“黄色车灯”是指同一个侧面的左上角和右上角都露出黄色。先在本例的两侧找到这两对黄色，再一步步执行。下一节会把 Pi 和“两个相邻黄角”分别做成独立案例。不同情况需要重新观察和摆放，不能把“做两次 Sune”当成不看方向的通用解法。",
           ],
           en: [
             "With zero or two yellow corners up you can do one Sune to reduce to a single corner, as in the beginner's method, or learn the direct algorithm. Zero corners has two shapes: H (headlights on two opposite sides) is R U R' U R U' R' U R U2 R'; Pi is R U2 R2 U' R2 U' R2 U2 R.",
@@ -314,29 +314,29 @@ export const cubeTutorials: Tutorial[] = [
         id: "co-pi",
         title: { zh: "独立案例：Pi，顶面没有黄角", en: "Separate case: Pi, no yellow top corners" },
         body: {
-          zh: ["先看目标：保持黄十字，把四个黄角翻到顶面，下面两层最终不变。起点顶面只有十字，四个角都不是黄。左面左上与右上都是黄，像一对车灯；右面没有黄色车灯。前面的右上角、后面的左上角各有一张黄贴纸。这些特征一起区分 Pi 与上一例 H。", "保持黄上绿前，逐个点击 R、U2、R2、U'、R2、U'、R2、U2、R。带 2 的记号只点一次。最后第九步结束后，检查顶面全黄、下两层复原；不要为了让中间状态好看而临时补转。"],
+          zh: ["先看目标：保持黄十字，把四个黄角都翻到顶面，最后下面两层保持不变。起点：顶面只有十字，四个角都不是黄色朝上。左面的左上角和右上角都是黄色，像一对车灯；右面没有黄色车灯。前面的右上角、后面的左上角各有一张黄色贴纸。这几个特征合在一起，才能把 Pi 和上一例的 H 区分开。", "保持黄上绿前，依次点 R、U2、R2、U'、R2、U'、R2、U2、R。带 2 的记号只点一次。第九步做完后，检查顶面全黄、下两层已经复原；不要为了让中间状态好看而临时多转。"],
           en: ["Goal: keep the yellow cross and turn all four corners yellow-up, restoring the lower layers at the end. Initially none of the top corners is yellow. Both upper corners of the left face are yellow headlights; the right face has no yellow headlights. The front top-right and back top-left stickers are yellow. These combined clues distinguish Pi from H.", "Keep yellow up and green front. Click once per token: R, U2, R2, U', R2, U', R2, U2, R. A 2 needs only one click. After step nine, check the fully yellow top and restored lower layers. Do not add turns to make intermediate positions look solved."],
         },
         alg: "R U2 R2 U' R2 U' R2 U2 R",
       },
       {
         id: "co-headlights",
-        title: { zh: "独立案例：两个黄角与前方车灯", en: "Separate case: two yellow corners, headlights in front" },
+        title: { zh: "独立案例：两个黄角，车灯在前", en: "Separate case: two yellow corners, headlights in front" },
         body: {
-          zh: ["起点已有黄色十字，后面两个顶角黄色朝上（顶面图最上行左右两格）。前面两个顶角的黄色朝前：从正面看，左上角和右上角都是黄色，像两盏车灯。把这对黄色车灯放在前面，不是左面。完成目标是九格黄色朝上、下两层不变。", "保持黄上绿前，逐步执行 R2、D、R'、U2、R、D'、R'、U2、R'。D 是正对底面看时顺时针转底层；不要把它当成 U，也不要为了看底面而改变公式的前方。D' 会把底层转回。", "第九步完成后停在成品，检查白底、全黄顶与侧面下两行。这一例也恰好完成整颗魔方；在其他打乱中，黄面朝向完成后还可能要置换顶层。"],
+          zh: ["起点已经有黄色十字，后面两个顶角黄色朝上（顶面图最上面一行的左右两格）。前面两个顶角的黄色朝向你：从正面看，左上角和右上角都是黄色，像两盏车灯。请把这对车灯放在前面，不是左面。目标是顶面九格都黄色朝上，下两层不变。", "保持黄上绿前，一步步做 R2、D、R'、U2、R、D'、R'、U2、R'。D 是正对着底面看时把底层顺时针转；不要把它当成 U，也不要为了看底面而改变公式的“前面”。后面的 D' 会把底层转回来。", "第九步做完停在成品上，检查白色底面、全黄顶面和每个侧面的下两排。这一例也正好整个复原了；在别的打乱里，黄面朝向完成后可能还需要调整顶层位置。"],
           en: ["The yellow cross is already present. Both back top corners face yellow up (the two upper diagram corners). The front two corners face yellow toward you: the front face’s upper-left and upper-right are yellow headlights. Keep these headlights in front, not on the left. Goal: nine yellow top stickers and preserved lower layers.", "Keep yellow up and green front; step through R2, D, R', U2, R, D', R', U2, R'. D turns the bottom clockwise as viewed directly from below. It is not U; do not change the algorithm’s front while inspecting the bottom. D' later returns the bottom layer.", "Stop after step nine. Check the white bottom, yellow top and lower two rows of every side. This prepared case also finishes the entire cube, but other scrambles may still need top-layer permutation after orientation."],
         },
         alg: "R2 D R' U2 R D' R' U2 R'",
       },
       {
         id: "cp",
-        title: { zh: "PLL 第一步：角块置换", en: "PLL look 1: corner permutation" },
+        title: { zh: "PLL 第一步：交换角块", en: "PLL look 1: corner permutation" },
         body: {
           zh: [
-            "顶面全黄、下面两层已还原后，先只看四个顶角。每个侧面顶行的左、右两张角贴纸若同色，就叫一对「车灯」；中间的棱贴纸暂时不看。检查四个侧面，不要看到一对就立刻套公式。",
-            "四个侧面都有车灯：角块的相对顺序已经正确。只转顶层，用 U、U' 或 U2 把角贴纸与侧面中心颜色对齐；若已经对齐就不转。跳过角块交换，直接检查下一节的棱块。例如整个魔方已经复原时也有四对车灯，这时做 T 置换反而会打乱它。",
-            "恰好只有一个侧面有车灯：把这一对放在左侧，再做本例的 T-perm：R U R' U' R' F R2 U' R' U' R U R' F'。没有任何车灯时，使用下一节单独讲解的 Y 置换案例，先对照它的起点摆放，不要在任意朝向盲套公式。",
-            "角块交换后，可能还需转一下顶层，才能让所有角块的侧面贴纸与中心对齐。核对角块后再处理顶棱。这里的 T 置换同时会换两个棱块；演示刻意配好了起点，所以最后整颗复原，并不代表真实打乱的棱块也一定同时完成。",
+            "顶面全黄、下面两层已经还原后，先只看四个顶角。每个侧面顶行的左右两张角贴纸如果同色，就叫一对“车灯”；中间那张棱块贴纸暂时不看。四个侧面都要检查，不要看到一对就马上套公式。",
+            "四个侧面都有车灯：说明角块的相对顺序已经对了。只需要用 U、U' 或 U2 转顶层，让角贴纸和侧面中心对齐；已经对齐就不用转。跳过换角，直接去检查下一节的棱块。例如整个魔方已经复原时，四个侧面也都有车灯，这时再做 T 置换反而会把它打乱。",
+            "恰好只有一个侧面有车灯：把这对车灯放在左边，再做本例的 T 置换：R U R' U' R' F R2 U' R' U' R U R' F'。一个车灯都没有时，用下一节单独讲解的 Y 置换案例，先对照它的起点摆放，不要随便从哪个方向套公式。",
+            "换完角后，可能还需要再转一下顶层，才能让所有角块的侧面贴纸和中心对齐。确认角块没问题后，再处理顶层棱块。这里的 T 置换同时也会交换两个棱块；演示特意配好了起点，所以最后整个复原，不代表真实打乱时棱块也一定同时完成。",
           ],
           en: [
             "Start with yellow on top and the lower two layers solved. Headlights are matching left and right corner stickers on a side's top row; ignore its middle edge sticker for now. Inspect all four sides before choosing an algorithm.",
@@ -352,18 +352,18 @@ export const cubeTutorials: Tutorial[] = [
         id: "cp-y",
         title: { zh: "独立案例：Y 置换，交换对角", en: "Separate case: Y permutation, diagonal corners" },
         body: {
-          zh: ["顶面全黄只说明黄色朝向正确，不说明侧面颜色正确。本例右前上角与左后上角互换；四个侧面都找不到两张同色的顶角贴纸。先看绿色前面：左上是绿，右上却是蓝；右面的左上是红而不是橙。这才是需要调整位置的证据。", "保持黄上绿前，选择此案例，每按一次下一步执行一个记号。前九步是 F R U' R' U' R U R' F'，后八步是 R U R' U' R' F R F'。分组只是帮助阅读，不能省掉任何一步；中间黄面被打乱是正常的。", "第 17 步后检查：顶面仍全黄，四个顶角的两张侧面贴纸分别与中心同色，下面两层保持正确。Y 置换也会交换两个棱块，本例特意配好这些棱，所以最终整颗复原。其它打乱做完后可能仍需下一节的棱块置换。"],
+          zh: ["顶面全黄只说明黄色朝向对了，不代表侧面颜色也对。本例是右前上角和左后上角互换，所以四个侧面都找不到两张同色的顶角贴纸。先看绿色的前面：左上是绿色，右上却是蓝色；右面的左上是红色而不是橙色。这些就是位置不对的证据。", "保持黄上绿前，选择本案例，每按一次下一步执行一个记号。前九步是 F R U' R' U' R U R' F'，后八步是 R U R' U' R' F R F'。分组只是方便阅读，一步都不能省；中途黄色顶面被打乱是正常的。", "第 17 步后检查：顶面仍然全黄，每个顶角的两张侧面贴纸都和中心同色，下面两层保持正确。Y 置换也会交换两个棱块，本例特意配好了这些棱块，所以最后整个复原。其他打乱做完后，可能还需要下一节的棱块置换。"],
           en: ["An all-yellow top proves orientation, not correct side colors. This case swaps the front-right and back-left top corners; no side has matching top-corner stickers. On the green front, the upper-left is green but upper-right is blue; the right face’s upper-left is red instead of orange. These mismatches show incorrect positions.", "Keep yellow up and green front. Select the case and press Next once per token. The first nine moves are F R U' R' U' R U R' F'; the last eight are R U R' U' R' F R F'. Groups help reading but do not omit moves. Temporary disruption of the yellow top is normal.", "After step 17, check the yellow top, both side stickers of each top corner matching their centers, and preserved lower layers. Y also swaps two edges. This prepared case includes those edges and finishes solved; other scrambles can still require edge permutation."],
         },
         alg: "F R U' R' U' R U R' F' R U R' U' R' F R F'",
       },
       {
         id: "ep",
-        title: { zh: "PLL 第二步：棱块置换", en: "PLL look 2: edge permutation" },
+        title: { zh: "PLL 第二步：交换棱块", en: "PLL look 2: edge permutation" },
         body: {
           zh: [
-            "角块到位后棱块只剩四种情况。三个棱循环：一个棱正确时把它放在后面，看其余三个是顺时针还是逆时针循环——Ua：R U' R U R U R U' R' U' R2，Ub：R2 U R U R' U' R' U' R' U R'。",
-            "四条顶棱都不正确时，先区分相对交换 H 和相邻交换 Z。后面分别有独立案例，按侧面颜色判断去向。Z 不能只做一次 Ua 就宣布完成；本页用两次 Ua 加顶层对齐动作带你做完，每一步都有按钮，最后还要检查六个面。",
+            "角块到位后，棱块只剩四种情况。三个棱块轮换：如果有一个棱块已经正确，把它放在后面，看其余三个是顺时针还是逆时针轮换——Ua：R U' R U R U R U' R' U' R2；Ub：R2 U R U R' U' R' U' R' U R'。",
+            "四个顶棱都不对时，先分清是“相对交换”H 还是“相邻交换”Z。后面分别有独立案例，按侧面颜色判断每个棱块要去哪里。Z 不能只做一次 Ua 就算完成；本页用两次 Ua 加上对齐顶层的动作带你做完，每一步都有按钮，最后还要检查六个面。",
           ],
           en: [
             "With corners placed, edges have four cases. Three-cycles: hold the correct edge at the back and see whether the other three cycle clockwise or counter-clockwise — Ua: R U' R U R U R U' R' U' R2, Ub: R2 U R U R' U' R' U' R' U R'.",
@@ -375,31 +375,31 @@ export const cubeTutorials: Tutorial[] = [
       },
       {
         id: "ep-ub",
-        title: { zh: "独立案例：Ub，三条棱各回各家", en: "Separate case: Ub, return three edges" },
+        title: { zh: "独立案例：Ub，三个棱块各回各家", en: "Separate case: Ub, three edges go home" },
         body: {
-          zh: ["先确认顶面全黄、四个顶角侧色正确。本例后面整行都是蓝，后上棱不用动。前面顶行中间是红，应该去左面红中心上方；左面顶行中间是橙，应该去右面；右面顶行中间是绿，应该去前面。不必猜“顺时针”是从哪里看，先按这三种颜色找到目的地。", "保持绿色中心朝前、蓝色中心朝后，逐步执行 R2 U R U R' U' R' U' R' U R'，共 11 次点击。两个连续 R' 之间即使没有 U，也要按显示顺序执行。半圈 R2 只点一次。", "完成后不要立即重启。检查四个侧面顶行的中间贴纸都与中心同色，顶角仍正确，黄顶白底与下面两层不变。本案例此时六面各自同色，已经复原。"],
+          zh: ["先确认顶面全黄、四个顶角的侧色都正确。本例后面整行都是蓝色，所以后上棱不用动。前面顶行中间是红色，应该去左面红色中心上方；左面顶行中间是橙色，应该去右面；右面顶行中间是绿色，应该去前面。不用去猜“顺时针”是从哪里看，按这三种颜色找到各自的目的地就行。", "保持绿色中心朝前、蓝色中心朝后，一步步做 R2 U R U R' U' R' U' R' U R'，一共点 11 次。两个连着的 R' 之间就算没有 U，也要按显示的顺序做。半圈 R2 只点一次。", "做完后不要马上重新开始。检查四个侧面顶行中间的贴纸都和中心同色，顶角仍然正确，黄色顶面、白色底面和下面两层都没变。本案例这时六个面各自同色，已经复原了。"],
           en: ["Check the yellow top and correctly placed top corners first. The back row is entirely blue, so its edge stays. The front upper-middle is red and belongs above the left red center; the left upper-middle is orange and belongs on the right; the right upper-middle is green and belongs at front. Follow color destinations instead of guessing the viewpoint for clockwise.", "Keep green front and blue back. Step through R2 U R U R' U' R' U' R' U R', eleven clicks. Follow every displayed token in order; R2 is one half-turn and one click.", "Do not restart immediately. Check each side’s upper-middle sticker against its center, all top corners, the yellow top, white bottom and lower layers. All six faces are uniform in this prepared case: it is solved."],
         },
         alg: "R2 U R U R' U' R' U' R' U R'",
       },
       {
         id: "ep-h",
-        title: { zh: "独立案例：H，两对相对棱互换", en: "Separate case: H, opposite edge pairs" },
+        title: { zh: "独立案例：H，两对相对的棱块互换", en: "Separate case: H, opposite edge pairs" },
         body: {
-          zh: ["不要与 OLL 的 H 混淆：这里顶面已经全黄，角块也已归位。只有四条顶棱的位置不对。前面顶行中间是蓝、后面是绿，它们需要互换；左面顶行中间是橙、右面是红，这一对也需要互换。中心块不会移动，用中心颜色判断目的地。", "选择案例后保持黄上绿前，按 R2 U2 R U2 R2 U2 R2 U2 R U2 R2 逐步操作，一共 11 个记号。大多数记号带 2，表示该面转半圈，不是按两次按钮。随时可以停下来对照六面图，不要求速度。", "最后停在成品：前后顶棱分别是绿和蓝，左右顶棱分别是红和橙，所有角块和下面两层保持正确，六面各自同色。若实体魔方没有达到这些条件，先重摆本例再逐步核对，不要盲目重复公式。"],
+          zh: ["别和 OLL 里的 H 搞混：这里顶面已经全黄，角块也已经归位，只有四个顶棱的位置不对。前面顶行中间是蓝色、后面是绿色，它们要互换；左面顶行中间是橙色、右面是红色，这一对也要互换。中心块不会动，用中心的颜色判断每个棱块要去哪里。", "选择案例后保持黄上绿前，按 R2 U2 R U2 R2 U2 R2 U2 R U2 R2 一步步做，一共 11 个记号。大部分记号带 2，表示那个面转半圈，不是按两次按钮。随时可以停下来对照六面图，不要求速度。", "最后停在成品上：前后顶棱分别是绿色和蓝色，左右顶棱分别是红色和橙色，所有角块和下面两层都正确，六个面各自同色。如果你的实物没有达到这些条件，先重新摆好本例，再逐步核对，不要盲目重复公式。"],
           en: ["Do not confuse this with OLL H: here the top is already yellow and corners are placed. Only four top edges are misplaced. The front upper-middle is blue and back is green: they swap. Left upper-middle is orange and right is red: they also swap. Centers do not move; use their colors as destinations.", "Select the case, keep yellow up and green front, and step through R2 U2 R U2 R2 U2 R2 U2 R U2 R2: eleven tokens. Most have 2, meaning a half-turn rather than two button presses. Pause to compare the six-face diagrams whenever needed; speed is not the goal.", "Keep the final result visible. Front/back top edges are green/blue and left/right are red/orange, with corners and lower layers correct. All faces are uniform. If your physical cube differs, reset the example and inspect each move instead of blindly repeating the algorithm."],
         },
         alg: "R2 U2 R U2 R2 U2 R2 U2 R U2 R2",
       },
       {
         id: "ep-z",
-        title: { zh: "独立案例：Z，两对相邻棱互换", en: "Separate case: Z, adjacent edge pairs" },
+        title: { zh: "独立案例：Z，两对相邻的棱块互换", en: "Separate case: Z, adjacent edge pairs" },
         body: {
           zh: [
-            "先看起点：黄顶已经完成，顶角侧面颜色正确，下面两层也正确。前面顶行中间是橙色，右面顶行中间是绿色，这两条棱需要互换；后面顶行中间是红色，左面顶行中间是蓝色，这两条也要互换。它们是两对相邻的位置，不是 H 案例的前后、左右互换。保持黄上、绿前、橙右。",
-            "本例用已经介绍的 Ua 分两段完成，不是最短速拧公式。第一段逐步做 R U' R U R U R U' R' U' R2，共 11 次点击。停在第 11 步观察：右上棱已对齐橙中心，前、后、左三条顶棱仍需移动；顶角仍正确。这只是中途检查点，不要点重新开始。",
-            "第 12 步只做 U'，把顶层转到第二段的起点，不要旋转整颗魔方。第 13 至 23 步再做同样的 11 步 Ua。此时还没有结束：第 24 步 U 把顶层对齐侧面中心。每次点击只执行当前一个记号，R2 也只点一次；中途可以暂停核对六面图。",
-            "完成后停在第 24 步：前、右、后、左的顶行中间分别为绿、橙、蓝、红，顶角也对齐中心，顶面全黄、底面全白，六面各自同色。只有与本例起点、持握方向一致时才照做；不同摆放要先重新识别，不要把两次 Ua 当作所有顶层的通用解法。"
+            "先看起点：顶面全黄，顶角的侧色正确，下面两层也正确。前面顶行中间是橙色，右面顶行中间是绿色，这两个棱块要互换；后面顶行中间是红色，左面顶行中间是蓝色，这两个也要互换。这是两对相邻位置的交换，不是 H 那样的前后、左右交换。保持黄上、绿前、橙右。",
+            "本例用已经学过的 Ua 分两段完成，不是最短的速拧公式。第一段一步步做 R U' R U R U R U' R' U' R2，一共点 11 次。停在第 11 步观察：右上棱已经对准橙色中心，前、后、左三个顶棱还要移动，顶角仍然正确。这只是中途检查点，不要点“重新开始”。",
+            "第 12 步只做 U'，把顶层转到第二段的起点，不要转动整个魔方。第 13 到 23 步再做同样的 11 步 Ua。这时还没结束：第 24 步做 U，把顶层和侧面中心对齐。每次点击只执行当前一个记号，R2 也只点一次；中途可以随时暂停核对六面图。",
+            "最后停在第 24 步：前、右、后、左四面顶行中间分别是绿、橙、蓝、红，顶角也和中心对齐，顶面全黄、底面全白，六个面各自同色。只有起点和拿法都和本例一致时才这样做；不同的摆放要先重新识别，不要把两次 Ua 当成所有顶层的通用解法。"
           ],
           en: [
             "Check the start: the top is yellow, top corners match their side centers, and the lower two layers are correct. The front upper-middle is orange and the right upper-middle is green: these edges must swap. The back upper-middle is red and the left upper-middle is blue: they must also swap. These are adjacent pairs, not the front/back and left/right swaps of H. Keep yellow up, green front and orange right.",
@@ -416,8 +416,8 @@ export const cubeTutorials: Tutorial[] = [
         title: { zh: "接下来练什么", en: "What to practise next" },
         body: {
           zh: [
-            "先以能解释和正确完成案例为目标，不承诺练几次就达到某个秒数。每次选一个案例：说出起点特征、指出目标块、慢慢执行、检查完成条件。能够独立做到后，再学新情况；不同学习者所需练习量不同。本文仍不是全部顶层情况的完整目录，不能把未讲解的情况硬套进相似公式。",
-            "每日谜题和术语表就在旁边，打乱、计时、复原，把今天学的公式用起来。",
+            "先以“能解释、能做对”为目标，没有“练几次就能达到几秒”这样的保证。每次选一个案例：说出它的起点特征、指出目标块、慢慢执行、检查完成条件。能独立做到后，再学新的情况；每个人需要的练习量不一样。这篇文章也不是所有顶层情况的完整目录，不要把没讲过的情况硬套进看起来相似的公式。",
+            "每日谜题和术语表就在旁边：打乱、计时、还原，把今天学的公式用起来。",
           ],
           en: [
             "Aim to explain and complete cases correctly first; no number of practice sessions guarantees a particular time. Choose one case, state its clues, identify target pieces, execute slowly and check the result. Learn another case once you can do that independently. Practice needs vary. This article is not a complete catalog of last-layer cases; do not force an unexplained case into a similar-looking algorithm.",
@@ -440,11 +440,11 @@ export const cubeTutorials: Tutorial[] = [
     steps: [
       {
         id: "how",
-        title: { zh: "怎么用这一篇", en: "How to use this page" },
+        title: { zh: "这一篇怎么用", en: "How to use this page" },
         body: {
           zh: [
-            "先选择图案案例，魔方会摆成复原态，但不会自己转动。每点击一次「下一步」，只执行一个记号；看清这一层改变后，再点下一次。最后一步结束后停在完成的图案上，不会继续转回原样。想重看才点「重新开始」。",
-            "拿实体魔方跟着做一遍，读错一步图案就不对称——这是检验记号有没有学会的即时反馈。",
+            "先选择一个图案案例，魔方会摆成还原状态，但不会自己转。每点一次「下一步」，只执行一个记号；看清这一层怎么变了，再点下一次。最后一步做完会停在图案上，不会自动转回原样。想重看再点“重新开始”。",
+            "拿实体魔方跟着做一遍：只要读错一步，图案就不对称了——这正好能检验你的记号有没有学会。",
           ],
           en: [
             "Select a pattern to prepare a solved cube without moving it. Each press of Next step executes exactly one notation token. Observe the changed layer before clicking again. After the last move, the finished pattern stays visible; it does not turn back to solved. Use Restart only when you want to start over.",
@@ -457,7 +457,7 @@ export const cubeTutorials: Tutorial[] = [
         title: { zh: "棋盘格", en: "Checkerboard" },
         body: {
           zh: [
-            "六个面各转 180°，每一面都变成对色相间的棋盘。这条公式是自逆的：再做一次就回到复原。它也是理解「相对面互换」的最好例子——U2 D2 只影响侧面，F2 B2 与 L2 R2 依此类推。",
+            "六个面各转 180°，每个面都变成和对面颜色交替的棋盘格。这个公式是“自逆”的：再做一次就回到还原状态。它也是理解“相对面互换”最好的例子：U2 D2 只影响四个侧面，F2 B2 和 L2 R2 也是一样。",
           ],
           en: [
             "Half-turn all six faces and every face becomes a checkerboard of opposite colours. The algorithm is its own inverse — repeat it to return to solved. It's also the clearest illustration of opposite-face swaps: U2 D2 only affects side faces, and F2 B2 and L2 R2 likewise.",
@@ -470,7 +470,7 @@ export const cubeTutorials: Tutorial[] = [
         title: { zh: "六点", en: "Six dots" },
         body: {
           zh: [
-            "中心块本身没有换色或搬到别的面；是周围八张贴纸变成同一种不同于中心的颜色，让中心看起来像一个点。标准写法用中层转动（M E S），这里给的是等价的面转版本。再做一次不会复原——它的周期是 3，做三次才回来；或者做它的逆序。",
+            "中心块本身没有换色，也没有搬到别的面；是周围八张贴纸变成了另一种颜色，让中心看起来像一个点。标准写法要用中层转动（M E S），这里给的是效果相同的面转版本。再做一次不会复原：它要做三次才回到原样，或者按逆序做一遍。",
           ],
           en: [
             "Centers do not change color or move to another face. The surrounding eight stickers become one different color, making the unchanged center look like a dot. The standard version uses slice moves (M E S); this is an equivalent face-turn version. Repeating it doesn't undo it — its order is 3, so three repetitions return to solved, or apply the inverse.",
@@ -483,7 +483,7 @@ export const cubeTutorials: Tutorial[] = [
         title: { zh: "六面十字", en: "Cross on every face" },
         body: {
           zh: [
-            "每个面中心与四条边中间的贴纸组成同色十字，四角贴纸则是另一种颜色；这另一种颜色不一定来自相对面。这条公式比前两条长，正好用来练习「读短语」：注意其中 L2 U2 L2 这样的对称结构。",
+            "每个面的中心和四条边中间的贴纸组成一个同色十字，四个角是另一种颜色；这另一种颜色不一定来自对面。这个公式比前两个长，正好用来练习“分段读”：留意其中 L2 U2 L2 这样的对称结构。",
           ],
           en: [
             "Each face has a same-color cross formed by its center and four edge stickers, with four corners of another color; that color is not necessarily the opposite face color. Longer than the first two — good practice for chunking; notice symmetric structures like L2 U2 L2.",
@@ -496,7 +496,7 @@ export const cubeTutorials: Tutorial[] = [
         title: { zh: "盒中盒", en: "Cube in a cube" },
         body: {
           zh: [
-            "一个 2×2×2 的小魔方「嵌」在大魔方的一角。这是最受欢迎的图案之一，15 步。做完以后不要急着复原，转个角度看看三个面是怎么对齐的。",
+            "大魔方的一个角上好像嵌进了一个 2×2×2 的小魔方。这是最受欢迎的图案之一，一共 15 步。做完先别急着复原，转个角度看看那三个面是怎么对齐的。",
           ],
           en: [
             "A 2×2×2 cube appears embedded in one corner of the big cube. One of the most popular patterns, 15 moves. Before undoing it, rotate the view and see how the three faces line up.",
@@ -509,8 +509,8 @@ export const cubeTutorials: Tutorial[] = [
         title: { zh: "Superflip：离复原最远的状态", en: "Superflip: as far from solved as it gets" },
         body: {
           zh: [
-            "每个棱块都在原位但全部翻转，角块和中心不动。Superflip 是第一个被证明需要 20 步（面转计）才能还原的状态——而 2010 年的计算证明，任何状态都不超过 20 步，这个数字被称为「上帝之数」。",
-            "这条 20 步公式本身就是一条最优解。它的逆序同样是 20 步，没有更短的路。",
+            "每个棱块都在原来的位置上，但全部翻转了；角块和中心块不动。Superflip 是第一个被证明至少需要 20 步（按面转计算）才能还原的状态；2010 年，人们又用计算证明任何状态都不超过 20 步，这个数字被称为“上帝之数”。",
+            "这条 20 步的公式本身就是一个最优解。它的逆序同样是 20 步，没有更短的走法。",
           ],
           en: [
             "Every edge is in place but flipped; corners and centres untouched. The superflip was the first position proven to need 20 face turns — and in 2010 it was shown that no position needs more. That number is called God's Number.",

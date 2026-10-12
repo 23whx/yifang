@@ -1,0 +1,3 @@
+# Redistributed third-party files must keep their exact upstream bytes on every OS.
+public/engine/** -text
+public/licenses/** -text

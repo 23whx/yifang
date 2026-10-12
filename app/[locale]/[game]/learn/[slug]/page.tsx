@@ -85,11 +85,8 @@ export default async function TutorialPage({
         {name:lt.title,path:`/${locale}/${game}/learn/${slug}`},
       ]} />
       <section className="border-b-2 border-ink">
-        <div className="mx-auto max-w-[1400px] px-5 py-10 sm:px-8 lg:py-14">
-          <Link href={`/${locale}/${game}/learn`} className="text-sm font-semibold text-ink-3 hover:text-vermilion">
-            ← {g.name[locale]} · {dict.hubLearnTitle}
-          </Link>
-          <h1 className="display-cjk mt-4 max-w-5xl text-[clamp(36px,5.5vw,84px)]">{lt.title}</h1>
+        <div className="mx-auto max-w-[1400px] px-5 pt-4 pb-10 sm:px-8 lg:pb-14">
+          <h1 className="page-title mt-2 max-w-5xl">{lt.title}</h1>
           {mahjongCourse ? <section aria-label={locale === 'zh' ? '本规则胜利条件' : 'Ruleset objective'} className="mt-6 max-w-prose border border-[#ae8550] p-5 leading-8"><h2 className="font-bold">{locale === 'zh' ? '先知道：本规则怎样才算和牌？' : 'First: what makes a legal win here?'}</h2><p>{mahjongCourse.objective[locale]}</p><p>{locale === 'zh' ? '规则参考：' : 'Reference: '}<a href={mahjongCourse.reference.url} className="underline">{mahjongCourse.reference.label}</a></p></section> : <WinCondition game={game} locale={locale} />}
           <div className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm text-ink-3">
             <span>{dict.level} · <b className="text-ink">{lt.level}</b></span>
@@ -121,7 +118,7 @@ export default async function TutorialPage({
         ) : game === "cube" ? (
           <div id={slug !== 'cube-first-lesson' ? 'guided-practice' : undefined}><TutorialPlayer tutorial={lt} dict={dict} locale={locale} /></div>
         ) : (
-          <article className="max-w-3xl"><nav aria-label={locale === "zh" ? "课程目录" : "Lesson contents"} className="mb-10 border-y border-rule py-5">{lt.steps.map((s,i)=><a key={s.id} href={`#step-${s.id}`} className="block py-2">{String(i+1).padStart(2,"0")} · {s.title}</a>)}</nav>{lt.steps.map((s,i)=><section key={s.id} id={`step-${s.id}`} className="mb-12 scroll-mt-8"><h2 className="mb-5 text-2xl font-bold">{String(i+1).padStart(2,"0")} · {s.title}</h2><div className="prose-yf"><p>{s.body[0]}</p></div>{game === 'mahjong' && <MahjongFigure id={s.id} locale={locale}/>}<div className="prose-yf">{s.body.slice(1).map((p,j)=><p key={j}>{p}</p>)}</div></section>)}<Link href={`/${locale}/${game}/play`} className="btn-sign">{locale === "zh" ? "前往练习" : "Go to practice"} →</Link>{game === 'mahjong' && !mahjongCourse && slug !== 'mahjong-terms' && <><Link className="btn-sign ml-3 mt-3" href={`/${locale}/mahjong/learn`}>{locale === 'zh' ? '选择一条地区路线 →' : 'Choose a regional branch →'}</Link><Link className="btn-sign ml-3 mt-3" href={`/${locale}/mahjong/learn/mahjong-terms`}>{locale === 'zh' ? '可选参考：看图查术语 →' : 'Optional: illustrated vocabulary →'}</Link></>}</article>
+          <article className="max-w-3xl"><nav aria-label={locale === "zh" ? "课程目录" : "Lesson contents"} className="mb-10 border-y border-rule py-5">{lt.steps.map((s,i)=><a key={s.id} href={`#step-${s.id}`} className="block py-2">{String(i+1).padStart(2,"0")} · {s.title}</a>)}</nav>{lt.steps.map((s,i)=><section key={s.id} id={`step-${s.id}`} className="mb-12 scroll-mt-8"><h2 className="mb-5 text-2xl font-bold">{String(i+1).padStart(2,"0")} · {s.title}</h2><div className="prose-yf"><p>{s.body[0]}</p></div>{game === 'mahjong' && <MahjongFigure id={s.id} locale={locale}/>}<div className="prose-yf mt-[1.1em]">{s.body.slice(1).map((p,j)=><p key={j}>{p}</p>)}</div></section>)}<Link href={`/${locale}/${game}/play`} className="btn-sign">{locale === "zh" ? "前往练习" : "Go to practice"} →</Link>{game === 'mahjong' && !mahjongCourse && slug !== 'mahjong-terms' && <><Link className="btn-sign ml-3 mt-3" href={`/${locale}/mahjong/learn`}>{locale === 'zh' ? '选择一条地区路线 →' : 'Choose a regional branch →'}</Link><Link className="btn-sign ml-3 mt-3" href={`/${locale}/mahjong/learn/mahjong-terms`}>{locale === 'zh' ? '可选参考：看图查术语 →' : 'Optional: illustrated vocabulary →'}</Link></>}</article>
         )}
         {game === 'mahjong' && slug === 'mahjong-mcr' && <aside id="mcr-extra-reference" className="my-8 space-y-6">
           <h2 className="text-2xl font-bold">{locale === 'zh' ? '课后图解：花牌与容易混淆的番种' : 'After the lesson: flowers and easily confused patterns'}</h2>

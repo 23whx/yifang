@@ -412,7 +412,7 @@ body:has(.atlas-shell) .rpg-brand {
   }
   .atlas-filters button {
     font-size: 11px;
-    min-height: 40px;
+    min-height: 44px;
   }
   .atlas-viewport {
     position: relative;

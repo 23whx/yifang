@@ -57,11 +57,8 @@ export default async function GlossaryPage({ params }: { params: Promise<{ local
       <Breadcrumbs locale={locale} items={[{ name: locale === 'zh' ? '弈方首页' : 'Yifang home', path: `/${locale}` }, { name: g.name[locale], path: `/${locale}/${game}` }, { name: gamePageCopy(g.slug, g.name[locale], locale, 'glossary').title, path: `/${locale}/${game}/glossary` }]} />
       <JsonLd data={jsonLd} />
       <section className="border-b-2 border-ink">
-        <div className="mx-auto max-w-[1400px] px-5 py-10 sm:px-8 lg:py-14">
-          <Link href={`/${locale}/${game}`} className="text-sm font-semibold text-ink-3 hover:text-vermilion">
-            ← {g.name[locale]}
-          </Link>
-          <h1 className="display-cjk mt-4 text-[clamp(36px,5.5vw,84px)]">{g.name[locale]} · {dict.glossaryTitle}</h1>
+        <div className="mx-auto max-w-[1400px] px-5 pt-4 pb-10 sm:px-8 lg:pb-14">
+          <h1 className="page-title mt-2">{g.name[locale]} · {dict.glossaryTitle}</h1>
           <p className="prose-yf mt-6 max-w-2xl">{gamePageCopy(g.slug, g.name[locale], locale, 'glossary').description}</p>
         </div>
       </section>

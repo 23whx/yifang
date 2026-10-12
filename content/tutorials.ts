@@ -91,16 +91,16 @@ const tutorialSources: Tutorial[] = [
       },
       {
         id: "white-cross",
-        title: { zh: "第一步：底层白色十字", en: "Step 1: The White Cross" },
+        title: { zh: "第一步：底层白十字", en: "Step 1: The White Cross" },
         body: {
           zh: [
-            "把白色中心朝下，目标是把 4 个含白色的棱块归位，在底面拼出白色十字。注意：不只是白色朝下，每个棱块侧面的颜色还必须和相邻的中心块颜色一致。",
-            "第一次可以分两段做：先在黄中心周围收集四个白色棱贴纸，像四片白花瓣，这叫‘小花’；此时不要求花瓣的侧色对齐。再逐片对齐侧色，送到底层。已经拼好的白十字就跳过；别把白色角贴纸算作花瓣。以下找块时可以水平换拿法，但一直黄上白下。",
-            "情况一：白贴纸已经朝上，就先留作花瓣。情况二：白贴纸朝下，把这枚棱所在侧面放到正前方；先转 U，让前上棱位置没有白色朝上的花瓣，再做 F2，把这枚白棱送到上面。‘让出空位’是把已有花瓣移到别处，并不要求那里真的没有小块。",
-            "情况三：白贴纸朝向侧面，先水平换拿法让白贴纸朝前。若它在中层前右，先用 U 让右上棱位置没有白色花瓣，再做 R；若在中层前左，先让左上位置没有花瓣，再做 L′。这两种动作都会把朝前的白色翻到顶面。每次只处理一个目标。",
-            "情况四：白贴纸朝前，但目标在前上或前下。先做 F 把它转到中层，再按情况三处理；若从前下开始，做 F 前先用 U 移开前上的白色花瓣，免得破坏它。若从前上开始，该处白贴纸本来就不朝上，不必先转 U。每完成一个目标，就重新数顶面白花瓣；至少增加一枚，有时顺带送上另一枚，直到四枚齐全。",
-            "花瓣齐后，选一枚白棱，读出另一色，水平换拿法让同色中心朝前；转 U，把该棱移到前上，确认侧面贴纸与前中心同色，再做 F2。对余下花瓣逐个重复，已送到下面的白棱不用再取出。最后检查底面四个白棱和四面侧色，不能只看白色十字的形状。",
-            "本页演示只展示最后一片白绿花瓣的送入：白色朝上，绿色朝前且对着绿中心，F2 将其送到底部，另外三条已好的白棱不受影响。它不是从任意打乱直接只做一次 F2；遇到其它位置，先按前面的四种情况收集，再对齐。",
+            "白色中心朝下。目标是把 4 个带白色的棱块放好，在底面拼出白色十字。注意：不只是白色朝下，每个棱块侧面的那个颜色还要和旁边的中心同色。",
+            "第一次可以分两段做：先在黄色中心周围收集四个“白色朝上”的棱块，像四片白花瓣，这叫“小花”，这时还不用管花瓣侧面的颜色。然后再一片一片对准侧色，送到底层。白十字已经拼好就跳过。注意别把白色的角块贴纸当成花瓣。找块时可以水平转动整个魔方换拿法，但始终保持黄色朝上、白色朝下。",
+            "情况一：白色贴纸已经朝上，就留着当花瓣。情况二：白色朝下。把这个棱块所在的侧面转到正前方，先转 U，让前上方那个位置不是白色花瓣，再做 F2，把这个白棱翻上来。“让出位置”只是把已有的花瓣转到别处，不是说那里要真的空着。",
+            "情况三：白色朝向侧面。先水平换拿法，让白色贴纸朝前。如果它在中层的前右位置，先用 U 让右上方不是白色花瓣，再做 R；如果在中层前左位置，先用 U 让左上方不是花瓣，再做 L′。这两种动作都会把朝前的白色翻到顶面。每次只处理一个目标。",
+            "情况四：白色朝前，但这个棱块在前上或前下。先做 F 把它转到中层，再按情况三处理。如果是从前下开始，做 F 之前先用 U 把前上方的白色花瓣移开，免得把它弄掉；如果从前上开始，它的白色本来就不朝上，不用先转 U。每处理完一个，重新数一数顶面有几片白花瓣：至少会多一片，有时还会顺带多一片，直到四片齐全。",
+            "花瓣收齐后，选一片白棱，看它另一种颜色是什么，水平换拿法让那个颜色的中心朝前；转 U，把这个棱块移到前上方，确认它朝前的贴纸和前面中心同色，再做 F2 送到底面。剩下的花瓣一个个照做，已经送下去的不用再拿上来。最后检查底面四个白棱和四个侧面的颜色，不能只看白十字的形状。",
+            "本页演示只做最后一片白绿花瓣：白色朝上、绿色朝前并对准绿色中心，一个 F2 就把它送到底部，另外三个已经放好的白棱不受影响。这不是说任意打乱都只要一个 F2；遇到其他位置，要先按上面四种情况收集、对齐。",
           ],
           en: [
             "Hold the cube with the white center facing down. The goal is to place the 4 white edges so they form a white cross on the bottom — and each edge's side color must match the adjacent center.",
@@ -120,13 +120,13 @@ const tutorialSources: Tutorial[] = [
       },
       {
         id: "white-corners",
-        title: { zh: "第二步：底层白色角块", en: "Step 2: The White Corners" },
+        title: { zh: "第二步：底层白角", en: "Step 2: The White Corners" },
         body: {
           zh: [
-            "先验收白十字，再找一个带白色的三色角。比如白绿橙角的家，是白、绿、橙三个中心之间。保持白下黄上，水平换拿法，让它的家位于底层前右；只转顶层 U，把这枚角送到家正上方的顶层前右。‘前右’是前面与右面相交处，不是屏幕画面上随便一个右边角。",
-            "在这个固定操作位置，完整做一组 R U R' U'，四步都做完才检查。若目标白角还没正确落到底层前右，就保持同一拿法继续整组；三种白色朝向通常分别需要1、3或5组。中途目标可能暂时离开前右，不要因此额外转 U 追它，也不要换拿法。终点必须白色朝下，另外两色分别对齐前、右中心。",
-            "若目标角已在底层前右但扭着，先做一组将它取到顶层；若卡在别的底层位置，先水平换拿法把那个位置作为前右，再取出。随后重新按第一段找家、把家摆到前右、用 U 对准。取出不等于已放好。某个白角已经正确则跳过，不要为凑满四次而破坏它。",
-            "本页四步演示只准备了一个恰好一组就能插好的案例，不会自动执行三组或五组。实体练习按每组结束后的实际状态判断。逐个完成四个白角后，检查底面九格全白，四个侧面最下面一排也分别同色；只有底面白、侧面错色，不能进入中层。",
+            "先确认白十字已经完成，再找一个带白色的三色角块。比如白绿橙角块，它的“家”在白、绿、橙三个中心之间。保持白下黄上，水平换拿法，让这个家位于底层的前右；然后只转 U，把这个角块送到家正上方，也就是顶层前右。“前右”是前面和右面相交的那个角，不是屏幕上随便哪个靠右的角。",
+            "保持这个拿法，完整做一组 R U R' U'，四步都做完再检查。如果目标白角还没正确落到底层前右，就保持同样的拿法再做一整组；根据白色朝向的不同，通常需要 1 组、3 组或 5 组。中途目标角可能暂时离开前右，不要额外转 U 去追它，也不要换拿法。最终要白色朝下，另外两种颜色分别对准前面和右面的中心。",
+            "如果目标角已经在底层前右但方向扭了，先做一组把它取到顶层；如果它卡在底层的其他位置，先水平换拿法，让那个位置变成前右，再做一组取出来。取出来后，重新按第一段的方法：找家、把家摆到前右、用 U 对准。取出来不等于放好了。已经放对的白角就跳过，不要为了凑满四次去破坏它。",
+            "本页的四步演示只准备了一个恰好一组就能放好的案例，不会自动执行三组或五组。用实体魔方练习时，每做完一组就看一次实际状态。四个白角都放好后，检查底面九格全白，四个侧面最下面一排也各自同色；如果底面白了但侧面颜色不对，还不能进入中层。",
           ],
           en: [
             "Check the white cross first, then find a three-color white corner. A white-green-orange corner belongs between those three centers. Keep white down and yellow up; regrip horizontally so its home is at bottom-front-right. Turn only U to bring the corner directly above its home at upper-front-right. Front-right means the intersection of the front and right faces, not an arbitrary rightmost corner on the screen.",
@@ -143,12 +143,12 @@ const tutorialSources: Tutorial[] = [
       },
       {
         id: "second-layer",
-        title: { zh: "第三步：还原中层棱块", en: "Step 3: The Second Layer" },
+        title: { zh: "第三步：中层棱块", en: "Step 3: The Second Layer" },
         body: {
           zh: [
-            "继续保持白下黄上，不要上下翻转。先检查底层已完整还原，再在顶层找不含黄色的棱块；白棱此时已经在底层，候选块应只有两个侧面颜色。水平换拿法，把其中一个颜色的中心当作正面；转 U，让棱块位于正面上方且朝前的贴纸与前中心同色。若朝前颜色对不上，先重新找对应中心，不要急着套公式。",
-            "观察棱块顶面的颜色：如果它应该去右边的中层位置，使用右侧公式（U R U' R' U' F' U F）；如果应该去左边，使用镜像公式 U' L' U L U F U' F'。",
-            "如果某个中层棱块位置或方向不对，先用公式把任意顶层棱块插进去把它「顶」出来，再重新插入。完成后魔方的下两层应该全部还原。",
+            "继续保持白下黄上，不要上下翻转。先确认底层已经完整还原，再在顶层找一个不带黄色的棱块；白色棱块这时都在底层，所以候选的棱块只有两种侧面颜色。水平换拿法，把其中一种颜色的中心转到正前方；转 U，让这个棱块位于前面中心正上方，而且朝前的贴纸和前面中心同色。如果颜色对不上，先重新找对应的中心，不要急着套公式。",
+            "看这个棱块朝上的那种颜色：如果它应该去右边的中层位置，就用右侧公式 U R U' R' U' F' U F；如果应该去左边，就用镜像公式 U' L' U L U F U' F'。",
+            "如果某个中层棱块位置不对或者翻反了，先用公式把任意一个顶层棱块插进那个位置，把它“顶”出来，再把它重新正确插入。这一步完成后，魔方下面两层就全部还原了。",
           ],
           en: [
             "Keep white down and yellow up; do not flip the cube over. Check that the first layer is complete, then find a top-layer edge without yellow. White edges are already below, so the candidate should have two side colors. Regrip horizontally to put one matching center at the front, then turn U to place the edge above it with its front sticker matching that center. Resolve any color mismatch before applying an algorithm.",
@@ -164,11 +164,11 @@ const tutorialSources: Tutorial[] = [
       },
       {
         id: "yellow-cross",
-        title: { zh: "第四步：顶层黄色十字", en: "Step 4: The Yellow Cross" },
+        title: { zh: "第四步：顶层黄十字", en: "Step 4: The Yellow Cross" },
         body: {
           zh: [
-            "现在只看顶面的黄色棱块，目标是拼出黄色十字（暂时不管侧面颜色）。你会遇到四种情况之一：一个点、一条横线、一个「L」形（拐角）、或已经是十字。",
-            "只数四个棱位置，不数中心和角块。横线要左右横放，用 F R U R' U' F'。L 形要两条黄棱在左边和后边，用另一条公式 F U R U' R' F'。若只有中心这个点，先用横线公式，再转 U 把产生的 L 摆到左后，最后用 L 公式。已经十字就跳过，不要继续转。进阶两步顶层课另有 L 形和点形的逐步图例。",
+            "现在只看顶面的黄色棱块，目标是拼出黄色十字，侧面颜色暂时不管。你会遇到四种情况之一：只有中间一个点、一条横线、一个“L”形（拐角）、或者已经是十字。",
+            "只数四个棱块的位置，不数中心和角块。横线要左右横着放，用 F R U R' U' F'。L 形要让两个黄色棱块在左边和后边，用另一个公式 F U R U' R' F'。如果只有中心一个点，先用横线公式，再转 U 把出现的 L 摆到左后方，最后用 L 形公式。已经是十字就跳过，不要继续转。进阶的两步顶层课另有 L 形和点形的逐步图例。",
           ],
           en: [
             "Focus only on the yellow edges on top — the goal is a yellow cross (ignore side colors for now). You'll see one of four patterns: a dot, a horizontal line, an \"L\" shape, or already a cross.",
@@ -183,12 +183,12 @@ const tutorialSources: Tutorial[] = [
       },
       {
         id: "yellow-face",
-        title: { zh: "第五步：先把黄色角块放到正确位置", en: "Step 5: Put yellow corners in the correct locations" },
+        title: { zh: "第五步：先把黄色角块放到正确位置", en: "Step 5: Put the yellow corners in place" },
         body: {
           zh: [
-            "本课采用先定角位置、再翻角方向的顺序，不把小鱼和其它流程混在一起。先忽略黄色是否朝上：例如黄绿橙角块，只要在黄、绿、橙三个中心夹住的位置，就叫位置正确，即使它扭着也算。逐个核对四个角的三种颜色，不是只找侧面两个相同贴纸。",
-            "若四角都在正确位置，跳过本步。若只有一个位置正确，保持黄上白下，把整颗魔方水平换个拿法，让这个正确角在上层前右，然后完整执行 U R U' L' U R' U' L。这条公式保留前右角，让其它三个角循环换位。做完重新检查；还没全部到位就保持这个正确角在前右，再做一次。",
-            "如果暂时有两个正确角，或一个也没有，先尝试转顶层 U，每转四分之一圈检查一次，最多试三个新方向：能找到一个正确角就按上一段处理，四角全对则跳过。四个顶层方向都没有正确角时，才先执行一遍公式，再寻找正确角。不要在半条公式中途换方向。验收只要求四个角的三色集合分别对应周围中心；黄色不一定朝上，下一步专门处理方向。",
+            "本课先把角块放到对的位置，下一步再翻转方向，不要和“小鱼”等其他方法混着用。这一步先不管黄色朝不朝上：比如黄绿橙角块，只要它在黄、绿、橙三个中心夹住的位置，就算位置正确，即使它是扭着的。要逐个核对每个角的三种颜色，不能只看侧面两张贴纸。",
+            "如果四个角都已经在正确位置，跳过这一步。如果只有一个角位置正确：保持黄上白下，水平转动整个魔方，让这个正确的角在顶层前右，然后完整做一遍 U R U' L' U R' U' L。这个公式会保持前右角不动，让另外三个角轮换位置。做完再检查；如果还没全部到位，保持这个正确角在前右，再做一次。",
+            "如果暂时有两个正确的角，或者一个都没有：先试着转 U，每转四分之一圈检查一次，最多试三个新方向。找到一个正确角，就按上一段处理；四个角都对，就跳过。只有四个方向都没有正确角时，才先做一遍公式，再去找正确的角。不要在公式做到一半时换方向。检查标准：每个角的三种颜色分别和周围三个中心对应；黄色不一定朝上，下一步专门处理方向。",
           ],
           en: [
             'This method places corners before twisting them; do not mix it with a different Sune-based sequence. Ignore whether yellow faces up. A yellow-green-orange corner is in the right location if it is between those three centers, even when twisted. Check all three colors of each corner.',
@@ -204,12 +204,12 @@ const tutorialSources: Tutorial[] = [
       },
       {
         id: "corner-permutation",
-        title: { zh: "第六步：逐个翻正黄色角块", en: "Step 6: Twist the yellow corners upright" },
+        title: { zh: "第六步：一个一个把黄角翻正", en: "Step 6: Twist the yellow corners upright" },
         body: {
           zh: [
-            "四角位置验收通过后，再处理朝向。全程黄上白下，前中心固定不变。把一个黄色未朝上的角用 U 转到上层前右。重复小组合 R' D' R D，每四步完整做完才检查一次；通常需要两组或四组，直到这个角的黄色朝上。已经朝上的角不要处理。",
-            "重点：过程中底下两层看起来会被打乱，这是暂时的，不要停下来修底层，也不要转动整颗魔方去找下一个角。只转 U，把下一个未翻好的角送到同一个前右操作位置，继续完整的四步小组合。处理完全部角后再转 U 对齐侧面角块，底下两层应该一起恢复。",
-            "演示是一道两个扭角的完整案例：先两组 R' D' R D，再 U 换角，接着四组，最后 U' 对齐。每次下一步只执行一个字母；分组是方便你检查，不是自动连转。实体魔方的扭角数量和方向不同，不能不看局面照抄这道题的组数。若全部角处理后底层没恢复，检查是否少做了每组最后的 D、换了整颗拿法或漏了某个角。",
+            "四个角的位置都对了之后，再处理方向。整个过程保持黄上白下，前面的中心也不换。用 U 把一个黄色没朝上的角转到顶层前右，反复做 R' D' R D 这一小组，每组四步做完才检查；通常需要 2 组或 4 组，这个角的黄色就会朝上。已经朝上的角不用处理。",
+            "重点：做的过程中，下面两层会看起来被打乱，这是暂时的，不要停下来修，也不要转动整个魔方去找下一个角。只转 U，把下一个还没翻好的角送到同一个前右位置，继续做完整的四步小组。所有角都翻好后，再转 U 对齐侧面，下面两层会一起恢复。",
+            "演示是一个有两个扭角的完整例子：先做两组 R' D' R D，转 U 换到下一个角，再做四组，最后 U' 对齐。每点一次“下一步”只执行一个字母；分组只是方便你检查，不会自动连转。你手上实物的扭角数量和方向可能不同，不能不看局面照抄组数。如果全部做完下面两层没有恢复，检查是不是漏了每组最后的 D、换了拿法、或者漏掉了某个角。",
           ],
           en: [
             "After all corners are correctly located, keep yellow up, white down and the same front center. Use U to bring an incorrectly oriented corner to upper-front-right. Repeat R' D' R D, checking only after all four moves. Usually two or four groups turn its yellow sticker upwards. Skip corners already facing up.",
@@ -225,17 +225,17 @@ const tutorialSources: Tutorial[] = [
       },
       {
         id: "edge-permutation",
-        title: { zh: "第七步：顶层棱块归位，完成还原", en: "Step 7: Permute the Edges & Finish" },
+        title: { zh: "第七步：顶层棱块归位，完成还原", en: "Step 7: Place the top edges and finish" },
         body: {
           zh: [
-            "最后一步：让顶层 4 个棱块归位。如果有一个棱块已经正确，把它所在的面朝后，执行右边的公式，其余三个棱块会循环换位；根据情况可能需要执行两次。",
-            "如果四个棱块都不正确，先在任意角度执行一次公式，就会出现一个正确的棱块，再按上面处理。",
-            "当最后一个棱块落位的瞬间——恭喜！你已经独立还原了一个三阶魔方。接下来可以反复练习，把每一步的观察和公式变成肌肉记忆，然后挑战更快的还原方法（如 CFOP）。",
+            "最后一步：让顶层的 4 个棱块回到正确位置。如果有一个棱块已经正确，就把它所在的面转到后面，然后执行本节下方的公式，另外三个棱块会轮换位置；根据情况可能要做两次。",
+            "如果四个棱块都不对，先随便从哪个角度做一次公式，就会出现一个正确的棱块，再按上一段处理。",
+            "最后一个棱块落位的那一刻——恭喜！你已经独立还原了一个三阶魔方。接下来多练几遍，把每一步的观察和公式练熟，再去挑战更快的还原方法，比如 CFOP。",
           ],
           en: [
-            "The final step: place the 4 top edges. If one edge is already correct, hold that face at the back and apply the algorithm — the other three edges cycle. You may need to apply it twice.",
-            "If no edge is correct, apply the algorithm once from any angle to create a correct one, then proceed.",
-            "The moment the last edge drops in — congratulations! You've solved a Rubik's Cube on your own. Keep practicing until each step becomes muscle memory, then move on to faster methods like CFOP.",
+            "The final step: place the 4 top edges. If one edge is already correct, turn that face to the back and apply the algorithm shown below — the other three edges cycle. You may need to apply it twice.",
+            "If no edge is correct, apply the algorithm once from any angle to create a correct one, then continue as above.",
+            "The moment the last edge drops in — congratulations! You've solved a Rubik's Cube on your own. Practise until each step feels natural, then move on to faster methods such as CFOP.",
           ],
         },
         alg: "R U' R U R U R U' R' U' R2",

@@ -1,4 +1,5 @@
 const fs=require('node:fs'),path=require('node:path'),Module=require('node:module'),ts=require('typescript'),assert=require('node:assert/strict');
+const {expandRoomKit}=require('./lib/room-kit-tree.cjs');
 require.extensions['.tsx']=require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,f);
 const resolve=Module._resolveFilename;
 Module._resolveFilename=function(request,...args){return resolve.call(this,request.startsWith('@/')?path.resolve(__dirname,'..',request.slice(2)):request,...args);};
@@ -27,12 +28,12 @@ function button(tree,label){const n=nodes(tree).find(n=>n.type==='button'&&text(
   const key=`yifang:board:${game}:recovery:v1`,old=mode==='malformed'?'{damaged':JSON.stringify({version:1,game,role:mode==='guest-save'?'guest':'host',secret:'a'.repeat(64),checkpoint:'original-checkpoint'});
   const data=new Map([[key,old],['unrelated','keep']]);let removals=0,writes=0;
   global.sessionStorage={getItem(k){if(mode==='read-denied')throw Error('blocked');return data.get(k)??null;},setItem(k,v){writes++;data.set(k,v);},removeItem(k){removals++;data.delete(k);}};
-  function render(){cursor=0;return Remote({game,locale});}
+  function render(){cursor=0;return expandRoomKit(Remote({game,locale}));}
   render();effects.splice(0).forEach(fn=>fn());await Promise.resolve();await Promise.resolve();let tree=render();
-  const zh=locale==='zh',label=guest?(zh?'我是朋友：生成应答':'Guest: generate answer'):(zh?'我是房主：生成邀请':'Host: generate invitation');
-  function fill(id){const parent=nodes(render()).find(n=>n.type==='label'&&text(n)===(zh?'朋友：粘贴房主邀请':'Guest: paste host invitation'));assert.ok(parent);nodes(parent).find(n=>n.type==='textarea').props.onChange({target:{value:JSON.stringify({v:1,game,id:id.repeat(24),type:'offer',sdp:'v=0\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\n'})}});}
+  const zh=locale==='zh',label=guest?(zh?'生成回复码':'Create reply code'):(zh?'生成邀请码':'Create invitation code');
+  function fill(id){const parent=nodes(render()).find(n=>n.type==='label'&&text(n)===(zh?'粘贴房主发来的邀请码':'Paste the host’s invitation code'));assert.ok(parent);nodes(parent).find(n=>n.type==='textarea').props.onChange({target:{value:JSON.stringify({v:1,game,id:id.repeat(24),type:'offer',sdp:'v=0\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\n'})}});}
   if(mode==='guest-save'&&guest){
-   await button(tree,zh?'恢复本标签页对局':'Restore this tab’s match').props.onClick();tree=render();
+   await button(tree,zh?'恢复上次对局':'Restore previous match').props.onClick();tree=render();
    assert.ok(text(tree).includes(zh?'恢复模式：':'Recovery mode:'));
    for(const value of ['public','manual']){nodes(tree).find(n=>n.type==='select').props.onChange({target:{value}});tree=render();}
    assert.ok(!text(tree).includes(zh?'恢复模式：':'Recovery mode:'),'Changing mode must cancel the selected old guest recovery');
@@ -43,7 +44,7 @@ function button(tree,label){const n=nodes(tree).find(n=>n.type==='button'&&text(
   assert.equal(data.get(key),old);assert.equal(removals,0);assert.equal(writes,0);
   assert.ok(text(tree).includes(zh?'旧存档会保留':'old save stays'));
   for(const value of ['public','manual']){nodes(tree).find(n=>n.type==='select').props.onChange({target:{value}});tree=render();}
-  assert.ok(!text(tree).includes(zh?'再次点击同一个创建':'Click the same host/join button'),'Changing connection mode clears old confirmation');
+  assert.ok(!text(tree).includes(zh?'再点一次同一个按钮':'Click the same button again'),'Changing connection mode clears old confirmation');
   if(guest)fill('a');tree=render();
   await button(tree,label).props.onClick();tree=render();assert.equal(attempts,0,'Returning to manual mode requires a fresh confirmation');
   if(guest){fill('b');tree=render();await button(tree,label).props.onClick();tree=render();assert.equal(attempts,0,'Changed invitation requires a fresh confirmation');}
@@ -52,9 +53,11 @@ function button(tree,label){const n=nodes(tree).find(n=>n.type==='button'&&text(
   assert.equal(data.get(key),old,'Rule-loading/negotiation failure must preserve original bytes');
   assert.equal(removals,0,'Preparing a new room must not delete the old save');assert.equal(writes,0);
   assert.equal(data.get('unrelated'),'keep');assert.ok(text(tree).includes(zh?'无法加载规则或连接服务':'Could not load the rules or connection service'));
-  const leave=nodes(tree).find(n=>n.type==='button'&&text(n)===(zh?'离开并清除连接码':'Leave and clear connection text'));
-  assert.ok(leave);leave.props.onClick();tree=render();assert.equal(data.get(key),old);
-  if(mode==='host-save'||mode==='guest-save')button(tree,zh?'恢复本标签页对局':'Restore this tab’s match');
+  const leave=nodes(tree).find(n=>n.type==='button'&&text(n)===(zh?'取消并离开':'Cancel and leave'));
+  // A failed attempt returns to role choice; leaving (when offered) must still keep the save.
+  if(leave){leave.props.onClick();tree=render();}
+  assert.ok(nodes(tree).some(n=>n.type==='button'&&text(n)===label),'Failure returns to the role choice');assert.equal(data.get(key),old);
+  if(mode==='host-save'||mode==='guest-save')button(tree,zh?'恢复上次对局':'Restore previous match');
   cases++;
  }
  console.log(`PASS: ${cases} four-game bilingual new-room handler cases: host/guest or unreadable saves require confirmation, changed invitations/modes reset it, mode changes cancel old recovery selection, failed rule-load/negotiation and leaving preserve original bytes. Hooks, Storage and failed engine/transport doubles, not native browser evidence.`);

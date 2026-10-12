@@ -24,9 +24,9 @@ export default async function Academy({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const zh = locale === "zh";
-  return (
+  return (<>
+    <Breadcrumbs locale={locale} items={[{name:zh?'弈方首页':'Yifang home',path:`/${locale}`},{name:pageCopy[locale].title,path:`/${locale}/academy`}]} />
     <div className="rpg-directory">
-      <Breadcrumbs locale={locale} items={[{name:zh?'弈方首页':'Yifang home',path:`/${locale}`},{name:pageCopy[locale].title,path:`/${locale}/academy`}]} />
       <PageSchema locale={locale} path="/academy" name={pageCopy[locale].title} description={pageCopy[locale].description} type="CollectionPage"
         items={games.flatMap(g => tutorialsForGame(g.slug).map(t => ({name:t.title[locale],path:`/${locale}/${g.slug}/learn/${t.slug}`})))} />
       <span className="atlas-eyebrow">THE ADVENTURER’S ACADEMY</span>
@@ -56,5 +56,5 @@ export default async function Academy({
         ))}
       </div>
     </div>
-  );
+  </>);
 }

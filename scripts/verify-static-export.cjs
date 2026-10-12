@@ -42,19 +42,19 @@ for(const locale of ['zh','en']){
  for(const marker of locale==='zh'?['独立案例：黄色 L 形变十字','独立案例：点形分两段变十字','第七次点击 U2','最后停在第十三步']:['Separate case: yellow L to cross','Separate case: dot to cross in two stages','Click seven is U2','Stop after step thirteen'])assert.ok(edges.includes(marker),`Missing exported edge case instruction: ${marker}`);
  const notation=fs.readFileSync(path.join(root,locale,'cube/learn/notation/index.html'),'utf8');
  assert.ok(notation.includes(locale==='zh'?'演示一组四步':'One four-move group'),'notation must distinguish displayed case from six repetitions');
- assert.ok(notation.includes(locale==='zh'?'不能冒充通用还原法':'not a general solve'),'notation must explain return-to-start versus solving');
+ assert.ok(notation.includes(locale==='zh'?'不是通用的还原方法':'not a general solve'),'notation must explain return-to-start versus solving');
  assert.ok(!notation.includes(locale==='zh'?'读任何三阶公式':'read any 3x3 algorithm'),'stale notation mastery claim');
  const pll=fs.readFileSync(path.join(root,locale,'cube/learn/cfop-2look-ll/index.html'),'utf8');
- assert.ok(pll.includes(locale==='zh'?'Z，两对相邻棱互换':'Z, adjacent edge pairs'),'missing independent Z case');
- assert.ok(pll.includes(locale==='zh'?'第 24 步 U':'step 24, U'),'Z must explain the final alignment');
+ assert.ok(pll.includes(locale==='zh'?'Z，两对相邻的棱块互换':'Z, adjacent edge pairs'),'missing independent Z case');
+ assert.ok(pll.includes(locale==='zh'?'第 24 步做 U':'step 24, U'),'Z must explain the final alignment');
  const f2l=fs.readFileSync(path.join(root,locale,'cube/learn/cfop-f2l/index.html'),'utf8');
  assert.ok(f2l.includes(locale==='zh'?'同一对换了位置':'The same pair in a new position'),'F2L title must describe the actual single case');
  assert.ok(f2l.includes(locale==='zh'?'看不清就停下来':'Pause whenever you lose track'),'F2L must allow beginners to pause');
- assert.ok(f2l.includes(locale==='zh'?'把最后一条白棱放回底面':'place its last edge'),'missing guided cross case');
- assert.ok(f2l.includes(locale==='zh'?'不是任意打乱都能用 F2 解决':'not an F2 solution for every scramble'),'cross case needs explicit applicability limits');
+ assert.ok(f2l.includes(locale==='zh'?'把最后一个白棱放回底面':'place its last edge'),'missing guided cross case');
+ assert.ok(f2l.includes(locale==='zh'?'不是说任何打乱都能用 F2 解决':'not an F2 solution for every scramble'),'cross case needs explicit applicability limits');
  assert.ok(!f2l.includes(locale==='zh'?'步数直接减半':'half the moves'),'F2L must not promise a fixed move reduction');
  assert.ok(pll.includes(locale==='zh'?'四个侧面都有车灯':'Headlights on all four sides'),'missing corner-skip recognition');
- assert.ok(pll.includes(locale==='zh'?'跳过角块交换':'Skip corner swapping'),'missing instruction to leave solved corners alone');
+ assert.ok(pll.includes(locale==='zh'?'跳过换角':'Skip corner swapping'),'missing instruction to leave solved corners alone');
  for(const game of ['mahjong','holdem','baccarat']){
   const hub=fs.readFileSync(path.join(root,locale,game,'index.html'),'utf8');
   assert.ok(new RegExp(`href="/${locale}/${game}/play/?"`).test(hub),`${locale}/${game}: missing actual play entry`);

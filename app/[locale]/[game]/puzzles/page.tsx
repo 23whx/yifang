@@ -2,7 +2,6 @@ import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import { pageMetadata } from '@/lib/seo';
 import { gamePageCopy } from '@/content/seo';
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import CubePuzzles from "@/components/cube/CubePuzzles";
 import KnowledgePuzzles from "@/components/board/KnowledgePuzzles";
@@ -44,11 +43,8 @@ export default async function PuzzlesPage({ params }: { params: Promise<{ locale
     <>
       <Breadcrumbs locale={locale} items={[{ name: locale === 'zh' ? '弈方首页' : 'Yifang home', path: `/${locale}` }, { name: g.name[locale], path: `/${locale}/${game}` }, { name: gamePageCopy(g.slug, g.name[locale], locale, 'puzzles').title, path: `/${locale}/${game}/puzzles` }]} />
       <section className="border-b-2 border-ink">
-        <div className="mx-auto max-w-[1400px] px-5 py-10 sm:px-8 lg:py-14">
-          <Link href={`/${locale}/${game}`} className="text-sm font-semibold text-ink-3 hover:text-vermilion">
-            ← {g.name[locale]}
-          </Link>
-          <h1 className="display-cjk mt-4 text-[clamp(36px,5.5vw,84px)]">{g.name[locale]} · {dict.puzzlesTitle}</h1>
+        <div className="mx-auto max-w-[1400px] px-5 pt-4 pb-10 sm:px-8 lg:pb-14">
+          <h1 className="page-title mt-2">{g.name[locale]} · {dict.puzzlesTitle}</h1>
           <p className="prose-yf mt-6 max-w-2xl">{puzzleDescription(game, locale)}</p>
         </div>
       </section>

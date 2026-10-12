@@ -1,4 +1,5 @@
 const fs=require('node:fs'),path=require('node:path'),Module=require('node:module'),ts=require('typescript'),assert=require('node:assert/strict');
+const {expandRoomKit}=require('./lib/room-kit-tree.cjs');
 require.extensions['.tsx']=require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,f);
 const resolve=Module._resolveFilename;
 Module._resolveFilename=function(request,...args){return resolve.call(this,request.startsWith('@/')?path.resolve(__dirname,'..',request.slice(2)):request,...args);};
@@ -41,7 +42,7 @@ Module._load=function(request,...args){
 const Remote=require('../components/board/RemoteGame.tsx').default;
 function nodes(n){if(Array.isArray(n))return n.flatMap(nodes);return n&&typeof n==='object'?[n,...nodes(n.props?.children)]:[];}
 function text(n){return Array.isArray(n)?n.map(text).join(''):n==null||typeof n==='boolean'?'':typeof n==='object'?text(n.props?.children):String(n);}
-function render(r){runtime=r;r.cursor=0;return Remote(r.props);}
+function render(r){runtime=r;r.cursor=0;return expandRoomKit(Remote(r.props));}
 function findButton(r,label){const node=nodes(render(r)).find(n=>n.type==='button'&&text(n)===label);assert.ok(node,`Missing ${label}`);assert.ok(!node.props.disabled);return node;}
 async function click(r,label){await findButton(r,label).props.onClick();await new Promise(resolve=>setImmediate(resolve));}
 function fill(r,label,value){const parent=nodes(render(r)).find(n=>n.type==='label'&&text(n)===label);assert.ok(parent,`Missing label ${label}`);nodes(parent).find(n=>n.type==='textarea').props.onChange({target:{value}});}
@@ -52,15 +53,15 @@ function fill(r,label,value){const parent=nodes(render(r)).find(n=>n.type==='lab
   try{
    const oldSaves=clients.map(c=>c.store.getItem(saveKey));
    for(const c of clients)render(c);await new Promise(resolve=>setImmediate(resolve));
-   await click(h,zh?'我是房主：生成邀请':'Host: generate invitation');
+   await click(h,zh?'生成邀请码':'Create invitation code');
    assert.equal(channels.length,0,'First click must preserve the old host save');
-   await click(h,zh?'我是房主：生成邀请':'Host: generate invitation');
+   await click(h,zh?'生成邀请码':'Create invitation code');
    assert.equal(channels.length,1);assert.equal(h.store.getItem(saveKey),oldSaves[0],'Unconnected host invitation must not replace the old save');
-   fill(g,zh?'朋友：粘贴房主邀请':'Guest: paste host invitation',signal(game,'offer'));
-   await click(g,zh?'我是朋友：生成应答':'Guest: generate answer');assert.equal(channels.length,1);
-   await click(g,zh?'我是朋友：生成应答':'Guest: generate answer');
+   fill(g,zh?'粘贴房主发来的邀请码':'Paste the host’s invitation code',signal(game,'offer'));
+   await click(g,zh?'生成回复码':'Create reply code');assert.equal(channels.length,1);
+   await click(g,zh?'生成回复码':'Create reply code');
    assert.equal(channels.length,2);for(const [i,c] of clients.entries())assert.equal(c.store.getItem(saveKey),oldSaves[i],'Before handshake, original host/guest saves remain intact');
-   fill(h,zh?'粘贴朋友的应答':'Paste your guest’s answer',signal(game,'answer'));await click(h,zh?'使用应答连接':'Connect using answer');
+   fill(h,zh?'粘贴朋友发回的回复码':'Paste your friend’s reply code',signal(game,'answer'));await click(h,zh?'使用回复码连接':'Connect with reply code');
    for(const [i,c] of clients.entries())assert.notEqual(c.store.getItem(saveKey),oldSaves[i],'A successful new handshake checkpoints the new match');
    if(game==='go'){
     assert.equal(journals.length,0,'Go uses its own rules, never the ffish recovery journal');
@@ -81,10 +82,10 @@ function fill(r,label,value){const parent=nodes(render(r)).find(n=>n.type==='lab
     const partial=savedGo(h).view();
     for(const c of clients){runtime=c;for(const cleanup of c.cleanup)cleanup?.();c.slots=[];c.cleanup=[];}
     channels=[];
-    for(const c of clients){render(c);await new Promise(resolve=>setImmediate(resolve));assert.ok(text(render(c)).includes(zh?'本标签页已有存档':'This tab has a save'));}
-    await click(h,zh?'恢复本标签页对局':'Restore this tab’s match');await click(g,zh?'恢复本标签页对局':'Restore this tab’s match');
-    fill(g,zh?'朋友：粘贴房主邀请':'Guest: paste host invitation',signal(game,'offer'));await click(g,zh?'我是朋友：生成应答':'Guest: generate answer');
-    fill(h,zh?'粘贴朋友的应答':'Paste your guest’s answer',signal(game,'answer'));await click(h,zh?'使用应答连接':'Connect using answer');
+    for(const c of clients){render(c);await new Promise(resolve=>setImmediate(resolve));assert.ok(text(render(c)).includes(zh?'发现本标签页保存的上次对局':'This tab has a saved match'));}
+    await click(h,zh?'恢复上次对局':'Restore previous match');await click(g,zh?'恢复上次对局':'Restore previous match');
+    fill(g,zh?'粘贴房主发来的邀请码':'Paste the host’s invitation code',signal(game,'offer'));await click(g,zh?'生成回复码':'Create reply code');
+    fill(h,zh?'粘贴朋友发回的回复码':'Paste your friend’s reply code',signal(game,'answer'));await click(h,zh?'使用回复码连接':'Connect with reply code');
     const deadline=Date.now()+5000;
     while(!clients.every(c=>text(render(c)).includes(zh?'已恢复原对局':'Original match restored'))&&Date.now()<deadline)await new Promise(resolve=>setTimeout(resolve,10));
     for(const c of clients){assert.ok(text(render(c)).includes(zh?'已恢复原对局':'Original match restored'));assert.deepEqual(savedGo(c).view(),partial);}
@@ -117,10 +118,10 @@ function fill(r,label,value){const parent=nodes(render(r)).find(n=>n.type==='lab
    const original=journals[0].view(),oldEpoch=channels[0].epoch;
    for(const c of clients){runtime=c;for(const cleanup of c.cleanup)cleanup?.();c.slots=[];c.cleanup=[];}
    channels=[];journals=[];
-   for(const c of clients){render(c);await new Promise(resolve=>setImmediate(resolve));assert.ok(text(render(c)).includes(zh?'本标签页已有存档':'This tab has a save'));}
-   await click(h,zh?'恢复本标签页对局':'Restore this tab’s match');await click(g,zh?'恢复本标签页对局':'Restore this tab’s match');
-   fill(g,zh?'朋友：粘贴房主邀请':'Guest: paste host invitation',signal(game,'offer'));await click(g,zh?'我是朋友：生成应答':'Guest: generate answer');
-   fill(h,zh?'粘贴朋友的应答':'Paste your guest’s answer',signal(game,'answer'));await click(h,zh?'使用应答连接':'Connect using answer');
+   for(const c of clients){render(c);await new Promise(resolve=>setImmediate(resolve));assert.ok(text(render(c)).includes(zh?'发现本标签页保存的上次对局':'This tab has a saved match'));}
+   await click(h,zh?'恢复上次对局':'Restore previous match');await click(g,zh?'恢复上次对局':'Restore previous match');
+   fill(g,zh?'粘贴房主发来的邀请码':'Paste the host’s invitation code',signal(game,'offer'));await click(g,zh?'生成回复码':'Create reply code');
+   fill(h,zh?'粘贴朋友发回的回复码':'Paste your friend’s reply code',signal(game,'answer'));await click(h,zh?'使用回复码连接':'Connect with reply code');
    const deadline=Date.now()+5000;
    while(!clients.every(c=>text(render(c)).includes(zh?'已恢复原对局':'Original match restored'))&&Date.now()<deadline)await new Promise(resolve=>setTimeout(resolve,10));
    for(const c of clients){assert.ok(text(render(c)).includes(zh?'已恢复原对局':'Original match restored'),text(render(c)));assert.equal(nodes(render(c)).find(n=>n.type===Board).props.fen,original.fen);}

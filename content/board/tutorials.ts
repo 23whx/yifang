@@ -52,26 +52,26 @@ export const boardTutorials: Tutorial[] = [
         body: {
           zh: [
             "车走直线，象走斜线，后兼具两者，都可以走任意远但不能跳子。王每次只能走一格，任何方向。棋子价值的常用估算：兵 1、马 3、象 3、车 5、后 9——王无价。",
-            "演示里白后从 d4 直冲 d8 将军，黑王只能逃到 e7 或 f7；然后白车 a1–a8 沿着底线过来。注意每一步都是长距离直线，中间必须没有阻挡。",
+            "演示里白后从 d4 沿斜线走到 h8 将军，黑王走到 e7 躲开；然后白车从 a1 沿 a 线一直走到 a8。注意每一步都是长距离直线或斜线，中间必须没有阻挡。",
           ],
           en: [
             "Rooks move in straight lines, bishops diagonally, and the queen combines both — any distance, but no jumping. The king moves one square in any direction. Rough values: pawn 1, knight 3, bishop 3, rook 5, queen 9 — the king is priceless.",
-            "In the demo the white queen goes d4–d8 with check; the black king must run to e7 or f7; then the rook sweeps a1–a8. Every move is a long straight line with nothing in the way.",
+            "In the demo the white queen slides d4–h8 with check, the black king steps to e7, then the rook runs a1–a8 up the a-file. Every move is a long straight or diagonal line with nothing in the way.",
           ],
         },
-        position: { fen: "4k3/8/8/8/3Q4/8/8/R3K3 w - - 0 1", moves: ["d4d8", "e8f7", "a1a8"] },
+        position: { fen: "4k3/8/8/8/3Q4/8/8/R3K3 w - - 0 1", moves: ["d4h8", "e8e7", "a1a8"] },
       },
       {
         id: "check-mate",
         title: { zh: "将军与将死", en: "Check and checkmate" },
         body: {
           zh: [
-            "王被攻击叫「将军」（check），必须立刻解除：移开王、吃掉攻击者、或用子挡住。如果三种办法都没有，就是「将死」（checkmate），棋局结束。",
-            "演示的是四步杀「学者杀」：白后与象合攻 f7。黑方此时走 g8–f6 虽然攻击白后，却没有解除将杀威胁；改走 g7–g6 可以挡住后对 f7 的攻击。理解它的意义是学会防守它，而不是靠它赢棋。",
+            "王被攻击叫“将军”，必须马上解除：把王走开、吃掉攻击的棋子、或者用棋子挡住。三种都做不到，就是“将死”，棋局结束。",
+            "演示的是四步杀（又叫“学者杀”）：白后和象一起瞄准 f7。黑方这时走 g8→f6 虽然赶了白后，却没挡住 f7，于是被将死。正确的防守是 g7→g6，挡住后通往 f7 的路。学它是为了会防，而不是指望靠它赢棋。",
           ],
           en: [
-            "A king under attack is in check and must escape at once: move the king, capture the attacker, or block. If none is possible, it's checkmate and the game ends.",
-            "In Scholar's Mate, queen and bishop converge on f7. Here Ng8–f6 attacks the queen but fails to prevent mate; g7–g6 instead blocks the queen's attack on f7. Learn the threat so you can defend against it, not rely on it.",
+            "A king under attack is in check and must escape at once: move the king, capture the attacker, or block the attack. If none of these is possible, it is checkmate and the game ends.",
+            "The demo is Scholar's Mate: White's queen and bishop both aim at f7. Black's Ng8–f6 chases the queen but leaves f7 unguarded, so it is mate. The right defence was g7–g6, blocking the queen's path to f7. Learn this trap so you can defend against it, not so you can rely on it.",
           ],
         },
         position: { fen: CHESS_START, moves: ["e2e4", "e7e5", "d1h5", "b8c6", "f1c4", "g8f6", "h5f7"] },
@@ -81,12 +81,12 @@ export const boardTutorials: Tutorial[] = [
         title: { zh: "三条特殊规则", en: "Three special rules" },
         body: {
           zh: [
-            "王车易位：王和车都未动过、之间没有子、王不在被将军状态且经过的格子不被攻击时，王向车方向走两格，车跳到王的另一侧。短易位在王翼，长易位在后翼。演示中双方各易位一次。",
-            "吃过路兵：对方兵刚走两格、停在你兵的正旁边时，你可以在下一步立刻像它只走了一格那样斜吃它。只有紧接着的那一步有效。升变：兵走到底线必须换成后、车、象或马中的任意一个——几乎总是选后。",
+            "王车易位：一步棋里同时动王和车。条件是王和这个车都没动过、两者之间没有棋子、王此刻没被将军、王经过和到达的格子都不被攻击。走法是王朝车的方向走两格，车跳到王的另一边。靠王一侧的叫短易位，靠后一侧的叫长易位。演示里双方各易位一次。",
+            "吃过路兵：对方的兵从起点一次走两格，正好停在你的兵旁边时，你可以在紧接着的下一步，把它当作只走了一格那样斜着吃掉。错过这一步就不能再吃了。升变：兵走到最后一行，必须换成后、车、象或马之一，绝大多数时候选后。",
           ],
           en: [
-            "Castling: if king and rook have never moved, nothing stands between them, the king is not in check and doesn't pass through an attacked square, the king moves two squares towards the rook and the rook jumps over. Kingside is short, queenside long. Both sides castle in the demo.",
-            "En passant: when an enemy pawn advances two squares to land beside your pawn, on the very next move you may capture it as if it had moved one. Promotion: a pawn reaching the last rank must become a queen, rook, bishop or knight — almost always a queen.",
+            "Castling moves the king and a rook in a single turn. It is allowed only if neither piece has moved, nothing stands between them, the king is not in check, and the king does not pass through or land on an attacked square. The king moves two squares towards the rook and the rook jumps to the king's other side. Kingside castling is short, queenside castling is long. Both sides castle in the demo.",
+            "En passant: when an enemy pawn moves two squares from its start and lands right beside your pawn, on your very next move you may capture it diagonally as if it had moved only one square. Miss that move and the chance is gone. Promotion: a pawn reaching the last rank must become a queen, rook, bishop or knight — almost always a queen.",
           ],
         },
         position: { fen: "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1", moves: ["e1g1", "e8c8"] },
@@ -184,12 +184,12 @@ export const boardTutorials: Tutorial[] = [
         title: { zh: "兵卒：过河才能横走", en: "Soldiers: sideways only after the river" },
         body: {
           zh: [
-            "兵（卒）过河前只能向前走一格。过河后可以向前或左右横走一格，但永远不能后退。到了对方底线只能横走，所以「老兵」价值大跌——过河兵要尽早发挥作用。",
-            "演示：红兵 e5 进到 e6 过河，黑将走开一步，红兵 e6 平 d6 横走。注意黑将为什么要先走开：如果两将同在 e 路，兵一离开中间就成了「飞将」，那一步是不合法的。",
+            "兵（卒）没过河时只能向前走一格；过河后可以向前或左右走一格，但永远不能后退。走到对方底线后只能左右走，作用大大减弱，所以过河兵要趁早发挥作用。",
+            "演示：红兵 e5→e6 过河，黑将先挪开一步，红兵再 e6→d6 横走。为什么黑将要先挪开？因为两个将帅都在 e 列时，兵一离开就会让它们直接面对面（“飞将”），那一步是不合法的。",
           ],
           en: [
-            "Before crossing the river a soldier moves one point forward only. After crossing it may move forward or sideways one point, but never back. On the last rank it can only move sideways, so an \"old soldier\" loses most of its value — use crossed soldiers early.",
-            "Demo: red's soldier e5–e6 crosses the river, black's general steps aside, red's soldier e6–d6 moves sideways. Note why the general must move first: with both generals on the e-file, the soldier leaving it would expose a flying general, so that move would be illegal.",
+            "Before crossing the river a soldier moves one point forward only. After crossing it may move one point forward or sideways, but never back. On the enemy's last rank it can only move sideways and loses most of its value, so put crossed soldiers to work early.",
+            "Demo: Red's soldier e5–e6 crosses the river, Black's general steps aside, then the soldier moves sideways e6–d6. Why must the general move first? With both generals on the e-file, the soldier stepping away would leave them facing each other — a \"flying general\" — so that move would be illegal.",
           ],
         },
         position: { fen: "4k4/9/9/p8/9/4P4/9/9/9/4K4 w - - 0 1", moves: ["e5e6", "e10d10", "e6d6"] },
@@ -314,7 +314,7 @@ export const boardTutorials: Tutorial[] = [
       },
       {
         id: "mate",
-        title: { zh: "诘：一手将死", en: "Tsume: mate in one" },
+        title: { zh: "诘将棋：一步将死", en: "Tsume: mate in one" },
         body: {
           zh: [
             "王被攻击且无法解除即为「诘」。因为有打入，将棋的终盘几乎总是靠手里的子完成攻杀。「诘将棋」是日本传统的将棋谜题：给定局面，用连续将军把王诘死。",

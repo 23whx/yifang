@@ -198,6 +198,7 @@
   gap: 6px;
 }
 .atlas-filters button {
+  min-height: 44px;
   font-size: 12px;
   padding: 8px 15px;
   border: 1px solid #82603c;
@@ -461,12 +462,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 18px;
+  padding: 10px 20px;
   background: linear-gradient(#765030, #342316);
   color: #f2d5a0;
   border: 1px solid #ae8550;
   box-shadow: inset 0 0 0 3px #3e291a;
-  font-size: 13px;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 700;
 }
 .rpg-button.secondary {
   background: transparent;
@@ -481,12 +484,16 @@
   text-underline-offset: 4px;
 }
 .rpg-directory {
-  padding: 65px 5%;
-  max-width: 1440px;
+  padding: 16px 20px 64px;
+  max-width: 1400px;
   margin: auto;
 }
+@media (min-width: 640px) {
+  .rpg-directory { padding-inline: 32px; }
+}
 .rpg-directory > h1 {
-  font: clamp(30px, 4vw, 52px)/1.5 var(--font-serif-cjk);
+  font: 700 clamp(32px, 4.2vw, 52px)/1.3 var(--font-serif-cjk);
+  color: #21170f;
   margin: 10px 0 15px;
 }
 .rpg-directory > p {
@@ -554,7 +561,7 @@
 }
 .academy-list a > span {
   font: 28px Georgia;
-  color: #9b6037;
+  color: #85512d;
 }
 .academy-list a > div {
   flex: 1;
@@ -730,6 +737,7 @@ button:disabled {
   }
   .atlas-mobile-destinations button {
     white-space: nowrap;
+    min-height: 44px;
     font-size: 12px;
     padding: 10px 14px;
     border: 1px solid #8e683c;
@@ -752,7 +760,7 @@ button:disabled {
     font-size: 26px;
   }
   .rpg-directory {
-    padding: 38px 20px;
+    padding-top: 12px;
   }
   .rpg-game-grid {
     gap: 12px;
@@ -839,9 +847,11 @@ button:disabled {
     min-height: 30px;
   }
   .atlas-filters button {
-    min-height: 40px;
+    min-height: 44px;
   }
   .atlas-controls button {
     min-height: 44px;
   }
 }
+
+.atlas-search input { min-height: 44px; }

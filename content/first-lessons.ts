@@ -48,8 +48,8 @@ const make = (game: GameSlug, steps: TutorialStep[]): Tutorial => ({
     id: "guided-opening",
     title: l("现在动手：双方轮流的第一组着法", "Your turn: an opening sequence for both sides"),
     body: {
-      zh: ["选择右侧或上方的‘我来走’，按提示依次点击起点棋子和目标位置。这里只跟做指定教学路线，不评价其它合法开局的好坏。双方都由你操作，便于看清轮流机制。", "走完每步先观察高亮的起点和终点，再读下一步提示。可以退回重试或切回演示；回看是教学工具，不是正式比赛默认允许悔棋。"],
-      en: ["Choose Try the moves above or alongside the text. Select each indicated origin and destination. Follow this teaching line; other legal openings are not necessarily bad. You operate both sides to experience alternating turns.", "Inspect the highlighted origin and destination after each move before reading the next prompt. Review or switch back to playback as needed; these learning aids are not standard tournament takebacks."],
+      zh: ["点“我来走”，按提示先点要走的棋子，再点目标格。双方都由你来走，这样能看清轮流的节奏。这只是一条教学路线，别的合法开局也可以。", "每走一步，先看高亮的起点和终点，再读下一步提示。走错了可以退回重来，也可以切回观看演示。正式比赛一般不允许悔棋。"],
+      en: ["Choose Try the moves, then select each indicated piece and its destination. You play both sides so you can see how turns alternate. This is one teaching line; other legal openings are fine too.", "After each move, look at the highlighted origin and destination before reading the next prompt. You can step back and retry or switch to watching the demo. Real games usually do not allow take-backs."],
     },
     position: { fen: starts[game as keyof typeof starts], moves: game === "chess" ? ["e2e4", "e7e5", "g1f3", "b8c6"] : game === "xiangqi" ? ["b3e3", "b8e8", "h1g3", "h10g8"] : ["e3e4", "e7e6", "g1f2", "g9f8"] },
   }] : [])],
@@ -75,14 +75,14 @@ export const firstLessons: Tutorial[] = [
       "六种棋子的功能与走法",
       "All six pieces",
       [
-        "王 ♔：任意方向一格，负责生存；后 ♕：横、竖、斜任意格，是远程主力；车 ♖：横竖任意格，控制开放直线；象 ♗：斜走任意格，始终留在同色格。它们都不能越过棋子。",
-        "马 ♘：先两格再侧一格，能跳过任何棋子。兵 ♙：向前一格，在初始位置可走两格但沿途须空；只斜前一格吃子，不能后退。兵到末排必须升变成后、车、象或马。",
-        "除兵外，吃子和移动的路线相同：落在敌子所在格并移走敌子。任何子都不能落在己方棋子上。",
+        "王 ♔：任意方向走一格，要始终保护好它。后 ♕：横、竖、斜都能走任意远，是最强的棋子。车 ♖：横、竖走任意远。象 ♗：斜着走任意远，永远待在同一种颜色的格子上。这几种棋子都不能跳过别的棋子。",
+        "马 ♘：先直走两格，再横走一格，像个“L”，而且可以跳过棋子。兵 ♙：只能向前走一格；第一次走时可以一次走两格（前面两格都要是空的）。兵吃子是斜向前一格，而且永远不能后退。兵走到最后一行时，必须变成后、车、象或马，这叫“升变”。",
+        "除了兵以外，吃子的走法和平时一样：走到对方棋子所在的格子，把它拿走。不能走到自己棋子占着的格子。",
       ],
       [
-        "King: one square in any direction, keep it safe. Queen: any distance along ranks, files or diagonals. Rook: ranks and files. Bishop: diagonals, always on the same colour. None can jump over occupied squares.",
-        "Knight: two squares in one direction and one sideways, jumping over pieces. Pawn: one square forward, or two from its starting square if both are empty; captures diagonally forward, never backwards. Reaching the last rank requires promotion to queen, rook, bishop or knight.",
-        "Except for pawns, captures follow normal movement: land on the enemy square and remove that piece. Never land on your own piece.",
+        "King ♔: one square in any direction — keep it safe. Queen ♕: any distance along ranks, files or diagonals; the strongest piece. Rook ♖: any distance along ranks and files. Bishop ♗: any distance diagonally, so it always stays on one colour. None of these can jump over other pieces.",
+        "Knight ♘: two squares in a straight line, then one to the side — an \"L\" — and it may jump over pieces. Pawn ♙: one square forward; on its very first move it may go two, if both squares are empty. A pawn captures one square diagonally forward and can never move backwards. A pawn that reaches the last rank must become a queen, rook, bishop or knight: this is promotion.",
+        "Except for pawns, a piece captures the same way it moves: land on the enemy piece's square and remove that piece. You can never land on one of your own pieces.",
       ],
       starts.chess,
     ),
@@ -93,12 +93,12 @@ export const firstLessons: Tutorial[] = [
       [
         "被将军时必须立即解除：移王、吃攻击子、或挡住攻击线；马将军无法垫子阻挡。",
         "易位要求王与对应车从未动过，中间无子，王当前、经过与落点均不受攻击。吃过路兵仅能紧接着对方相邻兵两格前进的那一手进行，且仍不得暴露己王。",
-        "三次重复与 50 回合规则通常须提出和棋要求；五次重复与 75 回合规则自动和棋，最后一步将死优先。重复不仅比较棋子位置，还包括行棋方、易位与吃过路兵权利。",
+        "同一局面重复出现三次，或者连续 50 回合没有吃子也没有走兵，一方可以申请和棋；出现五次重复与 75 回合时则自动和棋。不过如果最后一步正好将死，以将死为准。判断“同一局面”时，不仅看棋子摆放，还要看轮到谁走、能否易位、能否吃过路兵。",
       ],
       [
         "Answer check by moving the king, capturing the attacker or blocking its line. A knight check cannot be blocked.",
         "Castling requires an unmoved king and rook, an empty path, and a king that is not in check and crosses and lands on unattacked squares. En passant is available only immediately after the adjacent enemy pawn’s two-square advance and cannot expose your king.",
-        "Threefold repetition and the 50-move rule normally require a claim; fivefold repetition and 75 moves are automatic draws, with checkmate on the last move taking priority. Position identity includes the turn and castling and en-passant rights.",
+        "If the same position occurs three times, or 50 moves pass with no capture and no pawn move, a player may claim a draw; at five repetitions or 75 moves the draw is automatic. If the last move happens to be checkmate, the mate stands. A \"same position\" means the same pieces and also the same side to move and the same castling and en-passant rights.",
       ],
       starts.chess,
     ),
@@ -120,17 +120,17 @@ export const firstLessons: Tutorial[] = [
     ),
     step(
       "pieces",
-      "七种棋子各有什么本领",
-      "All seven pieces",
+      "七种棋子的走法",
+      "How the seven pieces move",
       [
-        "帅／将：九宫内横竖一格。仕／士：九宫内斜一格。相／象：斜两格走田字，不能过河；中点有任何棋子就塞象眼。",
-        "车：横竖任意距离，不能越子。马：先直一格再向外斜一格，走日字；第一直步被任何子占据就蹩马腿。炮：不吃子时像车；吃子时必须与目标之间恰有一个炮架，敌我均可。",
-        "兵／卒：过河前向前一格，过河后可向前或横向一格，永不能后退，也不会升变。兵卒吃子与走法相同。",
+        "帅／将：在九宫里横着或竖着走一格。仕／士：在九宫里斜着走一格。相／象：斜着走两格（走“田”字），不能过河；“田”字中间有棋子挡住就不能走，这叫“塞象眼”。",
+        "车：横竖直线，走多远都行，但不能跳过棋子。马：先直走一格，再斜着往外走一格（走“日”字）；第一步那一格被任何棋子占住就走不了，这叫“蹩马腿”。炮：平时走法和车一样；吃子时，它和目标之间必须恰好隔着一枚棋子（叫“炮架”，红黑都可以）。",
+        "兵／卒：没过河时只能向前走一格；过河后可以向前或左右走一格。兵永远不能后退，走到底也不会变成别的棋子。兵吃子和走法一样。",
       ],
       [
-        "General: one orthogonal point within the palace. Advisor: one diagonal palace point. Elephant: exactly two diagonal points, never across the river; any piece on the midpoint blocks it.",
-        "Chariot: any clear orthogonal distance. Horse: one orthogonal step then an outward diagonal; any piece at the first step blocks both destinations on that side. Cannon: moves like a chariot, but captures over exactly one intervening piece of either colour.",
-        "Soldier: one step forward before the river; forward or sideways after crossing, never backwards and never promoting. Captures use the same movement.",
+        "General: one point along a line, inside the palace. Advisor: one point diagonally, inside the palace. Elephant: exactly two points diagonally and never across the river; any piece on the midpoint blocks it (\"blocking the elephant's eye\").",
+        "Chariot: any distance along a line, but it cannot jump over pieces. Horse: one point straight, then one point diagonally outward; a piece on that first point blocks the move (\"hobbling the horse's leg\"). Cannon: moves like a chariot, but to capture it must jump over exactly one piece of either colour — the \"screen\".",
+        "Soldier: one point forward before crossing the river; after crossing, one point forward or sideways. A soldier never moves backwards and never promotes. It captures the same way it moves.",
       ],
       starts.xiangqi,
     ),
@@ -171,12 +171,12 @@ export const firstLessons: Tutorial[] = [
       "八种棋子的完整走法",
       "All eight pieces",
       [
-        "先把名称与棋盘字形对应起来。王（王／玉）：八方向一格。金将（金）：前方三格、左右、正后方各一格，不能后斜。银将（銀）：前方三格、后方两斜格，不能横走与直退。",
-        "飞车（飛）：横竖任意格；角行（角）：斜线任意格；香车（香）：只能直向前任意格。路径都不能有子。桂马（桂）：只能向前两格再向左右一格，可跳子。步兵（歩）：向前一格，吃子也向前。前后以各方朝向为准；字形相同也要看尖端朝向，才能判断属于哪一方。",
+        "先把名字和棋盘上的字对应起来。王（王／玉）：任意方向走一格。金将（金）：向前三格（正前、左前、右前）、左右、正后方都能走一格，只有斜后方不能走。银将（銀）：向前三格和两个斜后方都能走一格，不能横走，也不能直退。",
+        "飞车（飛）：横竖直线走任意远。角行（角）：斜线走任意远。香车（香）：只能向正前方走任意远。这三种路上都不能有棋子挡着。桂马（桂）：向前两格再向左或右一格，可以跳过棋子。步兵（歩）：向前走一格，吃子也是向前。“前”是对棋子主人而言的；两边棋子字一样时，看尖头朝向判断是谁的。",
       ],
       [
-        "Match each name to its board character. King (王 / 玉): one step in any direction. Gold (金): one step to the three forward squares, either side or straight back, not backward diagonals. Silver (銀): the three forward squares and the two backward diagonals, not sideways or straight back.",
-        "Rook (飛): clear ranks and files. Bishop (角): clear diagonals. Lance (香): a clear forward file only. Knight (桂): two forward and one sideways, jumping over pieces. Pawn (歩): one forward, including captures. Forward is relative to the owner. The pointed end identifies the owner even when both pieces have the same character.",
+        "Match each name to the character on the board. King (王 / 玉): one step in any direction. Gold (金): one step forward, diagonally forward, sideways or straight back — every direction except the two backward diagonals. Silver (銀): one step forward, diagonally forward or diagonally back — not sideways and not straight back.",
+        "Rook (飛): any distance along ranks and files. Bishop (角): any distance diagonally. Lance (香): any distance straight forward only. None of these three can pass another piece. Knight (桂): two squares forward and one to the side, jumping over pieces. Pawn (歩): one step forward, and it captures forward too. \"Forward\" depends on who owns the piece; when two pieces show the same character, the point tells you whose it is.",
       ],
       starts.shogi,
     ),
@@ -187,12 +187,12 @@ export const firstLessons: Tutorial[] = [
       [
         "进入、离开或在敌阵三排内移动时可成：步、香、桂、银改走金；角增加横竖一格；飞增加斜一格。王和金不成。步香到末排、桂到末两排必须成。",
         "打入本身不成，但可打入敌阵。不可把步香打到末排、桂打到末两排；不可在已有己方未成步的列再打步（二步）；禁止打步立即将死，但走步将死及其它子打入将死合法。",
-        "同局面同方行棋四次出现通常千日手重下；连续王手造成重复时，连续将军的一方负。入玉与持将棋的点数判定依比赛规则，不等于王进敌阵就获胜。",
+        "同一局面、同一方走棋出现四次，叫“千日手”，通常要重下一局；但如果是一方连续将军造成的重复，连续将军的那一方判负。王走进对方阵地叫“入玉”，进去不等于赢，后续按比赛规则计点判定。",
       ],
       [
         "A move into, out of or within the far three ranks may promote: pawn, lance, knight and silver gain gold movement; bishop adds orthogonal steps; rook adds diagonal steps. Kings and golds never promote. Pawns and lances must promote on the last rank, knights on the last two.",
         "Drops do not promote, but may enter the promotion zone. Never drop pawn or lance on the last rank, or knight on the last two. No pawn drop on a file with your unpromoted pawn (nifu), and no immediate pawn-drop mate. Moving a pawn to mate or dropping another piece to mate is legal.",
-        "Fourfold repetition with the same side to move normally means a replay; the perpetual checking side loses if it caused the repetition. Entering-king and impasse points depend on tournament rules; entering the enemy camp alone is not victory.",
+        "When the same position with the same side to move occurs four times, it is sennichite and the game is normally replayed — unless the repetition comes from one side checking continuously, in which case the checking side loses. A king that walks into the enemy camp has \"entered\" (nyūgyoku); that alone does not win, and the outcome is settled by points under the event's rules.",
       ],
       starts.shogi,
     ),
@@ -277,8 +277,8 @@ export const firstLessons: Tutorial[] = [
         "练习一：R 与 R′ 互相抵消",
         "Practice 1: R and R prime",
         [
-          "点击本节标题，再按「下一步」。第一步 R 只转右层 90°；盯住右上前方的角块，观察它和同层棱块一起移动，左层不动。",
-          "第二步 R′ 沿相反方向转回 90°。两步完成后应回到初始还原态；若想比较，可点「退一步」。顺时针始终从正对右面的位置判断，不是从屏幕正面判断。",
+          "先点本节标题选中这个案例，再按「下一步」。第一步 R 只把右层转 90°：盯住右上前方的那个角块，看它和同一层的棱块一起移动，左边那层不动。",
+          "第二步 R′ 朝反方向转回 90°。两步做完，魔方应该回到原来的还原状态；想对比可以点「退一步」。判断顺时针时，要想象自己正对着右面看，而不是看屏幕的正面。",
         ],
         [
           "Select this section and use Next move. R turns only the right layer 90°. Follow the front-upper-right corner as it moves with the edges on that layer; the left layer stays still.",
@@ -290,11 +290,11 @@ export const firstLessons: Tutorial[] = [
     {
       ...step(
         "half-turn",
-        "练习二：半转与两次四分之一转",
+        "练习二：半圈等于两次四分之一圈",
         "Practice 2: half turns",
         [
-          "R2 表示右面转 180°，不是连续转两个不同的面。先执行 R2，再分两步执行 R′、R′。",
-          "总角度为 180° − 90° − 90°，所以最后回到原状。练习前固定持方，转动观察视角只是换摄像机方向，不会重新定义模型内部的 R、U。",
+          "R2 表示右面转 180°，不是转两个不同的面。先做 R2，再分两步做 R′、R′。",
+          "总共转了 180° − 90° − 90° = 0°，所以最后回到原样。练习时保持拿法不变；在网页上转动视角只是换了镜头方向，不会改变模型里 R、U 指的面。",
         ],
         [
           "R2 turns the right face 180°, not two different faces. Follow it with R prime twice, one move at a time.",
@@ -400,12 +400,12 @@ export const firstLessons: Tutorial[] = [
       "The fixed drawing table",
       [
         "没有天牌时，闲 0–5 补牌、6–7 停。闲停牌时，庄 0–5 补、6–7 停。",
-        "闲补第三张时，庄 0–2 必补；庄 3 除闲第三张为 8 外都补；庄 4 在闲第三张为 2–7 时补；庄 5 在 4–7 时补；庄 6 在 6–7 时补；庄 7 停。判断第三张时按其牌值，10/J/Q/K 为 0。",
+        "闲补了第三张时，庄这样决定：庄 0–2 点一定补；庄 3 点，除非闲第三张是 8，否则都补；庄 4 点，闲第三张是 2–7 时补；庄 5 点，闲第三张是 4–7 时补；庄 6 点，闲第三张是 6–7 时补；庄 7 点停。看第三张的点数时，10、J、Q、K 都算 0。",
         "补牌完全由规则决定，没有选牌或加牌策略。历史牌路不能改变独立预测的可靠性，练习重点是读懂点数与补牌表。",
       ],
       [
         "Without a natural, Player draws on 0–5 and stands on 6–7. If Player stands, Banker draws on 0–5 and stands on 6–7.",
-        "If Player draws, Banker draws on 0–2; on 3 except against Player’s third-card 8; on 4 against 2–7; on 5 against 4–7; on 6 against 6–7; and stands on 7. Third-card values treat 10/J/Q/K as zero.",
+        "When Player has drawn, Banker decides like this: on 0–2 Banker always draws; on 3 it draws unless Player's third card is an 8; on 4 it draws if Player's third card is 2–7; on 5 if it is 4–7; on 6 if it is 6–7; on 7 Banker stands. When reading the third card, 10, J, Q and K count as 0.",
         "Drawing is fixed by the rules: there is no card-selection or hit/stand strategy. Past outcome patterns are not a reliable prediction method. Practice focuses on totals and the drawing table.",
       ],
     ),

@@ -18,7 +18,8 @@ while(true){
     assert.ok(!html.includes('One computer action'));assert.ok(!html.includes('End / restart'));
     assert.ok(buttons(locked).every(b=>b.includes('disabled=""')),'All game actions disabled while pending/closed');
     const hand=v.stage==='setup'?v.setup.hand:v.round.players[id].hand;
-    assert.equal((html.match(/aria-label="Select /g)||[]).length,hand.length,'Render this recipient’s hand, not seat zero');
+    assert.equal((html.match(/aria-label="(?:Select|Discard) /g)||[]).length,hand.length,'Render this recipient’s hand, not seat zero');
+    if(v.stage==='setup')assert.ok(!html.includes('aria-label="Discard '),'Setup tiles cannot be labelled as discards');
     phases.add(v.stage==='setup'?v.setup.phase:v.round.phase);
     if(v.stage==='play'&&v.round.phase==='result'){
       const pending=v.confirmed.flatMap((done,i)=>done?[]:[i+1]);

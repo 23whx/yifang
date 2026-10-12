@@ -109,8 +109,8 @@ export default function BoardGame({ game, dict, locale, compact }: Props) {
 
   // 轮到 AI 时思考
   const turn: Side | null = s ? (s.fen.split(" ")[1] === "b" ? "b" : "w") : null;
-  // 轮到电脑且棋局未结束，即处于思考状态
-  const thinking = mode === "ai" && ready && s !== null && !s.over && turn !== null && turn !== human;
+  // 轮到电脑且棋局未结束，即处于思考状态；电脑出错后不再算思考，让玩家可以悔棋或重试
+  const thinking = mode === "ai" && ready && s !== null && !s.over && turn !== null && turn !== human && !aiFailed;
   const undoPlies = boardUndoPlies(mode, human, turn, moves.length);
 
   useEffect(() => {

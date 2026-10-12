@@ -1,4 +1,5 @@
 const fs=require('node:fs'),path=require('node:path'),Module=require('node:module'),ts=require('typescript'),assert=require('node:assert/strict');
+const {expandRoomKit}=require('./lib/room-kit-tree.cjs');
 require.extensions['.tsx']=require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,f);
 const resolve=Module._resolveFilename;
 Module._resolveFilename=function(request,...args){return resolve.call(this,request.startsWith('@/')?path.resolve(__dirname,'..',request.slice(2)):request,...args);};
@@ -25,8 +26,9 @@ Module._load=function(request,...args){
 const Remote=require('../components/cards/HoldemRemote.tsx').default;
 function text(node){if(node==null||typeof node==='boolean')return '';if(typeof node!=='object')return String(node);return Array.isArray(node)?node.map(text).join(''):text(node.props?.children);}
 function nodes(node){if(!node||typeof node!=='object')return [];if(Array.isArray(node))return node.flatMap(nodes);return [node,...nodes(node.props?.children)];}
-function button(tree,label){const n=nodes(tree).find(n=>n.type==='button'&&text(n)===label);assert.ok(n,`Missing ${label}`);assert.ok(!n.props.disabled);return n;}
-function render(locale){cursor=0;return Remote({locale});}
+const confirmAlias={'创建四人房间':'确认创建新房','Create four-player room':'Confirm new room','生成回复码':'确认加入新房','Create reply code':'Confirm joining new room','生成邀请码':'确认创建新房','Create invitation code':'Confirm new room','创建房间':'确认创建新房','Create room':'Confirm new room','加入房间':'确认加入新房','Join room':'Confirm joining new room'};
+function button(tree,label){const n=nodes(tree).find(n=>n.type==='button'&&(text(n)===label||text(n)===confirmAlias[label]));assert.ok(n,`Missing ${label}`);assert.ok(!n.props.disabled);return n;}
+function render(locale){cursor=0;return expandRoomKit(Remote({locale}));}
 (async()=>{
  for(const locale of ['zh','en'])for(const over of [false,true])for(const failure of [false,true]){
   hooks=[];effects=[];deliveredView=pokerView(over?ended:initial,0);failCheckpoint=failure;checkpointText='new-checkpoint';
@@ -34,10 +36,10 @@ function render(locale){cursor=0;return Remote({locale});}
   global.sessionStorage={getItem:k=>data.get(k)??null,setItem:(k,v)=>data.set(k,v),removeItem:k=>data.delete(k)};
   render(locale);effects.splice(0).forEach(fn=>fn());await Promise.resolve();let tree=render(locale);
   const before=hosts.length;
-  await button(tree,locale==='zh'?'生成邀请信息':'Generate invitation').props.onClick();tree=render(locale);
+  await button(tree,locale==='zh'?'生成邀请码':'Create invitation code').props.onClick();tree=render(locale);
   assert.equal(hosts.length,before);assert.equal(JSON.parse(data.get(key)).checkpoint,'old-checkpoint');
-  assert.ok(nodes(nodes(tree).find(n=>n.type==='details'&&n.props.onToggle)).some(n=>n.props?.role==='alert'&&text(n).includes(locale==='zh'?'旧存档会保留':'old save stays')),'Manual confirmation must appear beside manual controls');
-  await button(tree,locale==='zh'?'生成邀请信息':'Generate invitation').props.onClick();tree=render(locale);
+  assert.ok(nodes(tree).some(n=>n.props?.role==='alert'&&text(n).includes(locale==='zh'?'旧存档会保留':'old save stays')),'New-room confirmation must be shown');
+  await button(tree,locale==='zh'?'生成邀请码':'Create invitation code').props.onClick();tree=render(locale);
   assert.equal(hosts.length,before+1);
   assert.equal(JSON.parse(data.get(key)).checkpoint,'old-checkpoint','New invitation must not clear old save before a hand starts');
   button(tree,locale==='zh'?'离开房间':'Leave room').props.onClick();tree=render(locale);
@@ -45,16 +47,16 @@ function render(locale){cursor=0;return Remote({locale});}
   const received=nodes(tree).find(n=>n.type==='textarea'&&n.props.value==='');
   assert.ok(received,'Received-information textarea should exist');
   received.props.onChange({target:{value:'{"not":"an invitation"}'}});tree=render(locale);
-  await button(tree,locale==='zh'?'生成回应信息':'Generate response').props.onClick();tree=render(locale);
+  await button(tree,locale==='zh'?'生成回复码':'Create reply code').props.onClick();tree=render(locale);
   assert.ok(text(tree).includes(locale==='zh'?'邀请文本无效':'Invalid invitation'));
-  assert.ok(nodes(nodes(tree).find(n=>n.type==='details'&&n.props.onToggle)).some(n=>n.props?.role==='alert'&&text(n).includes(locale==='zh'?'邀请文本无效':'Invalid invitation')),'Manual errors must appear beside manual controls');
+  assert.ok(nodes(tree).some(n=>n.props?.role==='alert'&&text(n).includes(locale==='zh'?'邀请文本无效':'Invalid invitation')),'Manual errors must be shown as an alert');
   assert.equal(JSON.parse(data.get(key)).checkpoint,'old-checkpoint','Invalid offer must preserve old save');
-  button(tree,locale==='zh'?'清除本标签页存档':'Clear this tab’s save').props.onClick();tree=render(locale);
-  await button(tree,locale==='zh'?'恢复本标签页原局':'Restore this tab’s match').props.onClick();hosts.at(-1).ready();tree=render(locale);
-  assert.equal(nodes(tree).find(n=>n.type==='details'&&n.props.onToggle).props.open,true,'Recovery must reveal its connection output');
+  button(tree,locale==='zh'?'删除这个存档':'Delete this save').props.onClick();tree=render(locale);
+  await button(tree,locale==='zh'?'恢复上次牌局':'Restore previous match').props.onClick();hosts.at(-1).ready();tree=render(locale);
+  assert.ok(nodes(tree).some(n=>n.props?.className==='room-steps'),'Recovery must reveal its connection steps');
   const statuses=nodes(tree).filter(n=>n.props?.role==='status').map(text).join('\n');
-  assert.ok(statuses.includes(locale==='zh'?'双方已连接，请房主确认':'Both connected. Waiting for the host'));
-  for(const stale of ['正在尝试局域网直连','Attempting a direct LAN connection','邀请已生成：','Invitation ready:','回应已生成：','Response ready:'])assert.ok(!statuses.includes(stale));
+  assert.ok(statuses.includes(locale==='zh'?'双方已连接，请房主确认':'Both connected — waiting for the host'));
+  for(const stale of ['正在尝试局域网直连','Attempting a direct LAN connection','邀请码已生成：','Invitation ready:','回复码已生成：','Response ready:'])assert.ok(!statuses.includes(stale));
   button(tree,locale==='zh'?'双方已连接，继续原局':'Both connected — continue saved match').props.onClick();tree=render(locale);
   assert.equal(text(tree).includes(locale==='zh'?'本次保存失败':'Save failed'),failure);
   assert.equal(JSON.parse(data.get(key)).checkpoint,failure?'old-checkpoint':'new-checkpoint');
@@ -64,8 +66,9 @@ function render(locale){cursor=0;return Remote({locale});}
   checkpointText='committed-before-send-failure';
   hosts.at(-1).onClose();tree=render(locale);
   assert.equal(JSON.parse(data.get(key)).checkpoint,failure?'old-checkpoint':checkpointText,'Disconnect must checkpoint the latest committed host state before disposal');
-  button(tree,locale==='zh'?'离开房间':'Leave room').props.onClick();tree=render(locale);
-  button(tree,locale==='zh'?'清除本标签页存档':'Clear this tab’s save');
+  // A dropped connection returns to the role choice; Leave is only offered while a room is live.
+  const leave=nodes(tree).find(n=>n.type==='button'&&text(n)===(locale==='zh'?'离开房间':'Leave room'));if(leave){leave.props.onClick();tree=render(locale);}
+  button(tree,locale==='zh'?'删除这个存档':'Delete this save');
  }
  console.log('PASS: 8 bilingual heads-up recovery UI handler cases; delayed new-match save replacement, invalid-offer preservation, restored active/ended views, explicit continue and contained serialization failure. Hook/transport doubles, not native browser.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

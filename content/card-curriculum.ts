@@ -15,22 +15,22 @@ export function cardCurriculum(first: Tutorial): Tutorial {
       take('beginner-welcome'), take('beginner-playing-cards'),
       { ...ranks, body: {
         zh: [...ranks.body.zh,
-          '先用五张具体牌检验：A♠、A♥、K♣、9♦、7♠ 是一对 A；把第二张换成 Q♥ 后不再有对子，要按 A、K、Q、9、7 依次比较高牌。同花顺的最高一种是同花色的 10、J、Q、K、A，称皇家同花顺，不是额外一类牌型。',
-          '两人都是一对 A 时，先比较余下三张中的最高张，再比次高张，最后比最小张。例如 A、A、K、9、7 胜 A、A、Q、J、10，因为先比较的 K 大于 Q；不能把后三张相加。若桌面已有 A♠ K♠ Q♠ J♠ 10♠，双方都可以不用底牌，最佳五张完全相同，平分底池。'],
+          '用五张具体的牌试试：A♠、A♥、K♣、9♦、7♠ 是“一对 A”。把 A♥ 换成 Q♥，就没有对子了，这时按 A、K、Q、9、7 的顺序依次比高牌。同花顺里最大的是同一花色的 10、J、Q、K、A，叫“皇家同花顺”，它只是最大的同花顺，不是另一种牌型。',
+          '如果两个人都是一对 A，就比剩下三张：先比最大的一张，一样再比第二张，再比最小的一张。例如 A、A、K、9、7 赢 A、A、Q、J、10，因为第一处不同是 K 大于 Q；不是把剩下三张加起来比。如果桌上公共牌已经是 A♠ K♠ Q♠ J♠ 10♠，两人都可以一张底牌不用，最强五张一模一样，就平分底池。'],
         en: [...ranks.body.en,
-          'Inspect five cards: A♠ A♥ K♣ 9♦ 7♠ form a pair of aces. Replacing A♥ with Q♥ removes the pair; compare high cards in the order A, K, Q, 9, 7. The highest straight flush is suited 10-J-Q-K-A, called a royal flush, not an additional hand category.',
-          'When both have a pair of aces, compare their three remaining cards from highest to lowest. A-A-K-9-7 beats A-A-Q-J-10 because K beats Q at the first difference; do not add the kickers. With A♠ K♠ Q♠ J♠ 10♠ on the board, both can use no hole cards and share the same best five, splitting the pot.'],
+          'Try five real cards: A♠ A♥ K♣ 9♦ 7♠ is a pair of aces. Swap A♥ for Q♥ and the pair is gone, so you compare high cards in the order A, K, Q, 9, 7. The best straight flush is 10-J-Q-K-A of one suit, called a royal flush; it is simply the highest straight flush, not a separate hand type.',
+          'If both players have a pair of aces, compare the other three cards: the highest first, then the next, then the lowest. A-A-K-9-7 beats A-A-Q-J-10 because the first difference is K over Q; you never add the kickers together. If the board already shows A♠ K♠ Q♠ J♠ 10♠, both players can use no hole cards at all, their best five are identical, and they split the pot.'],
       }},
       take('beginner-chips'), take('beginner-actions'),
       { ...streets, body: {
         zh: [...streets.body.zh,
-          '上面是两人的行动顺序。三人或更多人时，翻牌前从大盲左侧开始，之后每轮从按钮左侧仍未弃牌的人开始，按座位顺时针行动，跳过已弃牌或已全下的人。每手结束按钮通常顺时针移到下一位；不要把单挑“小盲先动”的口诀套到多人翻牌后。'],
+          '上面是两人对局的顺序。三人或更多人时：翻牌前从大盲左边的人开始；之后每一轮从按钮左边第一个还没弃牌的人开始，按顺时针轮流，跳过已经弃牌或全下的人。每手结束后，按钮通常顺时针移给下一位。不要把两人对局“小盲先动”的规则套到多人的翻牌后。'],
         en: [...streets.body.en,
-          'The example is heads-up. With three or more players, preflop action starts left of the big blind; later rounds start with the active player left of the button. Act clockwise, skipping folded or all-in players. The button normally moves clockwise for the next hand. Do not apply the heads-up small-blind-first rule to multiplayer postflop action.'],
+          'That is the two-player order. With three or more players: preflop starts with the player left of the big blind; every later round starts with the first player left of the button who is still in, going clockwise and skipping anyone who has folded or is all-in. After each hand the button usually moves one seat clockwise. Don\'t carry the two-player "small blind acts first" rule over to multiplayer rounds after the flop.'],
       }}, take('beginner-showdown'),
-      { id: 'practice-check', title: { zh: '做完案例后，检查你真正会了什么', en: 'After the example: check what you learned' }, body: {
-        zh: ['点击页首“跟着操作练习”，把本课串成一手：认花色 → 交盲注 → 补 5 跟注 → 三次公共牌与过牌 → 比一对 → 核对余额 110。每步说明自己为什么按这个按钮，不要只记按钮位置。', '本课不是完整比赛训练：你还没有练习自由加注、多方全下、边池分配或复杂摊牌。边池是部分玩家额外投入、只有相应出资者有资格争夺的筹码池。先会解释本例，再到练习页学习其他牌型与底池资格；不会这些时不要把本课完成当成已掌握全部规则。'],
-        en: ['Use “Guided hands-on practice” at the top to connect the lesson: identify suits, post blinds, call the extra 5, follow three board reveals and checks, compare pairs, and verify balance 110. Explain each action rather than memorising button positions.', 'This is not complete match training: free raises, multiway all-ins, side-pot distribution and complex showdowns are not practised here. A side pot holds additional contributions contested only by eligible contributors. Explain this example first, then practise other hands and pot eligibility; completing the lesson does not mean mastering every rule.'],
+      { id: 'practice-check', title: { zh: '做完案例后，检查自己学会了什么', en: 'After the example: check what you learned' }, body: {
+        zh: ['点页面顶部的“跟着操作练习”，把这一课串成完整的一手：认花色 → 交盲注 → 补 5 跟注 → 三次发公共牌并过牌 → 比一对 → 核对余额 110。每一步都说出自己为什么按这个按钮，而不是只记按钮位置。', '这一课还不是完整的比赛训练：自由加注、多人全下、边池分配和复杂的摊牌都还没练。“边池”是部分玩家额外放进去、只有出过这部分筹码的人才有资格争夺的那份筹码。先能讲清楚本例，再去练习页学别的牌型和底池资格。'],
+        en: ['Use "Guided hands-on practice" at the top of the page to play the whole lesson as one hand: identify suits → post blinds → call the extra 5 → three community-card reveals with checks → compare the pairs → confirm the balance of 110. At each step, say why you chose that button rather than memorising where it is.', 'This lesson is not full match training yet: free raises, multiway all-ins, side-pot distribution and complicated showdowns are not covered. A side pot is the extra money put in by some players, which only those players are eligible to win. Be able to explain this example first, then move on to other hands and pot eligibility on the practice page.'],
       }},
     ] };
   }
@@ -40,18 +40,18 @@ export function cardCurriculum(first: Tutorial): Tutorial {
   return { ...first, title: { zh: '百家乐第一课：认牌、算点与模拟结算', en: 'Baccarat Lesson 1: Cards, Totals and Simulated Settlement' }, minutes: 40,
     description: { zh: '从认牌和个位计分开始，按固定流程放模拟筹码、发牌与结算，再跟着第二例学习补牌表。', en: 'Start with cards and single-digit totals, then follow a simulated stake, deal and settlement before the second drawing example.' }, steps: [
     { ...welcome, body: {
-      zh: ['本课只教 Punto Banco 这一种固定补牌规则：两手牌最后比点数，较高的一手胜，9 点最高，同点为和；你选择的结果是否命中，再决定模拟筹码如何结算。', ...welcome.body.zh],
-      en: ['This course teaches Punto Banco with fixed drawing rules. Compare the final totals: higher wins, 9 is highest, and equal totals tie. Whether your earlier selection matches that result determines the teaching-credit settlement.', ...welcome.body.en],
+      zh: ['本课只教 Punto Banco 这一种固定补牌的百家乐：桌上两手牌最后比点数，点数高的赢，9 点最大，点数相同就是“和”。你之前选的结果有没有猜中，决定你的模拟筹码怎么结算。', ...welcome.body.zh],
+      en: ['This lesson teaches only Punto Banco, which has fixed drawing rules. Two hands on the table compare their final totals: the higher total wins, 9 is the best, and equal totals are a tie. Whether your earlier pick matched that result decides how your practice chips are settled.', ...welcome.body.en],
     }}, take('beginner-playing-cards'), take('beginner-values'), take('beginner-wallet'),
     take('beginner-natural'), take('beginner-settlement'),
     { ...draw, title: { zh: '第二个案例：没有天然牌时怎样补牌', en: 'Second example: drawing without a natural' } },
-    { id: 'drawing-reference', title: { zh: '按顺序查表，而不是猜下一张', en: 'Use the table in order, not a prediction' }, body: {
-      zh: ['先检查天然牌，再决定闲是否补牌；闲停牌时用上一节的简单规则。只有闲已补第三张时，才查下面的庄家表。“补”只补一张，“停”不再发。', take('draw').body.zh[1],
-        '练习查两次：庄 4、闲第三张 2，2 落在 2–7，所以庄补；庄 4、闲第三张 8，不在范围，所以庄停。第二个案例庄 3、闲第三张 8 也停：这里查的是那张 8，不是闲补后总点数 3。',
-        '补牌由规则决定，不存在选择加牌或挑牌的策略。过去出现“庄、庄、闲”的顺序不保证下一手是什么。本课只训练读牌、查表和核对虚拟结算；不同免佣版本的结算不能混用。'],
-      en: ['Check naturals first, then whether Player draws. If Player stands, use the simpler rule in the previous section. Consult this Banker table only after Player draws a third card. Draw means one extra card; stand means none.', take('draw').body.en[1],
-        'Try two lookups: Banker 4 with Player third-card 2 draws because 2 lies in 2–7. Banker 4 with Player third-card 8 stands because 8 does not. In the second example, Banker 3 against third-card 8 also stands: use that 8, not Player’s new total of 3.',
-        'Drawing follows rules, not a hit/stand or card-selection strategy. A previous sequence of Banker, Banker, Player does not guarantee the next result. Practise reading cards, looking up draws and checking virtual settlement; do not mix payouts from other no-commission variants.'],
+    { id: 'drawing-reference', title: { zh: '补牌表：按顺序查，不是猜下一张', en: 'The drawing table: look it up in order' }, body: {
+      zh: ['查表顺序：先看有没有天然牌，再看闲补不补；闲停牌时用上一节的简单规则。只有闲补了第三张，才查下面的庄家表。“补”只补一张，“停”就不再发。', take('draw').body.zh[1],
+        '练习查两次：庄 4 点、闲第三张 2，2 在 2–7 之间，所以庄补；庄 4 点、闲第三张 8，不在范围内，所以庄停。第二个案例里庄 3 点、闲第三张 8，也是停：这里看的是那张 8，不是闲补牌后的总点数 3。',
+        '补不补牌完全由规则决定，没有“要不要牌”或挑牌的策略。之前连续出现“庄、庄、闲”，也不能保证下一手是什么。本课只练读牌、查表和核对模拟结算；不要把其他免佣版本的赔率混进来。'],
+      en: ['Look things up in this order: check for a natural, then whether Player draws; if Player stands, use the simple rule from the previous section. Only when Player has drawn a third card do you use the Banker table below. "Draw" means one more card; "stand" means no more.', take('draw').body.en[1],
+        'Try two lookups: Banker 4 and Player\'s third card 2 — 2 is within 2–7, so Banker draws. Banker 4 and a third card of 8 — not in range, so Banker stands. In the second example, Banker 3 against a third card of 8 also stands: you look at that 8, not at Player\'s new total of 3.',
+        'Drawing is decided entirely by the rules; there is no hit-or-stand choice and no picking cards. A run like Banker, Banker, Player says nothing about the next hand. This lesson only practises reading cards, looking up draws and checking the practice settlement; don\'t mix in payouts from no-commission versions.'],
     }},
   ] };
 }

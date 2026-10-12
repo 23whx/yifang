@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import type { Peer } from "peerjs";
 import { ManualBoardConnection, type BoardConnection } from '@/lib/board/manual-connection';
 import { readManualSignal } from '@/lib/manual-rtc';
@@ -15,6 +15,7 @@ import { isBoardGame, VARIANTS } from "@/lib/board/variants";
 import { newGo, playGo, scoreGo, type GoState } from "@/lib/go/rules";
 import { newReview, changeReview, validReview, reviewDone, type Review, type ReviewAction } from '@/lib/go/review';
 import ResultDialog from '@/components/ui/ResultDialog';
+import { RoomHeader, RoleCard, Steps, SignalOutput, RoomNotes, RoomAlert, type StepState } from '@/components/remote/RoomKit';
 import Board from "./Board";
 import GoBoard from "../go/GoBoard";
 import { newMatch, changeMatch, validMatch, roomCode, type MatchState, type MatchAction } from "@/lib/board/remote-match";
@@ -80,6 +81,8 @@ export default function RemoteGame({
   const [answer, setAnswer] = useState('');
   const [signalBusy, setSignalBusy] = useState(false);
   const invited = useSyncExternalStore(noSubscribe, () => roomCode(new URL(window.location.href).searchParams.get('room') ?? '', game), () => '');
+  // An invitation link carries a public room code: open the matching mode instead of hiding it.
+  useEffect(() => { if (invited) queueMicrotask(() => setMode(m => m === 'manual' && !connection.current ? 'public' : m)); }, [invited]);
   function ended() { return matchRef.current.resigned !== null || (game === 'go' ? reviewDone(reviewRef.current) : !!board.current?.isGameOver()); }
   function publishMatch(next: MatchState) {
     setConfirmResign(false);
@@ -500,145 +503,103 @@ export default function RemoteGame({
     status === "connected" && match.resigned === null &&
     (game === "go" ? goState.turn === 1 : snapshot?.turn) === isHostPlayer;
   const hasEnded = match.resigned !== null || (game === 'go' ? reviewDone(review) : !!snapshot?.over);
+  const t = (cn: string, en: string) => zh ? cn : en;
+  const connected = status === 'connected', starting = status === 'idle' || status === 'error';
+  const seatName = isHostPlayer ? t('房主', 'Host') : t('朋友', 'Guest');
+  const sides = game === 'go' ? null : VARIANTS[game].sideName;
+  const firstSide = sides ? t(`执${sides.w.zh}（先走）`, `playing ${sides.w.en} (moves first)`) : t('执黑（先走）', 'playing Black (moves first)');
+  const secondSide = sides ? t(`执${sides.b.zh}（后走）`, `playing ${sides.b.en} (moves second)`) : t('执白（后走）', 'playing White (moves second)');
+  const turnText = hasEnded ? t('本局结束，双方都同意才会再来一局', 'Game over — both must agree to a rematch') : game === 'go' && goState.passes >= 2
+    ? (reviewDone(review) ? t('双方已确认，本局结束', 'Both confirmed — game ended') : t('双方停一手：一起核对死子与计分', 'Both passed: review dead stones and the score together'))
+    : myTurn ? t('轮到你了', 'Your turn') : t('等待对方落子', 'Opponent’s turn');
+  const statusText = connected ? turnText
+    : status === 'waiting' ? (mode === 'public' ? t('等待朋友加入', 'Waiting for your friend') : isHostPlayer ? t('等待朋友的回复码', 'Waiting for your friend’s reply code') : t('等待房主连接', 'Waiting for the host to connect'))
+    : status === 'connecting' ? t('正在连接…', 'Connecting…')
+    : status === 'error' ? t('连接已中断', 'Connection stopped') : t('未连接', 'Not connected');
+  const tone = connected ? 'ok' : status === 'error' ? 'warn' : status === 'idle' ? 'idle' : 'busy';
+  async function copyText(value: string, done: string) {
+    try { await navigator.clipboard.writeText(value); setCopyMessage(done); }
+    catch { setCopyMessage(t('自动复制失败：请点一下文本框，全选后手动复制。', 'Copy failed: tap the box, select everything and copy it manually.')); }
+  }
+  function leave() { dispose(); setStatus('idle'); setSignal(''); setAnswer(''); setInvitation(''); setSignalBusy(false); setError(''); setCode(''); setCopyMessage(''); }
+  const hostSteps: { label: string; state: StepState; body?: ReactNode }[] = [
+    { label: t('生成邀请码', 'Create an invitation code'), state: signal ? 'done' : 'now', body: !signal && signalBusy ? <p>{t('正在生成，通常几秒钟…', 'Creating it — usually a few seconds…')}</p> : undefined },
+    { label: t('把邀请码发给朋友，再粘贴朋友发回的回复码', 'Send the invitation, then paste your friend’s reply code'), state: signal && status === 'waiting' ? 'now' : status === 'connecting' && !signalBusy ? 'done' : 'todo', body: signal && status === 'waiting' ? <>
+      <SignalOutput label={t('你的邀请码（整段复制发给朋友，它不是网址）', 'Your invitation code (send all of it; it is not a web address)')} value={signal} copyLabel={t('复制邀请码', 'Copy invitation code')} onCopy={() => copyText(signal, t('邀请码已复制，发给朋友吧。', 'Invitation copied — send it to your friend.'))} />
+      <label className="block text-sm font-bold">{t('粘贴朋友发回的回复码', 'Paste your friend’s reply code')}<textarea className="room-field" rows={3} maxLength={65536} value={answer} onChange={e => setAnswer(e.target.value)} /></label>
+      <div><button className="rpg-button" disabled={!answer.trim() || signalBusy || status !== 'waiting'} onClick={finishManual}>{t('使用回复码连接', 'Connect with reply code')}</button></div>
+    </> : undefined },
+    { label: t('连接成功后开始对局', 'Start playing once connected'), state: status === 'connecting' && !signalBusy ? 'now' : 'todo', body: status === 'connecting' && !signalBusy ? <p>{t('正在建立连接，最多约 25 秒。', 'Connecting — this takes up to about 25 seconds.')}</p> : undefined },
+  ];
+  const guestSteps: { label: string; state: StepState; body?: ReactNode }[] = [
+    { label: t('生成回复码', 'Create your reply code'), state: signal ? 'done' : 'now', body: !signal ? <p>{t('正在生成，通常几秒钟…', 'Creating it — usually a few seconds…')}</p> : undefined },
+    { label: t('把回复码发回给房主，等房主连接', 'Send the reply code back and wait for the host'), state: signal ? 'now' : 'todo', body: signal ? <SignalOutput label={t('你的回复码（整段复制发给房主）', 'Your reply code (send all of it to the host)')} value={signal} copyLabel={t('复制回复码', 'Copy reply code')} onCopy={() => copyText(signal, t('回复码已复制，发回给房主吧。', 'Reply copied — send it back to the host.'))} /> : undefined },
+    { label: t('房主连接后自动开始', 'The game starts when the host connects'), state: 'todo' },
+  ];
   return (
     <div className="space-y-7">
-      <div className="border border-ink p-5 space-y-4">
-        <h2 className="text-xl font-bold">{zh ? '双人网络对战 · 房间邀请' : 'Online two-player room'}</h2>
-        {<aside className="space-y-3 rounded-xl border border-[#ae8550] bg-[#f3e7cd] p-4 text-[#392616]" aria-label={zh?'本标签页棋谱恢复':'This tab’s match recovery'}>
-          <h3 className="font-bold">{zh?'刷新前先知道':'Before refreshing'}</h3>
-          {game==='go'&&<p className="text-sm leading-7">{zh?'围棋还会保存停一手、死子标记及双方计分确认；恢复后接着原来的步骤进行，不会擅自清除标记或替你确认。':'Go also saves passes, dead-stone marks and both scoring approvals. Restoration keeps the current step; it does not clear marks or approve the score for you.'}</p>}
-          <p className="max-w-[68ch] text-sm leading-7">{zh?'连接后自动把完整棋谱、原座位和恢复凭证保存在本标签页 sessionStorage，不保存邀请或应答码。双方刷新后先点“恢复本标签页对局”，原房主重新生成邀请，原客方再粘贴邀请生成应答；验证通过后继续原来的局面和轮次。请保留双方标签页，不要分享存档。关闭标签页、清理数据、禁止存储或换设备可能无法恢复。':'After connection, the full move record, original seat and recovery credential are saved in this tab’s sessionStorage, not invitation or answer text. After refreshing, both choose “Restore this tab’s match.” The original host generates a fresh invitation; the original guest then pastes it and generates an answer. Successful verification restores the position and turn. Keep both tabs; never share saves. Closing tabs, clearing data, blocked storage or changing devices may prevent recovery.'}</p>
-          <p role="status" className="text-sm">{saved?(zh?'本标签页已有存档；仍需对方保留自己的存档。':'This tab has a save; the other player also needs their own save.'):(zh?'尚无已保存的对局。':'No saved match yet.')}</p>
-          {saveError&&<p role="alert" className="font-bold text-[#803d2b]">{saveError}</p>}
-          {['idle','error'].includes(status)&&<div className="flex flex-wrap gap-3">
-            {saved&&<button className="rpg-button" onClick={()=>{setMode('manual');setReplaceIntent(null);setClearConfirm(false);if(saved.role==='host')void start(true,saved);else{resumeSelection.current=saved;setRestoring(true);setError('');}}}>{zh?'恢复本标签页对局':'Restore this tab’s match'}</button>}
-            {(saved||saveError)&&<button className="rpg-button" onClick={()=>{if(!clearConfirm){setClearConfirm(true);return;}if(forget())setRestoring(false);}}>{clearConfirm?(zh?'确认清除，无法撤销':'Confirm permanent removal'):(zh?'清除本标签页存档':'Clear this tab’s save')}</button>}
-          </div>}
-          {replaceIntent&&<p role="alert" className="font-bold text-[#803d2b]">{zh?'本标签页有存档或读取失败。再次点击同一个创建／加入按钮确认新局；旧存档会保留到新对局连接成功并保存后才被覆盖。':'This tab has a save or its save could not be read. Click the same host/join button again to confirm a new game. The old save stays until the new game connects and saves successfully.'}</p>}
-          {restoring&&<p className="font-bold">{status==='connected'?(zh?'已恢复原对局，没有重新开局。':'Original match restored; no new game was started.'):(zh?'恢复模式：原房主生成新邀请；原客方粘贴新邀请。验证完成前不能走棋。':'Recovery mode: original host generates an invitation; original guest pastes it. Play stays disabled until verification completes.')}</p>}
-        </aside>}
-        <label className="block space-y-2"><span>{zh ? '连接方式' : 'Connection method'}</span><select className="block max-w-full border border-ink p-3" value={mode} disabled={['connecting','waiting','connected'].includes(status)} onChange={e => { dispose(); resumeSelection.current=null;setRestoring(false);setReplaceIntent(null);setClearConfirm(false);setStatus('idle'); setError(''); setSignal(''); setAnswer(''); setInvitation(''); setMode(e.target.value as 'manual' | 'public'); }}><option value="manual">{zh ? '局域网直连 · 手动交换连接码' : 'LAN direct · exchange connection text'}</option><option value="public">{zh ? '公共信令服务 · 短房间码' : 'Public signaling service · short room code'}</option></select></label>
-        {mode === 'manual' && <section className="space-y-4">
-          <p className="text-sm leading-7">{zh ? '双方先通过有效 HTTPS 打开同一个游戏页面；localhost 只能在本机预览，直接使用 http://局域网IP 不具备刷新恢复所需的安全上下文。本模式不联系信令、STUN 或 TURN 服务，无账号。优先在同一局域网使用；网络隔离、防火墙可能阻止连接，跨网络不保证成功。' : 'Both players first open the same game page over valid HTTPS. Localhost is only for this device; plain HTTP on a LAN IP lacks the secure context required for refresh recovery. This mode uses no signaling, STUN, TURN or account. Prefer the same LAN; isolation or firewalls may block it, and cross-network success is not guaranteed.'}</p>
-          <ol className="list-decimal pl-5 space-y-2 text-sm leading-7"><li>{zh ? '房主生成邀请，将完整邀请文字私下发给朋友。它不是网址，不要粘贴到地址栏。' : 'Host generates an invitation and privately sends the complete text. It is not a URL.'}</li><li>{zh ? '朋友粘贴邀请，生成应答，再把完整应答发回房主。' : 'Guest pastes the invitation, generates an answer, and sends the complete answer back.'}</li><li>{zh ? '房主粘贴应答并连接。看到“轮到你了”或“等待对方落子”才算连接完成，房主先走。保持双方页面开启。' : 'Host pastes the answer and connects. Wait for Your turn or Opponent’s turn; host moves first. Keep both pages open.'}</li></ol>
-          <p className="text-sm">{zh ? '连接码可能含本地网络信息，只发给信任的朋友；离开后失效，不支持自动重连。' : 'Connection text may contain local network information. Share only with trusted friends; leaving invalidates it. No automatic reconnection.'}</p>
-          {['idle','error'].includes(status) && <>
-            <button className="btn-sign" onClick={() => start(true)}>{zh ? '我是房主：生成邀请' : 'Host: generate invitation'}</button>
-            <label className="block">{zh ? '朋友：粘贴房主邀请' : 'Guest: paste host invitation'}<textarea className="block w-full min-w-0 border border-ink p-3" rows={3} maxLength={65536} value={invitation} onChange={e => {setInvitation(e.target.value);setReplaceIntent(null);}} /></label>
-            <button className="btn-sign btn-sign-outline" disabled={!invitation.trim()} onClick={() => start(false,resumeSelection.current?.role==='guest'?resumeSelection.current:null)}>{zh ? '我是朋友：生成应答' : 'Guest: generate answer'}</button>
-          </>}
-          {signal && <label className="block">{isHostPlayer ? (zh ? '你的邀请：全选复制给朋友' : 'Your invitation: copy all for your guest') : (zh ? '你的应答：全选复制给房主' : 'Your answer: copy all for your host')}<textarea className="block w-full min-w-0 border border-ink p-3" rows={3} readOnly value={signal} onFocus={e => e.target.select()} /></label>}
-          {signal && isHostPlayer && <><label className="block">{zh ? '粘贴朋友的应答' : 'Paste your guest’s answer'}<textarea className="block w-full min-w-0 border border-ink p-3" rows={3} maxLength={65536} value={answer} onChange={e => setAnswer(e.target.value)} /></label><button className="btn-sign" disabled={!answer.trim() || signalBusy || status !== 'waiting'} onClick={finishManual}>{zh ? '使用应答连接' : 'Connect using answer'}</button></>}
-          {status !== 'idle' && <button className="btn-sign btn-sign-outline" onClick={() => { dispose(); setStatus('idle'); setSignal(''); setAnswer(''); setInvitation(''); setSignalBusy(false); setError(''); }}>{zh ? '离开并清除连接码' : 'Leave and clear connection text'}</button>}
-        </section>}
-        {mode === 'public' && <>
-        <p className="text-sm">{zh ? '只有选择此模式并创建或加入房间后，才会联系 PeerJS 公共信令；其默认配置还会尝试第三方 STUN，并可能通过 TURN 中继传输对局数据。这不是完全无服务的直连，也不保证点对点传输。不同设备应通过有效 HTTPS 打开网站以支持安全恢复；无需账号。如不希望使用这些服务，请改选局域网手动直连。' : 'Only after you select this mode and create or join a room does it contact public PeerJS signaling. Its default configuration also tries third-party STUN and may relay match data through TURN. This is not fully service-free or guaranteed peer-to-peer transport. Each device should open a valid HTTPS site for secure recovery; no account is needed. Choose Manual LAN connection to avoid those services.'}</p>
-        <ol className="list-decimal space-y-2 pl-5 text-sm leading-7"><li>{zh ? '房主点击创建房间，再把房间码或邀请链接发给朋友。' : 'Host: create a room and share its code or invitation link.'}</li><li>{zh ? '朋友打开同一个游戏的网络页，粘贴房间码或链接，再点击加入房间。' : 'Friend: open the same game, paste the code or link, then select Join room.'}</li><li>{zh ? '看到“轮到你了”才表示握手完成。房主先走，双方每步同步。' : 'Your turn means the handshake finished. The host moves first; moves synchronize.'}</li></ol>
-        <p className="text-sm">{zh ? '注意：127.0.0.1 / localhost 只代表当前电脑，不能直接把此本机地址发给远方朋友。朋友需要打开已部署的网站，再输入房间码。房间码不是密码，请只分享给受邀者。' : '127.0.0.1 / localhost means this computer, not a publicly accessible site. A distant friend must open the deployed site and enter the code. Share room codes only with invited players.'}</p>
-        <p className="text-sm leading-7">
-          {zh
-            ? "创建房间后，将房间码发给朋友。房主执先，对方执后。保持双方页面开启；无账号、无自动重连，房间仅容纳两人。"
-            : "Create a room and share its code. The host plays first. Keep both pages open; no account or automatic reconnection, two players per room."}
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <button
-            className="btn-sign"
-            disabled={
-              status === "connecting" ||
-              status === "connected" ||
-              status === "waiting"
-            }
-            onClick={() => start(true)}
-          >
-            {zh ? "创建房间" : "Create room"}
-          </button>
-          <input
-            className="border border-ink px-3 min-w-0"
-            aria-label={zh ? "房间码" : "Room code"}
-            placeholder={`yf-${game}-…`}
-            value={entry ?? invited}
-            onChange={(e) => {setEntry(e.target.value);setReplaceIntent(null);}}
-          />
-          <button
-            className="btn-sign btn-sign-outline"
-            disabled={
-              !roomCode(entry ?? invited, game) ||
-              ["connecting", "connected", "waiting"].includes(status)
-            }
-            onClick={() => start(false)}
-          >
-            {zh ? "加入房间" : "Join room"}
-          </button>
-          {status !== "idle" && (
-            <button
-              className="btn-sign btn-sign-outline"
-              onClick={() => {
-                dispose();
-                setStatus("idle");
-                setCode("");
-                setError("");
-              }}
-            >
-              {zh ? "离开房间" : "Leave room"}
-            </button>
-          )}
-        </div>
-        {code && (
-          <div className="flex flex-wrap gap-3 items-center">
-            <code className="break-all">{code}</code>
-            <button
-              className="underline text-sm"
-              onClick={() =>
-                navigator.clipboard
-                  .writeText(code)
-                  .catch(() =>
-                    setError(
-                      zh
-                        ? "请手动复制房间码。"
-                        : "Please copy the room code manually.",
-                    ),
-                  )
-              }
-            >
-              {zh ? "复制房间码" : "Copy code"}
-            </button>
+      <div className="room">
+        <RoomHeader title={connected ? t(`第 ${match.round} 局 · 你是${seatName}，${isHostPlayer ? firstSide : secondSide}`, `Round ${match.round} · You are the ${seatName.toLowerCase()} and ${isHostPlayer ? firstSide : secondSide}`) : t('双人好友对战', 'Two-player friend room')} lead={connected ? undefined : t('一人开房、一人加入。房主执先，朋友执后。', 'One player opens the room, the other joins. The host moves first.')} tone={tone}>{statusText}</RoomHeader>
+        {error && <RoomAlert>{error}</RoomAlert>}
+        {saveError && <RoomAlert>{saveError}</RoomAlert>}
+        {starting && (saved || saveError) && <div className="room-banner" aria-label={t('上次的对局', 'Previous match')}>
+          <p className="room-banner-title">{saved ? t('发现本标签页保存的上次对局', 'This tab has a saved match') : t('存档读取失败', 'The save could not be read')}</p>
+          {saved && <p>{t(`你上次是${saved.role === 'host' ? '房主' : '朋友'}。想接着下：双方都点“恢复上次对局”，再像开房一样重新交换一次邀请码和回复码，棋局会回到断开时的局面。`, `You were the ${saved.role} last time. To continue, both players choose Restore previous match and swap a fresh invitation and reply; the board returns to where it stopped.`)}</p>}
+          <div className="room-actions">
+            {saved && <button className="rpg-button" onClick={() => { setMode('manual'); setReplaceIntent(null); setClearConfirm(false); if (saved.role === 'host') void start(true, saved); else { resumeSelection.current = saved; setRestoring(true); setError(''); } }}>{t('恢复上次对局', 'Restore previous match')}</button>}
+            <button className="room-link" onClick={() => { if (!clearConfirm) { setClearConfirm(true); return; } if (forget()) setRestoring(false); }}>{clearConfirm ? t('确认删除存档（无法撤销）', 'Confirm delete (cannot be undone)') : t('删除这个存档', 'Delete this save')}</button>
           </div>
-        )}
-        {code && <button className="btn-sign btn-sign-outline" onClick={async () => {
-          const url = new URL(window.location.href); url.search = ''; url.searchParams.set('room', code); url.hash = '';
-          try { await navigator.clipboard.writeText(url.toString()); setCopyMessage(zh ? '邀请链接已复制。本机地址只能本机打开；跨设备请使用部署域名。' : 'Invitation copied. Localhost links are local only; use the deployed domain across devices.'); } catch { setCopyMessage(zh ? '复制失败，请使用上方房间码。' : 'Copy failed; use the room code above.'); }
-        }}>{zh ? '复制邀请链接' : 'Copy invitation link'}</button>}
-        {copyMessage && <p role="status">{copyMessage}</p>}
-        </>}
-        {status === 'connected' && <section className="space-y-3 border-t border-rule pt-4">
-          <p>{zh ? `第 ${match.round} 局 · ${isHostPlayer ? '你是房主，执先' : '你是客方，执后'}` : `Round ${match.round} · ${isHostPlayer ? 'Host, first side' : 'Guest, second side'}`}</p>
-          {!hasEnded && <><button className="btn-sign btn-sign-outline" onClick={() => { if(confirmResign) sendMatchAction('resign'); else setConfirmResign(true); }}>{confirmResign ? (zh ? '确认认输，结束本局' : 'Confirm resignation') : (zh ? '认输' : 'Resign')}</button>{confirmResign && <button className="btn-sign btn-sign-outline ml-3" onClick={()=>setConfirmResign(false)}>{zh ? '取消' : 'Cancel'}</button>}</>}
-          {hasEnded && <><button className="btn-sign" disabled={match.rematch[isHostPlayer ? 0 : 1]} onClick={() => sendMatchAction('rematch')}>{zh ? '同意再来一局' : 'Agree to a rematch'}</button><p>{zh ? `房主${match.rematch[0] ? '已同意' : '未同意'}；客方${match.rematch[1] ? '已同意' : '未同意'}。双方同意后才重置；房主继续执先。` : `Host ${match.rematch[0] ? 'agreed' : 'pending'}; guest ${match.rematch[1] ? 'agreed' : 'pending'}. Both must agree; host remains first.`}</p></>}
-        </section>}
-        {match.resigned !== null && <ResultDialog key={match.round} locale={locale} title={match.resigned === (isHostPlayer ? 0 : 1) ? (zh ? '你已认输' : 'You resigned') : (zh ? '你获胜了' : 'You win')} reason={zh ? '一方主动认输，本局结束。棋盘与棋谱保留；双方同意再来一局才会清空。' : 'A player resigned, ending this game. The position and moves remain until both agree to a rematch.'}/>}
-        <p role="status">
-          {status === "waiting"
-            ? zh
-              ? "等待朋友加入…"
-              : "Waiting for a friend…"
-            : status === "connecting"
-              ? zh
-                ? "正在连接…"
-                : "Connecting…"
-              : status === "connected"
-                ? hasEnded ? (zh ? '本局结束，可双方同意再来一局' : 'Game ended; both may agree to a rematch') : game === 'go' && goState.passes >= 2
-                  ? reviewDone(review) ? (zh ? '双方已确认，本局结束' : 'Both confirmed — game ended') : (zh ? '核对死子与计分提案，不需要按落子轮次等待' : 'Review the scoring proposal; either player may respond')
-                  : myTurn
-                  ? zh
-                    ? "轮到你了"
-                    : "Your turn"
-                  : zh
-                    ? "等待对方落子"
-                    : "Opponent’s turn"
-                : error}
-        </p>
+        </div>}
+        {replaceIntent && <RoomAlert>{t('你有一个未完成的对局存档。再点一次同一个按钮就开始新对局；旧存档会保留到新对局连上并保存后才被替换。', 'You have an unfinished saved match. Click the same button again to start a new game; the old save stays until the new game connects and saves.')}</RoomAlert>}
+        {restoring && <p className="room-progress">{connected ? t('已恢复原对局，没有重新开局。', 'Original match restored; no new game was started.') : t('恢复模式：原房主重新生成邀请码，原朋友粘贴后生成回复码。验证完成前不能走棋。', 'Recovery mode: the original host makes a new invitation, the original guest pastes it and replies. Moves stay locked until verification completes.')}</p>}
+        {starting && mode === 'manual' && <div className="room-roles">
+          <RoleCard badge={t('房主', 'Host')} title={t('我来开房', 'Open a room')} steps={[t('生成邀请码，发给朋友', 'Create an invitation code and send it'), t('粘贴朋友发回的回复码', 'Paste the reply code your friend sends back'), t('连接成功，你执先', 'Connected — you move first')]}>
+            <button className="rpg-button" disabled={signalBusy} onClick={() => start(true)}>{t('生成邀请码', 'Create invitation code')}</button>
+          </RoleCard>
+          <RoleCard badge={t('朋友', 'Guest')} title={t('朋友邀请我', 'A friend invited me')} steps={[t('粘贴房主发来的邀请码', 'Paste the host’s invitation code'), t('生成回复码，发回给房主', 'Create a reply code and send it back'), t('房主连接后开始，你执后', 'Play starts when the host connects — you move second')]}>
+            <label className="block text-sm font-bold">{t('粘贴房主发来的邀请码', 'Paste the host’s invitation code')}<textarea className="room-field" rows={3} maxLength={65536} value={invitation} onChange={e => { setInvitation(e.target.value); setReplaceIntent(null); }} /></label>
+            <button className="rpg-button" disabled={!invitation.trim()} onClick={() => start(false, resumeSelection.current?.role === 'guest' ? resumeSelection.current : null)}>{t('生成回复码', 'Create reply code')}</button>
+          </RoleCard>
+        </div>}
+        {starting && mode === 'public' && <div className="room-roles">
+          <RoleCard badge={t('房主', 'Host')} title={t('我来开房', 'Open a room')} steps={[t('点“创建房间”，得到一个短房间码', 'Create a room to get a short room code'), t('把房间码或邀请链接发给朋友', 'Send the code or invitation link'), t('朋友加入后开始，你执先', 'Play starts when your friend joins — you move first')]}>
+            <button className="rpg-button" onClick={() => start(true)}>{t('创建房间', 'Create room')}</button>
+          </RoleCard>
+          <RoleCard badge={t('朋友', 'Guest')} title={t('朋友邀请我', 'A friend invited me')} steps={[t('粘贴房间码或邀请链接', 'Paste the room code or link'), t('点“加入房间”', 'Choose Join room'), t('连接后开始，你执后', 'Play starts once connected — you move second')]}>
+            <label className="block text-sm font-bold">{t('房间码或邀请链接', 'Room code or invitation link')}<input className="room-field" placeholder={`yf-${game}-…`} value={entry ?? invited} onChange={e => { setEntry(e.target.value); setReplaceIntent(null); }} /></label>
+            <button className="rpg-button" disabled={!roomCode(entry ?? invited, game)} onClick={() => start(false)}>{t('加入房间', 'Join room')}</button>
+          </RoleCard>
+        </div>}
+        {!starting && !connected && mode === 'manual' && <Steps items={isHostPlayer ? hostSteps : guestSteps} />}
+        {!starting && !connected && mode === 'public' && code && <div className="room-banner">
+          <p className="room-banner-title">{t('房间已创建，把房间码发给朋友', 'Room ready — send the code to your friend')}</p>
+          <p><code className="break-all text-base font-bold">{code}</code></p>
+          <div className="room-actions">
+            <button className="rpg-button" onClick={() => copyText(code, t('房间码已复制。', 'Room code copied.'))}>{t('复制房间码', 'Copy code')}</button>
+            <button className="rpg-button" onClick={() => { const url = new URL(window.location.href); url.search = ''; url.searchParams.set('room', code); url.hash = ''; void copyText(url.toString(), t('邀请链接已复制。本机地址（localhost）只能在这台电脑打开；跨设备请用正式网址。', 'Invitation link copied. A localhost link only opens on this computer; use the deployed address across devices.')); }}>{t('复制邀请链接', 'Copy invitation link')}</button>
+          </div>
+        </div>}
+        {copyMessage && !connected && <p role="status" className="text-sm font-bold">{copyMessage}</p>}
+        {!starting && !connected && <div><button className="room-link" onClick={leave}>{t('取消并离开', 'Cancel and leave')}</button></div>}
+        {connected && <div className="room-bar">
+          {!hasEnded && <div className="room-actions"><button className="rpg-button secondary" onClick={() => { if (confirmResign) sendMatchAction('resign'); else setConfirmResign(true); }}>{confirmResign ? t('确认认输，结束本局', 'Confirm resignation') : t('认输', 'Resign')}</button>{confirmResign && <button className="room-link" onClick={() => setConfirmResign(false)}>{t('取消', 'Cancel')}</button>}</div>}
+          {hasEnded && <div className="room-actions"><button className="rpg-button" disabled={match.rematch[isHostPlayer ? 0 : 1]} onClick={() => sendMatchAction('rematch')}>{t('同意再来一局', 'Agree to a rematch')}</button><p className="text-sm">{t(`房主${match.rematch[0] ? '已同意' : '未同意'}；朋友${match.rematch[1] ? '已同意' : '未同意'}。双方同意后重新开局，房主仍然执先。`, `Host ${match.rematch[0] ? 'agreed' : 'pending'}; guest ${match.rematch[1] ? 'agreed' : 'pending'}. A new game starts once both agree; the host moves first again.`)}</p></div>}
+          <button className="room-link" onClick={leave}>{t('离开对局', 'Leave game')}</button>
+        </div>}
+        {match.resigned !== null && <ResultDialog key={match.round} locale={locale} title={match.resigned === (isHostPlayer ? 0 : 1) ? t('你已认输', 'You resigned') : t('你获胜了', 'You win')} reason={t('一方主动认输，本局结束。棋盘与棋谱保留；双方同意再来一局才会清空。', 'A player resigned, ending this game. The position and moves remain until both agree to a rematch.')}/>}
+        {starting && <RoomNotes summary={t('连接说明与常见问题', 'Connection notes and troubleshooting')}>
+          <p>{mode === 'manual'
+            ? t('当前为手动直连：不联系公共信令、STUN 或 TURN 服务。连接失败时，先确认双方使用同一局域网，再检查访客 Wi-Fi 隔离和防火墙，并重新交换完整连接码。不要关闭防火墙；也可以返回人机或同屏双人。', 'Manual direct mode: no public signaling, STUN or TURN services. If connection fails, check that both devices share a LAN, check guest Wi-Fi isolation and firewall rules, then exchange complete fresh codes. Do not disable the firewall. AI and local play remain available.')
+            : t('当前为公共房间号模式：使用 PeerJS 公共信令服务交换连接信息，不是完全无外部服务。部分公司网络或严格 NAT 环境可能无法直连；此时可切换手动直连，或使用人机、同屏双人。', 'Public room-code mode uses PeerJS public signaling to exchange connection information; it is not free of external services. Some corporate networks or strict NATs prevent direct connections. You can try manual mode, AI or local play.')}</p>
+          <p>{t('双方都要通过有效 HTTPS 打开同一个游戏页面。localhost 只能在本机预览；直接用 http://局域网IP 打开时，浏览器不允许保存可恢复的对局。最好在同一个 Wi-Fi 下使用，跨网络不保证能连上。', 'Both players open the same game page over valid HTTPS. Localhost works only on this device; opening plain http on a LAN IP prevents the browser from keeping a recoverable match. The same Wi-Fi works best; cross-network connections are not guaranteed.')}</p>
+          <p>{t('邀请码和回复码里可能包含本地网络信息，只发给你信任的朋友。离开页面后它们就失效了。', 'Invitation and reply codes may contain local network details. Share them only with friends you trust; they stop working when you leave the page.')}</p>
+          <p>{t('刷新或断线后：连接成功后，棋谱、座位和恢复凭证会自动保存在本标签页（sessionStorage）。双方都保留原来的标签页，点“恢复上次对局”并重新交换一次邀请码和回复码即可接着下。关闭标签页、清理浏览数据或换设备后无法恢复；不要把存档分享给别人。', 'After a refresh or disconnect: once connected, the moves, seats and a recovery credential are saved in this tab (sessionStorage). Keep both original tabs, choose Restore previous match and swap a fresh invitation and reply to continue. Closing the tab, clearing browsing data or switching devices prevents recovery; never share a save.')}</p>
+          {game === 'go' && <p>{t('围棋还会保存停一手、死子标记和双方的计分确认，恢复后从原来的步骤继续。', 'Go also saves passes, dead-stone marks and scoring approvals, and resumes at the same step.')}</p>}
+          <label className="block"><span className="font-bold">{t('连接方式', 'Connection method')}</span><select className="room-field" value={mode} disabled={['connecting', 'waiting', 'connected'].includes(status)} onChange={e => { dispose(); resumeSelection.current = null; setRestoring(false); setReplaceIntent(null); setClearConfirm(false); setStatus('idle'); setError(''); setSignal(''); setAnswer(''); setInvitation(''); setMode(e.target.value as 'manual' | 'public'); }}><option value="manual">{t('局域网直连 · 手动交换连接码（推荐）', 'LAN direct · exchange connection text (recommended)')}</option><option value="public">{t('公共信令服务 · 短房间码', 'Public signaling service · short room code')}</option></select></label>
+          {mode === 'public' && <p>{t('只有选择此模式并创建或加入房间后，才会联系 PeerJS 公共信令；其默认配置还会尝试第三方 STUN，并可能通过 TURN 中继传输对局数据。这不是完全无服务的直连，也不保证点对点传输。房间码不是密码，只发给受邀的朋友。远方朋友要打开已部署的网站，localhost 链接对方打不开。', 'Only after you select this mode and create or join a room does it contact public PeerJS signaling. Its default configuration also tries third-party STUN and may relay match data through TURN. This is not fully service-free or guaranteed peer-to-peer transport. A room code is not a password; share it only with invited players. A distant friend must open the deployed site — your localhost link will not work for them.')}</p>}
+        </RoomNotes>}
       </div>
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,640px)_1fr]">
+      {(connected || history.length > 0) && <div className="grid gap-8 lg:grid-cols-[minmax(0,640px)_1fr]">
         <div>
           {game === "go" ? (
             <>
@@ -660,7 +621,7 @@ export default function RemoteGame({
                 <section className="mt-5 space-y-3 rounded border border-[#ae8550] bg-paper p-4 leading-8">
                   <h3 className="text-xl font-bold">{zh?'双方核对死子，再确认结果':'Review dead groups, then both confirm'}</h3>
                   <p>{zh?'死子是双方认为已经无法救活的棋子。点击一枚棋子会标记或取消整块；这不是自动判死活。任意修改都会清除双方旧确认，有争议就继续下。':'Dead stones are groups both players agree cannot survive. Click a stone to toggle its entire group. Life and death is not automatic; edits clear both approvals. Resume play if disputed.'}</p>
-                  <p>{zh?`当前计分：黑 ${scoreGo(goState,review.dead).black}，白 ${scoreGo(goState,review.dead).white}（含 7.5 贴目）。房主${review.approved[0]?'已确认':'未确认'}，客方${review.approved[1]?'已确认':'未确认'}。`:`Current score: Black ${scoreGo(goState,review.dead).black}, White ${scoreGo(goState,review.dead).white} (7.5 komi included). Host ${review.approved[0]?'confirmed':'pending'}, guest ${review.approved[1]?'confirmed':'pending'}.`}</p>
+                  <p>{zh?`当前计分：黑 ${scoreGo(goState,review.dead).black}，白 ${scoreGo(goState,review.dead).white}（含 7.5 贴目）。房主${review.approved[0]?'已确认':'未确认'}，朋友${review.approved[1]?'已确认':'未确认'}。`:`Current score: Black ${scoreGo(goState,review.dead).black}, White ${scoreGo(goState,review.dead).white} (7.5 komi included). Host ${review.approved[0]?'confirmed':'pending'}, guest ${review.approved[1]?'confirmed':'pending'}.`}</p>
                   <button className="btn-sign" disabled={status!=='connected'||reviewDone(review)||review.approved[isHostPlayer?0:1]} onClick={()=>requestReview({kind:'confirm'})}>{zh?'我同意这份死子与计分提案':'I agree with this proposal'}</button>
                   <button className="btn-sign btn-sign-outline ml-3" disabled={status!=='connected'||reviewDone(review)} onClick={()=>requestReview({kind:'resume'})}>{zh?'有争议，继续下':'Disputed — resume play'}</button>
                   {reviewDone(review)&&<ResultDialog locale={locale} title={scoreGo(goState,review.dead).black>scoreGo(goState,review.dead).white?(zh?'黑方获胜':'Black wins'):(zh?'白方获胜':'White wins')} reason={zh?`双方已确认同一提案。按活子＋独占空点计分，白另加 7.5。黑 ${scoreGo(goState,review.dead).black}，白 ${scoreGo(goState,review.dead).white}；高分方获胜。提走的棋子不再额外加分。`:`Both accepted the same proposal. Count surviving stones plus enclosed empty points; White adds 7.5. Black ${scoreGo(goState,review.dead).black}, White ${scoreGo(goState,review.dead).white}. Higher total wins; captures are not added again.`}/>} 
@@ -687,28 +648,18 @@ export default function RemoteGame({
                 checked={snapshot.checked}
               />
               {snapshot.over && (
-                <ResultDialog key={match.round} locale={locale} title={zh ? `棋局结束 · ${snapshot.result}` : `Game over · ${snapshot.result}`} reason={snapshot.result === '1/2-1/2' ? (zh ? '规则引擎判定本局和棋。棋盘保留供复盘。' : 'The rules engine determined a draw. The board stays for review.') : (snapshot.inCheck ? (zh ? '被将军的一方没有合法应对，构成将死。' : 'The checked side has no legal response: checkmate.') : (zh ? '规则引擎判定本游戏的终局条件成立。无子可走在不同游戏中不一定都是和棋。' : 'The rules engine reached this variant’s terminal condition. No legal moves is not a draw in every variant.'))}/>
+                <ResultDialog key={match.round} locale={locale} title={snapshot.result === '1/2-1/2' ? t('和棋', 'Draw') : (snapshot.result === '1-0') === isHostPlayer ? t('你获胜了', 'You win') : t('对方获胜', 'Your opponent wins')} reason={snapshot.result === '1/2-1/2' ? (zh ? '规则引擎判定本局和棋。棋盘保留供复盘。' : 'The rules engine determined a draw. The board stays for review.') : (snapshot.inCheck ? (zh ? '被将军的一方没有合法应对，构成将死。' : 'The checked side has no legal response: checkmate.') : (zh ? '规则引擎判定本游戏的终局条件成立。无子可走在不同游戏中不一定都是和棋。' : 'The rules engine reached this variant’s terminal condition. No legal moves is not a draw in every variant.'))}/>
               )}
             </>
           ) : null}
         </div>
-        <ol className="max-h-[550px] overflow-y-auto text-sm space-y-2">
-          {history.map((m, i) => (
-            <li key={i}>
-              {i + 1}. {m}
-            </li>
-          ))}
-        </ol>
-      </div>
-      <p className="text-xs text-ink-3 leading-6">
-        {mode === 'manual'
-          ? (zh
-            ? '当前为手动直连：不联系公共信令、STUN 或 TURN 服务。连接失败时，先确认双方使用同一局域网，再检查访客 Wi-Fi 隔离和防火墙，并重新交换完整连接码。不要关闭防火墙；也可以返回人机或同屏双人。'
-            : 'Manual direct mode: no public signaling, STUN or TURN services. If connection fails, check that both devices share a LAN, check guest Wi-Fi isolation and firewall rules, then exchange complete fresh codes. Do not disable the firewall. AI and local play remain available.')
-          : (zh
-            ? '当前为公共房间号模式：使用 PeerJS 公共信令服务交换连接信息，不是完全无外部服务。部分公司网络或严格 NAT 环境可能无法直连；此时可切换手动直连，或使用人机、同屏双人。'
-            : 'Public room-code mode uses PeerJS public signaling to exchange connection information; it is not free of external services. Some corporate networks or strict NATs prevent direct connections. You can try manual mode, AI or local play.')}
-      </p>
+        <section className="min-w-0" aria-label={t('棋谱', 'Move list')}>
+          <h3 className="mb-2 font-bold">{t('棋谱', 'Moves')}</h3>
+          {history.length === 0 ? <p className="text-sm text-ink-3">{t('还没有走棋。', 'No moves yet.')}</p> : <ol className="max-h-[550px] overflow-y-auto text-sm space-y-2">
+            {history.map((m, i) => <li key={i}>{i + 1}. {i % 2 === 0 ? t('房主', 'Host') : t('朋友', 'Guest')} · {m}</li>)}
+          </ol>}
+        </section>
+      </div>}
     </div>
   );
 }

@@ -45,7 +45,7 @@ export default async function GameHub({ params }: { params: Promise<{ locale: st
       <section className="rpg-hub-hero grid border-b border-ink lg:grid-cols-[3fr_2fr]">
         <div className="px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
           <Link href={`/${locale}`} className="atlas-eyebrow">← {locale === "zh" ? "返回世界地图" : "BACK TO THE ATLAS"}</Link>
-          <h1 className="display-cjk mt-6 text-[clamp(36px,5vw,80px)]">
+          <h1 className="page-title mt-6">
             {g.name[locale]}
             {locale === "zh" && (
               <span className="display ml-4 align-baseline text-[0.36em] text-vermilion">{g.glyph.en}</span>

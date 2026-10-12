@@ -1,4 +1,5 @@
 const fs=require('node:fs'),path=require('node:path'),Module=require('node:module'),ts=require('typescript'),assert=require('node:assert/strict');
+const {expandRoomKit}=require('./lib/room-kit-tree.cjs');
 const {AsyncLocalStorage}=require('node:async_hooks');
 require.extensions['.tsx']=require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,f);
 const resolve=Module._resolveFilename;
@@ -32,7 +33,7 @@ Module._load=function(request,...args){
 Object.defineProperty(global,'sessionStorage',{configurable:true,get(){return scope.getStore().storage;}});
 const Remote=require('../components/cards/HoldemRemote.tsx').default;
 function tab(locale){const data=new Map();return {locale,data,cursor:0,hooks:[],effects:[],cleanups:[],storage:{getItem:k=>data.get(k)??null,setItem:(k,v)=>data.set(k,v),removeItem:k=>data.delete(k)}};}
-function render(t){return scope.run(t,()=>{t.cursor=0;return Remote({locale:t.locale});});}
+function render(t){return scope.run(t,()=>{t.cursor=0;return expandRoomKit(Remote({locale:t.locale}));});}
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
 async function mount(t){render(t);scope.run(t,()=>t.effects.splice(0).forEach(fn=>{const clean=fn();if(clean)t.cleanups.push(clean);}));await flush();}
 function text(n){if(n==null||typeof n==='boolean')return '';if(typeof n!=='object')return String(n);return Array.isArray(n)?n.map(text).join(''):text(n.props?.children);}
@@ -59,7 +60,7 @@ function save(t){return JSON.parse(t.data.get(key));}
    const input=nodes(render(g)).find(n=>n.type==='input'&&n.props['aria-label']===(zh(g)?'房间码或邀请链接':'Room code or invitation'));
    scope.run(g,()=>input.props.onChange({target:{value:room}}));
    await click(g,zh(g)?'加入房间':'Join room');
-   assert.ok(text(render(h)).includes(zh(h)?'双方已连接，请房主确认':'Both connected. Waiting for the host'));
+   assert.ok(text(render(h)).includes(zh(h)?'双方已连接，请房主确认':'Both connected — waiting for the host'));
    assert.equal(h.data.has(key),false);assert.equal(g.data.has(key),false,'No save or deal before explicit start');
    await click(h,zh(h)?'双方已连接，开始发牌':'Both connected — deal cards');
    assert.equal(save(h).role,'host');assert.equal(save(g).role,'guest');
@@ -75,7 +76,7 @@ function save(t){return JSON.parse(t.data.get(key));}
    assert.ok(text(render(h)).includes(zh(h)?'连接已停止':'Connection stopped'));
    const savedH=h.data.get(key),savedG=g.data.get(key);
    scope.run(h,()=>h.cleanups.forEach(fn=>fn()));
-   for(const [t,value] of [[h,savedH],[g,savedG]]){t.hooks=[];t.effects=[];t.cleanups=[];t.data.set(key,value);await mount(t);assert.ok(text(render(t)).includes(zh(t)?'本标签页已保存':'Saved in this tab'));}
+   for(const [t,value] of [[h,savedH],[g,savedG]]){t.hooks=[];t.effects=[];t.cleanups=[];t.data.set(key,value);await mount(t);assert.ok(text(render(t)).includes(zh(t)?'本标签页已保存上次的牌局':'This tab has a saved match'));}
    assert.equal(save(h).checkpoint,hostSave);assert.equal(save(g).checkpoint,guestSave);
    for(const m of traffic.filter(m=>m.payload))assert.ok(!/"(?:keys|deck|archive)":/.test(JSON.stringify(m)));
   }finally{for(const t of [h,g])scope.run(t,()=>t.cleanups.forEach(fn=>fn()));}

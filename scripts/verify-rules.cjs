@@ -70,7 +70,9 @@ async function main() {
   }
   const cubeFirst = tutorials.find(t=>t.slug === "cube-first-lesson");
   assert(!cubeFirst.title.zh.includes("棋子"));
-  assert(cubeFirst.steps.filter(s=>s.alg).length >= 3);
+  // Lesson 1 keeps one written turn-and-undo case; the guided quiz (CubeFirstPractice) adds the two U2 half-turns.
+  assert.deepEqual(cubeFirst.steps.filter(s=>s.alg).map(s=>s.alg), ["R R'"]);
+  assert(fs.readFileSync(path.join(__dirname, '../components/cube/CubeFirstPractice.tsx'), 'utf8').split('answer: "U2"').length - 1 === 2);
   console.log(`PASS: ${goExercises.length} guided Go cases and game-specific lesson titles.`);
   assert.equal(group(s.board, 0, 9).stones.size, 0);
   s = playGo(s, 0).state;

@@ -1,4 +1,5 @@
 const fs=require('node:fs'),path=require('node:path'),Module=require('node:module'),ts=require('typescript'),assert=require('node:assert/strict');
+const {expandRoomKit}=require('./lib/room-kit-tree.cjs');
 require.extensions['.tsx']=require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,f);
 const resolve=Module._resolveFilename;
 Module._resolveFilename=function(request,...args){return resolve.call(this,request.startsWith('@/')?path.resolve(__dirname,'..',request.slice(2)):request,...args);};
@@ -46,8 +47,9 @@ Module._load=function(request,...args){
 const Remote=require('../components/cards/McrRemote.tsx').default;
 function text(node){if(node==null||typeof node==='boolean')return '';if(typeof node!=='object')return String(node);return Array.isArray(node)?node.map(text).join(''):text(node.props?.children);}
 function nodes(node){if(!node||typeof node!=='object')return [];if(Array.isArray(node))return node.flatMap(nodes);return [node,...nodes(node.props?.children)];}
-function button(tree,label){const found=nodes(tree).find(n=>n.type==='button'&&text(n)===label);assert.ok(found,`Missing button: ${label}`);assert.ok(!found.props.disabled);return found;}
-function render(locale){cursor=0;return Remote({locale});}
+const confirmAlias={'创建四人房间':'确认创建新房','Create four-player room':'Confirm new room','生成回复码':'确认加入新房','Create reply code':'Confirm joining new room','生成邀请码':'确认创建新房','Create invitation code':'Confirm new room','创建房间':'确认创建新房','Create room':'Confirm new room','加入房间':'确认加入新房','Join room':'Confirm joining new room'};
+function button(tree,label){const found=nodes(tree).find(n=>n.type==='button'&&(text(n)===label||text(n)===confirmAlias[label]));assert.ok(found,`Missing button: ${label}`);assert.ok(!found.props.disabled);return found;}
+function render(locale){cursor=0;return expandRoomKit(Remote({locale}));}
 async function mount(locale){
  hooks=[];cursor=0;effects=[];
  const data=new Map([[MCR_SAVE_KEY,JSON.stringify({version:1,role:'host',checkpoint:'saved-checkpoint'})]]);
@@ -66,7 +68,7 @@ async function mount(locale){
   delete global.window;
   button(tree,locale==='zh'?'创建四人房间':'Create four-player room').props.onClick();tree=render(locale);
   assert.equal(hosts.length,priorHosts,'First new-room click must not replace the saved match');
-  assert.ok(text(tree).includes(locale==='zh'?'再次点击同一个按钮确认':'Click the same button again to confirm'));
+  assert.ok(text(tree).includes(locale==='zh'?'旧存档会保留':'old save stays'));
   assert.equal(JSON.parse(sessionStorage.getItem(MCR_SAVE_KEY)).checkpoint,'saved-checkpoint');
   button(tree,locale==='zh'?'创建四人房间':'Create four-player room').props.onClick();tree=render(locale);
   assert.equal(hosts.length,priorHosts+1,'Confirmed new room should be created');
@@ -76,19 +78,19 @@ async function mount(locale){
   assert.equal(JSON.parse(sessionStorage.getItem(MCR_SAVE_KEY)).checkpoint,'saved-checkpoint','Abandoning an unstarted room must preserve the original save');
   const invite=nodes(tree).find(n=>n.type==='textarea'&&n.props['aria-label']===(locale==='zh'?'房主邀请':'Host invitation'));
   invite.props.onChange({target:{value:'{"not":"an invitation"}'}});tree=render(locale);
-  button(tree,locale==='zh'?'生成我的回复':'Generate my answer').props.onClick();tree=render(locale);
+  button(tree,locale==='zh'?'生成回复码':'Create reply code').props.onClick();tree=render(locale);
   assert.ok(text(tree).includes(locale==='zh'?'邀请文本无效':'Invalid invitation'));
   assert.equal(JSON.parse(sessionStorage.getItem(MCR_SAVE_KEY)).checkpoint,'saved-checkpoint','Malformed offer must preserve the original save');
   // A half-confirmed delete must not remain armed after entering recovery.
-  button(tree,locale==='zh'?'清除本标签页存档':'Clear this tab’s save').props.onClick();tree=render(locale);
-  button(tree,locale==='zh'?'恢复本标签页牌局':'Restore this tab’s match').props.onClick();
+  button(tree,locale==='zh'?'删除这个存档':'Delete this save').props.onClick();tree=render(locale);
+  button(tree,locale==='zh'?'恢复上次牌局':'Restore previous match').props.onClick();
   hosts.at(-1).ready();tree=render(locale);
   assert.doesNotThrow(()=>button(tree,locale==='zh'?'四人到齐，继续原牌局':'All four ready — resume original match').props.onClick());
   tree=render(locale);const body=text(tree),practice=nodes(tree).find(n=>n.type===Practice);
   assert.ok(body.includes(locale==='zh'?'已恢复原牌局':'Original match restored'));
   assert.ok(!body.includes(locale==='zh'?'等待重新连接':'keep your original seat and reconnect'));
   assert.equal(practice.props.remote.disabled,ended,'Completed match must remain disabled after start callback');
-  if(ended){assert.ok(body.includes(locale==='zh'?'本场结束':'Match finished'));button(tree,locale==='zh'?'清除本标签页存档':'Clear this tab’s save');}
+  if(ended){assert.ok(body.includes(locale==='zh'?'本场结束':'Match finished'));button(tree,locale==='zh'?'删除这个存档':'Delete this save');}
   else assert.ok(body.includes(locale==='zh'?'对局中':'Playing'));
   assert.equal(body.includes(locale==='zh'?'本次进度保存失败':'This update could not be saved'),failure);
   if(failure)assert.equal(JSON.parse(sessionStorage.getItem(MCR_SAVE_KEY)).checkpoint,'saved-checkpoint');

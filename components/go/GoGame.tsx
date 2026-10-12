@@ -34,7 +34,12 @@ export default function GoGame({ locale }: { locale: "zh" | "en" }) {
               ko: "劫：不能重现之前的棋盘。",
               finished: "正在确认终局。",
             }[r.error!]
-          : `Illegal move: ${r.error}`,
+          : {
+              occupied: "That point already has a stone.",
+              suicide: "Suicide is not allowed: that group would have no liberties.",
+              ko: "Ko: you cannot recreate an earlier board position.",
+              finished: "Both players passed; review the score first.",
+            }[r.error!],
       );
   }
   useEffect(() => {
@@ -185,7 +190,7 @@ export default function GoGame({ locale }: { locale: "zh" | "en" }) {
           {zh ? "白" : "White"} {s.captures[1]}
         </p>
         <button
-          className="underline text-sm"
+          className="inline-flex min-h-11 items-center text-sm underline underline-offset-4"
           onClick={() => {
             const letters = "abcdefghijklmnopqrstuvwxyz";
             const moves = stack
@@ -211,7 +216,8 @@ export default function GoGame({ locale }: { locale: "zh" | "en" }) {
             a.href = url;
             a.download = "yifang-go.sgf";
             a.click();
-            URL.revokeObjectURL(url);
+            // Revoking immediately can cancel the download in some browsers.
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
           }}
         >
           {zh ? "下载棋谱 SGF" : "Download SGF"}

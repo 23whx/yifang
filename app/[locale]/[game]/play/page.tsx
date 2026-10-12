@@ -39,15 +39,12 @@ export default async function PlayPage({ params }: { params: Promise<{ locale: s
   const g = getGame(game)!;
   const dict = getDict(locale);
 
-  return (
-    <div className="mx-auto max-w-[1400px] px-5 py-10 sm:px-8 lg:py-14">
-      <Breadcrumbs locale={locale} items={[{ name: locale === 'zh' ? '弈方首页' : 'Yifang home', path: `/${locale}` }, { name: g.name[locale], path: `/${locale}/${game}` }, { name: gamePageCopy(g.slug, g.name[locale], locale, 'play').title, path: `/${locale}/${game}/play` }]} />
-      <Link href={`/${locale}/${game}`} className="text-sm font-semibold text-ink-3 hover:text-vermilion">
-        ← {g.name[locale]}
-      </Link>
-      <h1 className="display-cjk mt-4 text-[clamp(44px,7vw,110px)]">
+  return (<>
+    <Breadcrumbs locale={locale} items={[{ name: locale === 'zh' ? '弈方首页' : 'Yifang home', path: `/${locale}` }, { name: g.name[locale], path: `/${locale}/${game}` }, { name: gamePageCopy(g.slug, g.name[locale], locale, 'play').title, path: `/${locale}/${game}/play` }]} />
+    <div className="mx-auto max-w-[1400px] px-5 pt-4 pb-10 sm:px-8 lg:pb-14">
+      <h1 className="page-title mt-2">
         {g.name[locale]}
-        <span className="text-vermilion">·</span>
+        <span className="sep">·</span><wbr />
         {game === "baccarat" ? (locale === "zh" ? "规则训练" : "Rules training") : dict.hubPlayTitle}
       </h1>
       <WinCondition game={game} locale={locale} />
@@ -84,5 +81,5 @@ export default async function PlayPage({ params }: { params: Promise<{ locale: s
         </div>
       )}
     </div>
-  );
+  </>);
 }

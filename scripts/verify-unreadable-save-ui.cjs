@@ -1,4 +1,5 @@
 const fs=require('node:fs'),path=require('node:path'),Module=require('node:module'),ts=require('typescript'),assert=require('node:assert/strict');
+const {expandRoomKit}=require('./lib/room-kit-tree.cjs');
 require.extensions['.tsx']=require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,f);
 const resolve=Module._resolveFilename;
 Module._resolveFilename=function(request,...args){return resolve.call(this,request.startsWith('@/')?path.resolve(__dirname,'..',request.slice(2)):request,...args);};
@@ -45,7 +46,7 @@ async function flush(){await Promise.resolve();await Promise.resolve();}
  let cases=0;
  for(const [file,game,key,headsup] of configs){
   const Remote=require(`../components/cards/${file}.tsx`).default;
-  function render(locale){cursor=0;return Remote({locale});}
+  function render(locale){cursor=0;return expandRoomKit(Remote({locale}));}
   async function mount(locale,mode){
    hooks=[];effects=[];constructed=0;
    const data=new Map([[key,'{damaged'],['unrelated','keep']]);
@@ -58,8 +59,8 @@ async function flush(){await Promise.resolve();await Promise.resolve();}
    return data;
   }
   for(const locale of ['zh','en']){
-   const zh=locale==='zh',clear=zh?'清除本标签页存档':'Clear this tab’s save';
-   const confirm=headsup?(zh?'确认清除原局存档':'Confirm clear saved match'):(zh?'确认清除，无法撤销':'Confirm permanent removal');
+   const zh=locale==='zh',clear=zh?'删除这个存档':'Delete this save';
+   const confirm=headsup?(zh?'确认删除存档（无法撤销）':'Confirm delete (cannot be undone)'):(zh?'确认删除存档（无法撤销）':'Confirm delete (cannot be undone)');
    // An unreadable save is unknown, not evidence that there was no old match.
    for(const mode of ['malformed','read-denied'])for(const guest of [false,true]){
     const data=await mount(locale,mode);let tree=render(locale);
@@ -67,25 +68,25 @@ async function flush(){await Promise.resolve();await Promise.resolve();}
     assert.ok(!nodes(tree).some(n=>n.type==='button'&&text(n).includes(zh?'恢复本标签页':'Restore this tab')),'Do not offer restoration of an unparsed checkpoint');
     button(tree,clear);
     if(guest){
-     const label=headsup?(zh?'收到的信息':'Received information'):(zh?'房主邀请':'Host invitation');
+     const label=headsup?(zh?'粘贴房主发来的邀请码':'Paste the host’s invitation code'):(zh?'房主邀请':'Host invitation');
      const field=headsup?nodes(nodes(tree).find(n=>n.type==='label'&&text(n)===label)).find(n=>n.type==='textarea'):nodes(tree).find(n=>n.type==='textarea'&&n.props['aria-label']===label);assert.ok(field,`${file} invitation field`);
      const value=JSON.stringify({v:1,game,id:'a'.repeat(24),type:'offer',sdp:'v=0\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\n'});
      field.props.onChange({target:{value}});tree=render(locale);
     }
-    const label=headsup?(guest?(zh?'生成回应信息':'Generate response'):(zh?'生成邀请信息':'Generate invitation')):guest?(zh?'生成我的回复':'Generate my answer'):(zh?'创建四人房间':'Create four-player room');
+    const label=headsup?(guest?(zh?'生成回复码':'Create reply code'):(zh?'生成邀请码':'Create invitation code')):guest?(zh?'生成回复码':'Create reply code'):(zh?'创建四人房间':'Create four-player room');
     await button(tree,label).props.onClick();await flush();tree=render(locale);
     assert.equal(constructed,0,`${file}: first click must not replace unreadable save`);
     assert.equal(data.get(key),'{damaged');
     assert.ok(text(tree).includes(zh?'旧存档会保留':'old save stays'));
     if(guest){
-     const field=headsup?nodes(nodes(tree).find(n=>n.type==='label'&&text(n)===(zh?'收到的信息':'Received information'))).find(n=>n.type==='textarea'):nodes(tree).find(n=>n.type==='textarea'&&n.props['aria-label']===(zh?'房主邀请':'Host invitation'));
+     const field=headsup?nodes(nodes(tree).find(n=>n.type==='label'&&text(n)===(zh?'粘贴房主发来的邀请码':'Paste the host’s invitation code'))).find(n=>n.type==='textarea'):nodes(tree).find(n=>n.type==='textarea'&&n.props['aria-label']===(zh?'房主邀请':'Host invitation'));
      const replacement={...JSON.parse(field.props.value),id:'b'.repeat(24)};
      field.props.onChange({target:{value:JSON.stringify(replacement)}});tree=render(locale);
      await button(tree,label).props.onClick();await flush();tree=render(locale);
      assert.equal(constructed,0,'Changing the invitation must invalidate prior new-room confirmation');
      assert.equal(data.get(key),'{damaged');
     }
-    const confirmationLabel=file==='SichuanRemote'?(guest?(zh?'确认加入新房':'Confirm joining new room'):(zh?'确认创建新房':'Confirm new room')):label;
+    const confirmationLabel=guest?(zh?'确认加入新房':'Confirm joining new room'):(zh?'确认创建新房':'Confirm new room');
     await button(tree,confirmationLabel).props.onClick();await flush();
     assert.equal(constructed,1,`${file}: explicit second click may prepare a new room`);
     assert.equal(data.get(key),'{damaged','Preparing connection must not overwrite unknown old data');
@@ -95,7 +96,7 @@ async function flush(){await Promise.resolve();await Promise.resolve();}
     const data=await mount(locale,mode);let tree=render(locale);
     button(tree,clear).props.onClick();tree=render(locale);
     assert.equal(data.get(key),'{damaged','First click only arms removal');
-    if(headsup){button(tree,zh?'取消清除':'Cancel clear').props.onClick();tree=render(locale);button(tree,clear).props.onClick();tree=render(locale);}
+    if(headsup){button(tree,zh?'取消删除':'Keep the save').props.onClick();tree=render(locale);button(tree,clear).props.onClick();tree=render(locale);}
     button(tree,confirm).props.onClick();tree=render(locale);
     assert.equal(data.get('unrelated'),'keep','Clear must be scoped to the game save');
     if(mode==='malformed'){

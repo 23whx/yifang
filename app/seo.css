@@ -9,16 +9,22 @@
 .seo-reading h2 { font-family: var(--font-display-cjk), Georgia, serif; font-size: clamp(26px, 3vw, 36px); line-height: 1.4; }
 .seo-reading h3 { font-size: 20px; line-height: 1.5; margin: 24px 0 8px; }
 .seo-reading p { max-width: 68ch; line-height: 1.9; margin: 12px 0; overflow-wrap: anywhere; }
-.seo-reading a, .seo-breadcrumbs a { color: #803d2b; text-decoration: underline; text-underline-offset: 4px; }
+.seo-reading a { color: #803d2b; text-decoration: underline; text-underline-offset: 4px; }
 .seo-links { display: flex; flex-wrap: wrap; gap: 16px 24px; margin-top: 24px; }
 .seo-links a { display: inline-flex; align-items: center; min-height: 44px; }
 .seo-topic-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 32px; margin: 24px 0; padding: 0; list-style: none; }
 .seo-topic-list li { border-top: 1px solid #ae8550; padding-top: 8px; }
 .seo-topic-list a { display: inline-block; padding: 8px 0; }
 .seo-reference { font-size: 14px; }
-.seo-breadcrumbs { max-width: 1400px; margin: auto; padding: 16px 24px; font-size: 14px; line-height: 1.8; overflow-wrap: anywhere; }
-.seo-breadcrumbs ol { display: flex; flex-wrap: wrap; gap: 4px 8px; padding: 0; list-style: none; }
-.seo-breadcrumbs a { display: inline-block; padding: 8px 0; }
+/* 面包屑：每项同字号同行高，基线对齐；左缘由 .page-shell 与正文统一 */
+.seo-breadcrumbs { padding-top: 20px; padding-bottom: 4px; font-size: 14px; line-height: 1.5; color: #5c4329; }
+.seo-breadcrumbs ol { display: flex; flex-wrap: wrap; align-items: center; gap: 0 6px; margin: 0; padding: 0; list-style: none; }
+.seo-breadcrumbs li { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; overflow-wrap: anywhere; }
+.seo-breadcrumbs .crumb-sep { color: #86602f; }
+.seo-breadcrumbs a { color: #803d2b; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.seo-breadcrumbs a:hover { color: #5c2a1d; }
+.seo-breadcrumbs a:focus-visible { outline: 2px solid #803d2b; outline-offset: 2px; }
+.seo-breadcrumbs [aria-current="page"] { color: #392616; font-weight: 700; }
 @media (max-width: 600px) {
   .seo-reading { padding: 32px 20px; }
   .seo-topic-list { grid-template-columns: 1fr; }

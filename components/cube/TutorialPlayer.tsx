@@ -68,7 +68,7 @@ export default function TutorialPlayer({ tutorial, dict, locale }: Props) {
           >
             <button onClick={() => goTo(i)} className="group block text-left">
               <span
-                className={`display inline-block px-2 text-[64px] leading-none ${i === active ? "bg-ochre text-ink" : "text-ink"}`}
+                className={`display inline-block px-2 text-[44px] leading-none ${i === active ? "bg-ochre text-ink" : "text-[#86602f]"}`}
               >
                 {String(i + 1).padStart(2, "0")}
               </span>

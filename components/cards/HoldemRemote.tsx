@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import type { Peer, DataConnection } from 'peerjs';
 import { bestHand, cardText, categories, categoriesEn, rankText } from '@/lib/holdem';
 import { type PokerView, type PokerRequest } from '@/lib/holdem-remote';
@@ -12,6 +12,7 @@ import type { HeadsUpRoomMessage } from '@/lib/holdem-headsup-room';
 import { readHeadsUpPokerSave, writeHeadsUpPokerSave, clearHeadsUpPokerSave, type HeadsUpPokerSave } from '@/lib/holdem-headsup-save';
 import {secureMultiplayerContext,insecureMultiplayerMessage} from '@/lib/network-context';
 import {readManualSignal} from '@/lib/manual-rtc';
+import { RoomHeader, RoleCard, Steps, SignalOutput, RoomNotes, RoomAlert, type StepState } from '@/components/remote/RoomKit';
 
 const noSubscribe = () => () => {};
 
@@ -39,7 +40,6 @@ export default function HoldemRemote({ locale }: { locale: 'zh' | 'en' }) {
   const [clearArmed, setClearArmed] = useState(false);
   const [replaceIntent, setReplaceIntent] = useState<string | null>(null);
   const [restoring, setRestoring] = useState(false);
-  const [manualOpen, setManualOpen] = useState(false);
   const [manualStep, setManualStep] = useState<'idle' | 'preparing' | 'offer' | 'answer' | 'connecting'>('idle');
   const [signalOut, setSignalOut] = useState('');
   const [signalIn, setSignalIn] = useState('');
@@ -154,7 +154,6 @@ export default function HoldemRemote({ locale }: { locale: 'zh' | 'en' }) {
     if (['connecting', 'waiting', 'connected'].includes(status)) return;
     if(!isHost){try{readManualSignal(signalIn,'holdem-two','offer');}catch{setReplaceIntent(null);setManualFeedback({message:text('邀请文本无效或不属于双人扑克；原存档仍保留。','Invalid invitation or wrong game; the original save is still intact.'),error:true});return;}}
     if(!recovery&&!allowNew(isHost?'manual-host':'manual-guest'))return;
-    setManualOpen(true);
     dispose(); const token = generation.current;
     setReady(false);setRestoring(!!recovery);setClearArmed(false);setReplaceIntent(null);
     setIsHostSeat(isHost); latest.current = null;
@@ -203,45 +202,69 @@ export default function HoldemRemote({ locale }: { locale: 'zh' | 'en' }) {
     }
     reason += text(`\n\n你获得底池 ${view.awarded[view.seat]}，余额 ${view.stacks[view.seat]}，本手净变化 ${view.stacks[view.seat] - view.start[view.seat]}。无人跟上的投入会退回，不算赢利。`, `\n\nYour pot award: ${view.awarded[view.seat]}; balance: ${view.stacks[view.seat]}; net change: ${view.stacks[view.seat] - view.start[view.seat]}. Unmatched contributions are refunded, not winnings.`);
   }
+  const quick = code !== '' || manualStep === 'idle';
+  const statusText = status === 'connected' ? (pending ? text('正在等待动作确认…', 'Waiting for acknowledgement…') : view?.over ? text('本手已结束', 'Hand complete') : a ? text('轮到你了', 'Your turn') : text('等待对手行动', 'Waiting for opponent'))
+    : status === 'waiting' ? (ready ? text('双方已连接，请房主确认开始或继续原局', 'Both connected — waiting for the host to start or continue') : manualStep === 'offer' ? text('邀请码已生成：发给朋友，再粘贴朋友的回复码', 'Invitation ready: send it, then paste your friend’s reply code') : manualStep === 'answer' ? text('回复码已生成：发回给房主，等房主连接', 'Reply ready: send it to the host and wait') : manualStep === 'connecting' ? text('正在尝试局域网直连…', 'Attempting a direct LAN connection…') : text('房间已创建，等待朋友加入', 'Room created — waiting for your friend'))
+    : status === 'connecting' ? text('正在连接…', 'Connecting…') : status === 'error' ? text('连接已停止', 'Connection stopped') : text('尚未连接', 'Not connected');
+  const tone = status === 'connected' ? 'ok' : status === 'error' ? 'warn' : status === 'idle' ? 'idle' : 'busy';
+  const hostSteps: { label: string; state: StepState; body?: ReactNode }[] = [
+    { label: text('生成邀请码', 'Create an invitation code'), state: signalOut ? 'done' : 'now', body: !signalOut ? <p>{text('正在生成，通常几秒钟…', 'Creating it — usually a few seconds…')}</p> : undefined },
+    { label: text('把邀请码发给朋友，再粘贴朋友发回的回复码', 'Send the invitation, then paste your friend’s reply code'), state: manualStep === 'offer' ? 'now' : manualStep === 'connecting' || ready ? 'done' : 'todo', body: manualStep === 'offer' ? <>
+      <SignalOutput label={text('你的邀请码（整段复制发给朋友，它不是网址）', 'Your invitation code (send all of it; it is not a web address)')} value={signalOut} copyLabel={text('复制邀请码', 'Copy invitation code')} onCopy={copyManual} />
+      <label className="block text-sm font-bold">{text('粘贴朋友发回的回复码', 'Paste your friend’s reply code')}<textarea className="room-field" rows={3} maxLength={65536} value={signalIn} onChange={e => setSignalIn(e.target.value)} /></label>
+      <div><button className="rpg-button" disabled={status !== 'waiting' || !signalIn.trim()} onClick={finishManual}>{text('使用回复码连接', 'Connect with reply code')}</button></div>
+    </> : undefined },
+    { label: text('连接成功后开始发牌', 'Deal once connected'), state: manualStep === 'connecting' || ready ? 'now' : 'todo' },
+  ];
+  const guestSteps: { label: string; state: StepState; body?: ReactNode }[] = [
+    { label: text('生成回复码', 'Create your reply code'), state: signalOut ? 'done' : 'now', body: !signalOut ? <p>{text('正在生成，通常几秒钟…', 'Creating it — usually a few seconds…')}</p> : undefined },
+    { label: text('把回复码发回给房主，等房主连接', 'Send the reply code back and wait for the host'), state: ready ? 'done' : signalOut ? 'now' : 'todo', body: signalOut && !ready ? <SignalOutput label={text('你的回复码（整段复制发给房主）', 'Your reply code (send all of it to the host)')} value={signalOut} copyLabel={text('复制回复码', 'Copy reply code')} onCopy={copyManual} /> : undefined },
+    { label: text('等房主发牌', 'Wait for the host to deal'), state: ready ? 'now' : 'todo' },
+  ];
   return <section className="space-y-6">
-    <aside className="space-y-3 border border-[#ae8550] bg-[#f3e7cd] p-4 leading-7" aria-label={text('双人手动直连存档','Heads-up manual connection save')}>
-      <h2 className="text-xl font-bold">{text('刷新后继续原局','Continue after a refresh')}</h2>
-      <p>{text('快捷房间和手动直连均支持此存档；恢复统一使用下方手动直连，不需要再次联系快捷连接服务。开局后自动保存在当前标签页：房主保存原牌序与操作，朋友只保存自己的可见牌面。双方刷新后，房主先恢复并发送新邀请；朋友把邀请粘贴到“收到的信息”，再点恢复并发回回应；房主应用回应后点击继续。','Both quick rooms and manual connections support saves. Recovery uses Manual LAN connection below, without contacting the quick connection service again. Once play starts, this tab saves the host’s deck and actions or the guest’s own view. After refreshing, the host restores and sends a fresh invitation. The guest pastes it into Received information, restores and returns the response. The host applies it and chooses Continue.')}</p>
-      <p>{text('只与信任的朋友连接。不要分享存档。关闭标签页、清理浏览器数据或更换设备可能无法恢复。','Connect only with trusted friends. Never share saves. Closing the tab, clearing browser data or changing devices may prevent recovery.')}</p>
-      {saved?<><p role="status">{text(`本标签页已保存：${saved.role==='host'?'房主':'朋友'}。`,`Saved in this tab: ${saved.role}.`)}</p><div className="flex flex-wrap gap-3"><button className="rpg-button" disabled={busy||(saved.role==='guest'&&!signalIn.trim())} onClick={()=>startManual(saved.role==='host',saved)}>{text('恢复本标签页原局','Restore this tab’s match')}</button><button className="rpg-button" disabled={busy} onClick={clearSave}>{clearArmed?text('确认清除原局存档','Confirm clear saved match'):text('清除本标签页存档','Clear this tab’s save')}</button>{clearArmed&&<button className="rpg-button" onClick={()=>setClearArmed(false)}>{text('取消清除','Cancel clear')}</button>}</div></>:<p>{text('本标签页暂无可用存档。','No available save in this tab.')}</p>}
-      {saveError&&<p role="alert">{saveError}</p>}
-      {!saved&&saveError&&<div className="flex flex-wrap gap-3"><button className="rpg-button" disabled={busy} onClick={clearSave}>{clearArmed?text('确认清除原局存档','Confirm clear saved match'):text('清除本标签页存档','Clear this tab’s save')}</button>{clearArmed&&<button className="rpg-button" onClick={()=>setClearArmed(false)}>{text('取消清除','Cancel clear')}</button>}</div>}
-    </aside>
-    <div className="space-y-4 border border-[#ae8550] p-4 sm:p-6">
-      <h2 className="text-2xl font-bold">{text('双人扑克 · 好友房间', 'Heads-up poker · Friend room')}</h2>
-      <p className="text-sm leading-7">{text('此快捷房间仅在你点击创建或加入后使用 PeerJS 公共信令；其默认配置还会尝试第三方 STUN，并可能使用 TURN 中继传输对局数据。它不是完全无服务的直连，也不保证一定能点对点连接。不同设备应通过有效 HTTPS 打开网站，以支持安全恢复；想避免这些外部服务，请使用下方“局域网手动直连”。', 'Only after you create or join, this quick room uses public PeerJS signaling. Its default configuration also tries third-party STUN and may relay match data through TURN. This is not a fully service-free connection or a guarantee of peer-to-peer transport. Each device should open a valid HTTPS site for secure recovery; to avoid these external services, use Manual LAN connection below.')}</p>
-      <ol className="list-decimal space-y-2 pl-5 leading-7"><li>{text('一人创建房间，把房间码或邀请链接发给另一人。', 'One person creates a room and shares the code or invitation.')}</li><li>{text('朋友粘贴房间码或链接，点击加入。双方连接后，房主确认开始发牌，每人 200 个练习筹码。', 'Your friend pastes it and joins. Once both connect, the host confirms Deal cards; each starts with 200 practice chips.')}</li><li>{text('轮到你才能行动。一手结束后双方同意才发下一手；筹码延续，小盲 5、大盲 10 轮换。筹码输光后本场结束。', 'Act only on your turn. Both players agree before the next hand; balances carry over and 5/10 blinds swap. The match ends when a player runs out.')}</li></ol>
-      <p className="text-sm leading-7">{text('仅练习，不涉及真钱；没有自动重连。房主浏览器负责洗牌与判定，需要信任房主，这不是防作弊服务器。127.0.0.1 / localhost 不能让远方朋友访问，异地需要已部署的网站；某些网络可能无法连接。', 'Practice only, no real money or automatic reconnection. The host browser deals and adjudicates: trust your host; this is not a cheat-proof server. A distant friend needs a deployed website, not your localhost URL; some networks may be unable to connect.')}</p>
-      <div className="flex flex-wrap gap-3"><button className="rpg-button" disabled={busy} onClick={() => start(true)}>{text('创建房间', 'Create room')}</button><input className="min-h-11 min-w-0 max-w-full flex-1 border border-[#ae8550] p-2" aria-label={text('房间码或邀请链接', 'Room code or invitation')} value={entry ?? invited} onChange={e => {setEntry(e.target.value);setReplaceIntent(null);}} disabled={busy}/><button className="rpg-button" disabled={busy} onClick={() => start(false)}>{text('加入房间', 'Join room')}</button><button className="rpg-button" disabled={status === 'idle'} onClick={() => { dispose(); setStatus('idle'); setCode(''); setView(null); setPending(false); setError(''); setManualFeedback(null); setManualStep('idle'); setSignalIn(''); setSignalOut(''); }}>{text('离开房间', 'Leave room')}</button></div>
-      {code && <div className="flex flex-wrap items-center gap-3"><code className="break-all">{code}</code><button className="rpg-button" onClick={() => copy(false)}>{text('复制房间码', 'Copy room code')}</button><button className="rpg-button" onClick={() => copy(true)}>{text('复制邀请链接', 'Copy invitation')}</button></div>}
-      <p role="status">{status === 'connected' ? (pending ? text('正在等待动作确认…', 'Waiting for acknowledgement…') : view?.over ? text('本手已结束', 'Hand complete') : a ? text('轮到你了', 'Your turn') : text('等待对手行动', 'Waiting for opponent')) : status === 'waiting' ? (ready ? text('双方已连接，请房主确认开始或继续原局。', 'Both connected. Waiting for the host to start or continue the saved match.') : manualStep === 'offer' ? text('邀请已生成：发给朋友，然后在此粘贴朋友的回应。', 'Invitation ready: send it to your friend, then paste their response here.') : manualStep === 'answer' ? text('回应已生成：发回房主，等待房主应用回应。', 'Response ready: send it to the host and wait for them to apply it.') : manualStep === 'connecting' ? text('正在尝试局域网直连…', 'Attempting a direct LAN connection…') : text('房间已创建，等待朋友加入。', 'Room created. Waiting for your friend.')) : status === 'connecting' ? text('正在连接…', 'Connecting…') : status === 'error' ? text('连接已停止', 'Connection stopped') : text('尚未加入房间', 'Not in a room')}</p>
-      {error && <p role="alert" className="leading-7">{error}</p>}
+    <div className="room">
+      <RoomHeader title={text('双人德州扑克 · 好友房', 'Heads-up poker · Friend room')} lead={busy ? undefined : text('一人开房、一人加入。每人 200 个练习筹码，小盲 5、大盲 10，不涉及真钱。', 'One player opens the room, the other joins. Each starts with 200 practice chips, blinds 5/10. No real money.')} tone={tone}>{statusText}</RoomHeader>
+      {error && <RoomAlert>{error}</RoomAlert>}
+      {saveError && <RoomAlert>{saveError}</RoomAlert>}
+      {manualFeedback && (manualFeedback.error ? <RoomAlert>{manualFeedback.message}</RoomAlert> : <p role="status" className="text-sm font-bold">{manualFeedback.message}</p>)}
+      {!busy && (saved || saveError) && <div className="room-banner" aria-label={text('上次的牌局', 'Previous match')}>
+        <p className="room-banner-title">{saved ? text(`本标签页已保存上次的牌局（你是${saved.role === 'host' ? '房主' : '朋友'}）`, `This tab has a saved match (you were the ${saved.role})`) : text('存档读取失败', 'The save could not be read')}</p>
+        {saved && <p>{saved.role === 'host' ? text('想接着打：点“恢复上次牌局”，把新的邀请码发给原来的朋友，再粘贴他发回的回复码，最后点“继续原局”。', 'To continue: choose Restore previous match, send the new invitation to the same friend, paste their reply, then choose Continue.') : text('想接着打：先在下方“朋友邀请我”里粘贴房主发来的新邀请码，再点“恢复上次牌局”，把生成的回复码发回给房主。', 'To continue: paste the host’s new invitation under “A friend invited me” below, then choose Restore previous match and send the reply back.')}</p>}
+        <div className="room-actions">
+          {saved && <button className="rpg-button" disabled={saved.role === 'guest' && !signalIn.trim()} onClick={() => startManual(saved.role === 'host', saved)}>{text('恢复上次牌局', 'Restore previous match')}</button>}
+          <button className="room-link" onClick={clearSave}>{clearArmed ? text('确认删除存档（无法撤销）', 'Confirm delete (cannot be undone)') : text('删除这个存档', 'Delete this save')}</button>
+          {clearArmed && <button className="room-link" onClick={() => setClearArmed(false)}>{text('取消删除', 'Keep the save')}</button>}
+        </div>
+      </div>}
+      {!busy && <div className="room-roles">
+        <RoleCard badge={text('房主', 'Host')} title={text('我来开房', 'Open a room')} steps={[text('生成邀请码，发给朋友', 'Create an invitation code and send it'), text('粘贴朋友发回的回复码', 'Paste the reply code your friend sends back'), text('连接成功后由你发牌', 'Deal the first hand once connected')]}>
+          <button className="rpg-button" onClick={() => startManual(true)}>{replaceIntent === 'manual-host' ? text('确认创建新房', 'Confirm new room') : text('生成邀请码', 'Create invitation code')}</button>
+        </RoleCard>
+        <RoleCard badge={text('朋友', 'Guest')} title={text('朋友邀请我', 'A friend invited me')} steps={[text('粘贴房主发来的邀请码', 'Paste the host’s invitation code'), text('生成回复码，发回给房主', 'Create a reply code and send it back'), text('等房主发牌', 'Wait for the host to deal')]}>
+          <label className="block text-sm font-bold">{text('粘贴房主发来的邀请码', 'Paste the host’s invitation code')}<textarea className="room-field" rows={3} maxLength={65536} value={signalIn} onChange={e => { setSignalIn(e.target.value); setReplaceIntent(null); }} /></label>
+          <button className="rpg-button" disabled={!signalIn.trim()} onClick={() => startManual(false)}>{replaceIntent === 'manual-guest' ? text('确认加入新房', 'Confirm joining new room') : text('生成回复码', 'Create reply code')}</button>
+        </RoleCard>
+      </div>}
+      {busy && !quick && status !== 'connected' && <Steps items={isHostSeat ? hostSteps : guestSteps} />}
+      {busy && quick && code && status !== 'connected' && <div className="room-banner">
+        <p className="room-banner-title">{isHostSeat ? text('房间已创建，把房间码发给朋友', 'Room ready — send the code to your friend') : text('正在加入房间', 'Joining the room')}</p>
+        <p><code className="break-all text-base font-bold">{code}</code></p>
+        {isHostSeat && <div className="room-actions"><button className="rpg-button" onClick={() => copy(false)}>{text('复制房间码', 'Copy room code')}</button><button className="rpg-button" onClick={() => copy(true)}>{text('复制邀请链接', 'Copy invitation')}</button></div>}
+      </div>}
+      {ready && status === 'waiting' && isHostSeat && <div><button className="rpg-button" onClick={() => { if (!manualHost.current?.start()) setError(text('尚不能开始，请确认双方连接。', 'Cannot start yet. Check both connections.')); }}>{restoring ? text('双方已连接，继续原局', 'Both connected — continue saved match') : text('双方已连接，开始发牌', 'Both connected — deal cards')}</button></div>}
+      {status !== 'idle' && status !== 'error' && <div><button className="room-link" onClick={() => { dispose(); setStatus('idle'); setCode(''); setView(null); setPending(false); setError(''); setManualFeedback(null); setManualStep('idle'); setSignalIn(''); setSignalOut(''); }}>{text('离开房间', 'Leave room')}</button></div>}
+      {!busy && <RoomNotes summary={text('用短房间码连接（需第三方服务）', 'Connect with a short room code (uses third-party services)')} open={!!invited}>
+        <p>{text('此快捷房间仅在你点击创建或加入后使用 PeerJS 公共信令；其默认配置还会尝试第三方 STUN，并可能使用 TURN 中继传输对局数据。它不是完全无服务的直连，也不保证一定能点对点连接。不同设备应通过有效 HTTPS 打开网站，以支持安全恢复；想避免这些外部服务，请使用上方的邀请码方式（局域网手动直连）。', 'Only after you create or join, this quick room uses public PeerJS signaling. Its default configuration also tries third-party STUN and may relay match data through TURN. This is not a fully service-free connection or a guarantee of peer-to-peer transport. Each device should open a valid HTTPS site for secure recovery; to avoid these external services, use the invitation codes above (Manual LAN connection).')}</p>
+        <div className="room-actions"><button className="rpg-button" onClick={() => start(true)}>{replaceIntent === 'quick-host' ? text('确认创建新房', 'Confirm new room') : text('创建房间', 'Create room')}</button></div>
+        <label className="block"><span className="font-bold">{text('房间码或邀请链接', 'Room code or invitation')}</span><input className="room-field" aria-label={text('房间码或邀请链接', 'Room code or invitation')} value={entry ?? invited} onChange={e => { setEntry(e.target.value); setReplaceIntent(null); }} /></label>
+        <div className="room-actions"><button className="rpg-button" onClick={() => start(false)}>{replaceIntent === 'quick-guest' ? text('确认加入新房', 'Confirm joining new room') : text('加入房间', 'Join room')}</button></div>
+      </RoomNotes>}
+      {!busy && <RoomNotes summary={text('连接说明与常见问题', 'Connection notes and troubleshooting')}>
+        <p>{text('邀请码方式不联系 PeerJS、STUN 或 TURN。不同设备先通过有效 HTTPS 打开网站并接入同一局域网；localhost 只能在本机预览，http://局域网IP 不具备刷新恢复所需的安全上下文。访客 Wi-Fi 隔离、防火墙或浏览器地址保护可能阻止直连，不保证异地可用。', 'Invitation codes contact no PeerJS, STUN or TURN service. Each device must first open a valid HTTPS site on the same LAN. Localhost is only for this device; plain HTTP on a LAN IP lacks the secure context required for refresh recovery. Guest Wi-Fi isolation, firewalls or browser address protection can block direct connections; cross-network access is not guaranteed.')}</p>
+        <p>{text('仅供练习，不涉及真钱。房主浏览器负责洗牌与判定，需要信任房主，这不是防作弊服务器。一手结束后双方都同意才发下一手；筹码延续，小盲 5、大盲 10 轮换，有人筹码输光本场结束。', 'Practice only, no real money. The host browser deals and adjudicates: trust your host; this is not a cheat-proof server. Both players agree before each next hand; balances carry over, 5/10 blinds alternate, and the match ends when someone runs out.')}</p>
+        <p>{text('刷新或断线后：开局后会自动保存在当前标签页，房主保存原牌序与操作，朋友只保存自己的可见牌面。双方保留原标签页，按上方“上次的牌局”提示重新交换一次邀请码和回复码即可继续。不要分享存档；关闭标签页、清理浏览器数据或更换设备可能无法恢复。', 'After a refresh or disconnect: once play starts this tab saves the host’s deck and actions or the guest’s own view. Keep both original tabs and follow the Previous match prompt to swap a fresh invitation and reply. Never share saves; closing the tab, clearing browser data or changing devices may prevent recovery.')}</p>
+      </RoomNotes>}
     </div>
-    <details open={manualOpen} onToggle={e=>setManualOpen(e.currentTarget.open)} className="space-y-4 border border-[#ae8550] p-4 sm:p-6">
-      <summary className="cursor-pointer text-xl font-bold">{text('局域网手动直连 · 不使用信令服务器', 'Manual LAN connection · No signaling server')}</summary>
-      <p className="leading-7">{text('此模式不联系 PeerJS、STUN 或 TURN。不同设备先通过有效 HTTPS 打开网站并接入同一局域网；localhost 只能在本机预览，http://局域网IP 不具备刷新恢复所需的安全上下文。连接信息不能代替网页地址。访客 Wi-Fi 隔离、防火墙或浏览器地址保护可能阻止直连，不保证异地可用。', 'This mode contacts no PeerJS, STUN or TURN service. Each device must first open a valid HTTPS site on the same LAN. Localhost is only for this device; plain HTTP on a LAN IP lacks the secure context required for refresh recovery. Connection text does not serve the website. Guest Wi-Fi isolation, firewalls or browser address protection can block direct connections; cross-network access is not guaranteed.')}</p>
-      <ol className="list-decimal space-y-2 pl-5 leading-7">
-        <li>{text('房主点“生成邀请信息”，把完整输出发给朋友。不要关闭此页面。', 'Host: generate an invitation and send the complete output to your friend. Keep this page open.')}</li>
-        <li>{text('朋友粘贴到“收到的信息”，点“生成回应信息”，把新输出完整发回房主。', 'Friend: paste it into Received information, generate a response, and send the complete new output back.')}</li>
-        <li>{text('房主把回应粘贴到“收到的信息”，点“应用回应并连接”。双方连接后，房主再点击“开始发牌”或“继续原局”；看到“轮到你了”或“等待对手行动”才进入牌局。', 'Host: paste the response into Received information and apply it. Once both are connected, the host must choose Deal cards or Continue saved match. Your turn or Waiting for opponent confirms play has begun.')}</li>
-      </ol>
-      <p className="text-sm">{text('信息只对本次页面有效，可能包含网络地址，请只发给受邀朋友，不要公开发布。取消或换模式请点“离开房间”。', 'Information is valid for this session and may contain network addresses. Share only with your invited friend. Choose Leave room to cancel or change modes.')}</p>
-      <label className="block">{text('收到的信息', 'Received information')}<textarea className="mt-2 min-h-28 w-full border border-[#ae8550] p-3 font-mono text-xs" maxLength={65536} value={signalIn} onChange={e => {setSignalIn(e.target.value);setReplaceIntent(null);}} disabled={status === 'connected' || manualStep === 'preparing'} /></label>
-      <div className="flex flex-wrap gap-3">
-        <button className="rpg-button" disabled={busy} onClick={() => startManual(true)}>{text('生成邀请信息', 'Generate invitation')}</button>
-        <button className="rpg-button" disabled={busy || !signalIn.trim()} onClick={() => startManual(false)}>{text('生成回应信息', 'Generate response')}</button>
-        <button className="rpg-button" disabled={manualStep !== 'offer' || status !== 'waiting' || !signalIn.trim()} onClick={finishManual}>{text('应用回应并连接', 'Apply response and connect')}</button>
-      </div>
-      {manualFeedback&&<p role={manualFeedback.error?'alert':'status'} className={`leading-7 ${manualFeedback.error?'font-bold text-[#803d2b]':''}`}>{manualFeedback.message}</p>}
-      {manualStep === 'preparing' && status === 'connecting' && <p role="status">{text('正在收集连接信息…', 'Gathering connection information…')}</p>}
-      {signalOut && <><label className="block">{text('发给朋友的完整信息', 'Complete information to send')}<textarea readOnly className="mt-2 min-h-28 w-full border border-[#ae8550] p-3 font-mono text-xs" value={signalOut}/></label><button className="rpg-button" onClick={copyManual}>{text('复制完整信息', 'Copy complete information')}</button></>}
-    </details>
-    {ready&&status==='waiting'&&<div className="space-y-3 border border-[#ae8550] p-4"><p role="status">{text('双方已连接。请房主确认开始或继续原局。','Both players connected. The host must confirm Start or Continue.')}</p>{isHostSeat&&<button className="rpg-button" onClick={()=>{if(!manualHost.current?.start())setError(text('尚不能开始，请确认双方连接。','Cannot start yet. Check both connections.'));}}>{restoring?text('双方已连接，继续原局','Both connected — continue saved match'):text('双方已连接，开始发牌','Both connected — deal cards')}</button>}</div>}
     {view && <div className="space-y-5 border-2 border-[#ae8550] bg-[#f3e7cd] p-4 sm:p-6">
       <h2 className="text-xl font-bold">{text(`第 ${view.hand} 手 · 你是玩家${view.seat + 1}`, `Hand ${view.hand} · You are Player ${view.seat + 1}`)}</h2>
       <p>{text('阶段：', 'Street: ')}{(zh ? ['翻牌前（先看两张手牌）', '翻牌（三张公共牌）', '转牌（第四张公共牌）', '河牌（第五张公共牌）'] : ['Preflop', 'Flop', 'Turn', 'River'])[view.street]} · {text('底池', 'Pot')} {view.committed[0] + view.committed[1]} {view.over && text('（已分配）', '(awarded)')}</p>
@@ -250,7 +273,7 @@ export default function HoldemRemote({ locale }: { locale: 'zh' | 'en' }) {
       <div aria-label={text('公共牌', 'Community cards')}><h3>{text('公共牌：双方都可以用', 'Community cards: shared by both players')}</h3>{view.community.length ? cards(view.community) : <p>{text('尚未发出公共牌。', 'No community cards yet.')}</p>}</div>
       <div aria-label={text('你的手牌', 'Your cards')}><h3>{text('你的两张手牌', 'Your two cards')}</h3>{cards(view.ownCards)}</div>
       <p>{text(`本轮你已投入 ${view.streetBet[view.seat]}，对手已投入 ${view.streetBet[1 - view.seat]}。`, `This street: you contributed ${view.streetBet[view.seat]}, opponent ${view.streetBet[1 - view.seat]}.`)}</p>
-      {!view.over && <fieldset disabled={status !== 'connected' || pending || !a} className="space-y-4 disabled:opacity-60"><legend className="font-bold">{text('选择这一步', 'Choose your action')}</legend><div className="flex flex-wrap gap-3"><button className="rpg-button" onClick={() => act({ kind: 'fold' })}>{text('弃牌：放弃本手', 'Fold: give up this hand')}</button>{a?.canCheck ? <button className="rpg-button" onClick={() => act({ kind: 'check' })}>{text('过牌：不投入，交给对手', 'Check: add nothing')}</button> : <button className="rpg-button" onClick={() => act({ kind: 'call' })}>{text(`跟注：补 ${a?.call ?? '…'}`, `Call: add ${a?.call ?? '…'}`)}</button>}</div>{a?.canRaise && <div className="space-y-3"><label className="block">{text(`本轮加到（至少 ${a.minTo}，最多 ${a.maxTo}；不足最小值只能全下）`, `Raise-to total (minimum ${a.minTo}, maximum ${a.maxTo}; below minimum only when all-in)`)}<input className="ml-2 min-h-11 w-28 border border-[#ae8550] p-2" type="number" min={1} max={a.maxTo} step={1} value={raise} onChange={e => setRaise(e.target.value)}/></label><p>{text('“加到”是这一轮的总投入，不是另外再交这个数。', 'Raise-to means your total for this street, not an additional payment.')}</p><div className="flex flex-wrap gap-3"><button className="rpg-button" onClick={() => act({ kind: 'raise', to: Number(raise) })}>{text('确认加到', 'Confirm raise-to')}</button><button className="rpg-button" onClick={() => act({ kind: 'raise', to: a.maxTo })}>{text('全下：投入剩余筹码', 'All-in: commit remaining chips')}</button></div></div>}</fieldset>}
+      {!view.over && !a && <p role="status" className="font-bold">{pending ? text('正在等待动作确认…', 'Waiting for acknowledgement…') : text('等待对手行动…', 'Waiting for your opponent…')}</p>}{!view.over && a && <fieldset disabled={status !== 'connected' || pending || !a} className="space-y-4 disabled:opacity-60"><legend className="font-bold">{text('选择这一步', 'Choose your action')}</legend><div className="flex flex-wrap gap-3"><button className="rpg-button" onClick={() => act({ kind: 'fold' })}>{text('弃牌：放弃本手', 'Fold: give up this hand')}</button>{a?.canCheck ? <button className="rpg-button" onClick={() => act({ kind: 'check' })}>{text('过牌：不投入，交给对手', 'Check: add nothing')}</button> : <button className="rpg-button" onClick={() => act({ kind: 'call' })}>{text(`跟注：补 ${a?.call ?? '…'}`, `Call: add ${a?.call ?? '…'}`)}</button>}</div>{a?.canRaise && <div className="space-y-3"><label className="block">{text(`本轮加到（至少 ${a.minTo}，最多 ${a.maxTo}；不足最小值只能全下）`, `Raise-to total (minimum ${a.minTo}, maximum ${a.maxTo}; below minimum only when all-in)`)}<input className="ml-2 min-h-11 w-28 border border-[#ae8550] p-2" type="number" min={1} max={a.maxTo} step={1} value={raise} onChange={e => setRaise(e.target.value)}/></label><p>{text('“加到”是这一轮的总投入，不是另外再交这个数。', 'Raise-to means your total for this street, not an additional payment.')}</p><div className="flex flex-wrap gap-3"><button className="rpg-button" onClick={() => act({ kind: 'raise', to: Number(raise) })}>{text('确认加到', 'Confirm raise-to')}</button><button className="rpg-button" onClick={() => act({ kind: 'raise', to: a.maxTo })}>{text('全下：投入剩余筹码', 'All-in: commit remaining chips')}</button></div></div>}</fieldset>}
       {view.over && <><ResultDialog key={view.hand} locale={locale} title={view.winner === 'tie' ? text('平分底池', 'Split pot') : winning ? text('你赢得本手', 'You won this hand') : text('对手赢得本手', 'Opponent won this hand')} reason={reason}/><p className="whitespace-pre-line leading-8">{reason}</p>{view.stacks.every(n => n > 0) ? <><p>{text(`下一手同意情况：你${view.next[view.seat] ? '已同意' : '未同意'}，对手${view.next[1 - view.seat] ? '已同意' : '未同意'}。`, `Next hand: you ${view.next[view.seat] ? 'ready' : 'not ready'}, opponent ${view.next[1 - view.seat] ? 'ready' : 'not ready'}.`)}</p><button className="rpg-button" disabled={status !== 'connected' || pending || view.next[view.seat]} onClick={() => act({ kind: 'next' })}>{text('同意下一手', 'Agree to next hand')}</button></> : <p>{text('有玩家筹码归零，本场结束。想重新练习，请离开后创建新房间。', 'A player has no chips: match over. Leave and create a new room to practice again.')}</p>}</>}
       <details open><summary className="cursor-pointer font-bold">{text('本手记录：每一步为什么扣筹码', 'Hand log: every chip movement')}</summary><ol className="mt-3 list-decimal space-y-2 pl-5 leading-7">{view.log.map((line, i) => <li key={i}>{line[locale]}</li>)}</ol></details>
     </div>}

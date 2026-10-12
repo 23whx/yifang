@@ -28,15 +28,12 @@ export default async function LearnIndex({ params }: { params: Promise<{ locale:
   const dict = getDict(locale);
   const tuts = tutorialsForGame(game).map((t) => localizeTutorial(t, locale));
 
-  return (
-    <div className="mx-auto max-w-[1400px] px-5 py-12 sm:px-8 lg:py-16">
-      <Breadcrumbs locale={locale} items={[{ name: locale === 'zh' ? '弈方首页' : 'Yifang home', path: `/${locale}` }, { name: g.name[locale], path: `/${locale}/${game}` }, { name: gamePageCopy(g.slug, g.name[locale], locale, 'learn').title, path: `/${locale}/${game}/learn` }]} />
-      <Link href={`/${locale}/${game}`} className="text-sm font-semibold text-ink-3 hover:text-vermilion">
-        ← {g.name[locale]}
-      </Link>
-      <h1 className="display-cjk mt-4 text-[clamp(44px,7vw,110px)]">
+  return (<>
+    <Breadcrumbs locale={locale} items={[{ name: locale === 'zh' ? '弈方首页' : 'Yifang home', path: `/${locale}` }, { name: g.name[locale], path: `/${locale}/${game}` }, { name: gamePageCopy(g.slug, g.name[locale], locale, 'learn').title, path: `/${locale}/${game}/learn` }]} />
+    <div className="mx-auto max-w-[1400px] px-5 pt-4 pb-12 sm:px-8 lg:pb-16">
+      <h1 className="page-title mt-2">
         {g.name[locale]}
-        <span className="text-vermilion">·</span>
+        <span className="sep">·</span><wbr />
         {dict.hubLearnTitle}
       </h1>
       <WinCondition game={game} locale={locale} />
@@ -67,5 +64,5 @@ export default async function LearnIndex({ params }: { params: Promise<{ locale:
         </p>
       )}
     </div>
-  );
+  </>);
 }
