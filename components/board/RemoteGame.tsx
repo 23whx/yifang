@@ -486,10 +486,11 @@ export default function RemoteGame({
       } else {
         const target = roomCode(entry ?? invited, game);
         if (timeout.current) clearTimeout(timeout.current);
-        const lookingNote = zh ? '正在连接房主……如果房主暂时切到了其他应用，会自动重试，最多等 5 分钟。' : 'Connecting to the host… if they switched apps briefly, this retries automatically for up to 5 minutes.';
-        setLinkNote(lookingNote);
+        const lookingNote = zh ? '已连上房间服务，正在寻找房主……如果房主暂时切到了其他应用，会自动重试，最多等 5 分钟。' : 'Room service reached; looking for the host… if they switched apps briefly, this retries automatically for up to 5 minutes.';
+        setLinkNote(zh ? '正在连接房间服务…' : 'Connecting to the room service…');
         const room = await joinPeerRoom(target, {}, {
           onOpen: c => { if (token !== generation.current) { c.close(); return; } setLinkNote(''); attach(c); },
+          onService: () => { if (token === generation.current) setLinkNote(lookingNote); },
           onWaiting: () => { if (token === generation.current) setLinkNote(lookingNote); },
           onFailure: reason => { if (token === generation.current) fail(peerFailureMessage(reason, zh)); },
         });

@@ -142,8 +142,9 @@ export default function HoldemRemote({ locale }: { locale: 'zh' | 'en' }) {
         peer.current = room;
       } else {
         setCode(target);
-        setLinkNote(text('正在连接房主……如果房主暂时切到了其他应用，会自动重试，最多等 5 分钟。', 'Connecting to the host… if they switched apps briefly, this retries automatically for up to 5 minutes.'));
+        setLinkNote(text('正在连接房间服务…', 'Connecting to the room service…'));
         const room = await joinPeerRoom(target, {}, {
+          onService: () => { if (token === generation.current) setLinkNote(text('已连上房间服务，正在寻找房主……如果房主暂时切到了其他应用，会自动重试，最多等 5 分钟。', 'Room service reached; looking for the host… if they switched apps briefly, this retries automatically for up to 5 minutes.')); },
           onOpen: c => {
             if (token !== generation.current) { c.close(); return; }
             setLinkNote('');

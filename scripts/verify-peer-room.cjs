@@ -5,10 +5,10 @@ require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f
 const resolve=Module._resolveFilename;
 Module._resolveFilename=function(request,...args){return resolve.call(this,request.startsWith('@/')?path.resolve(__dirname,'..',request.slice(2)):request,...args);};
 class Events{constructor(){this.l=new Map();}on(e,f){this.l.set(e,[...(this.l.get(e)||[]),f]);return this;}emit(e,...a){for(const f of this.l.get(e)||[])f(...a);}}
-const peers=new Map(),connects=[];
+const peers=new Map(),connects=[];let silent=false;
 class Conn extends Events{constructor(options){super();this.open=false;this.metadata=options?.metadata;this.options=options;}send(v){this.sent=(this.sent||[]).concat([v]);}close(){if(this.closed)return;this.closed=true;this.open=false;this.emit('close');}}
 class Peer extends Events{
- constructor(id){super();this.id=id||'guest-'+Math.random().toString(16).slice(2);this.disconnected=false;this.destroyed=false;this.reconnects=0;peers.set(this.id,this);queueMicrotask(()=>this.emit('open',this.id));}
+ constructor(id){super();this.id=id||'guest-'+Math.random().toString(16).slice(2);this.disconnected=false;this.destroyed=false;this.reconnects=0;peers.set(this.id,this);if(!silent)queueMicrotask(()=>{this.open=true;this.emit('open',this.id);});}
  connect(id,options){const c=new Conn(options);connects.push({id,options});const host=peers.get(id);
   queueMicrotask(()=>{if(!host||host.disconnected||host.destroyed){this.emit('error',{type:'peer-unavailable'});return;}const remote=new Conn(options);host.emit('connection',remote);c.open=remote.open=true;c.emit('open');remote.emit('open');});return c;}
  reconnect(){this.reconnects++;this.disconnected=false;peers.set(this.id,this);queueMicrotask(()=>this.emit('open',this.id));}
@@ -63,6 +63,12 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  {let reason='';const target=room.newRoomCode('xiangqi');const h=await room.hostPeerRoom(target,{onFailure:r=>{reason=r;}});
   peers.get(target).emit('error',{type:'unavailable-id'});assert.equal(reason,'room-taken');h.destroy();}
 
+ // An unreachable room service fails visibly instead of waiting forever.
+ {silent=true;const reasons=[];let services=0;
+  const g=await room.joinPeerRoom(room.newRoomCode('shogi'),{},{onOpen(){},onService:()=>services++,onFailure:r=>reasons.push('guest '+r)});
+  const h=await room.hostPeerRoom(room.newRoomCode('shogi'),{onFailure:r=>reasons.push('host '+r)});
+  await wait(room.SERVICE_LIMIT_MS+300);silent=false;
+  assert.deepEqual(reasons.sort(),['guest service','host service']);assert.equal(services,0);g.destroy();h.destroy();}
  for(const reason of ['service','room-taken','host-gone','network','browser'])for(const zh of [true,false])assert.ok(room.peerFailureMessage(reason,zh).length>10);
- console.log('PASS: link rooms parse codes per game, buffer data until handlers attach, retry while the host is away, carry the recovery seat, use JSON framing, and re-register a dropped host under the same id.');
+ console.log('PASS: link rooms parse codes per game, buffer data until handlers attach, retry while the host is away, carry the recovery seat, use JSON framing, re-register a dropped host under the same id, and report an unreachable room service instead of waiting forever.');
 })().catch(e=>{console.error(e);process.exit(1);});

@@ -18,11 +18,27 @@ export type PeerFailure = 'service' | 'room-taken' | 'host-gone' | 'network' | '
 export type PeerJoinEvents = {
   onOpen: (connection: BoardConnection) => void;
   onWaiting?: () => void;
+  /** The room service answered; from here on we are looking for the host. */
+  onService?: () => void;
   onFailure: (reason: PeerFailure) => void;
 };
 export const JOIN_RETRY_MS = 3000;
 export const JOIN_LIMIT_MS = 5 * 60 * 1000;
 const ATTEMPT_LIMIT_MS = 15000;
+/** Google STUN is unreachable from mainland China and PeerJS TURN sits in Europe/US, so
+ * list STUN servers reachable there first. Without a reflexive address, two devices on
+ * different networks cannot find a path to each other. */
+export const ICE_CONFIG: RTCConfiguration = {
+  iceServers: [
+    { urls: ['stun:stun.miwifi.com:3478', 'stun:stun.chat.bilibili.com:3478', 'stun:stun.cloudflare.com:3478'] },
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: ['turn:eu-0.turn.peerjs.com:3478', 'turn:us-0.turn.peerjs.com:3478'], username: 'peerjs', credential: 'peerjsp' },
+  ],
+};
+/** Two silent attempts while the host is registered mean the networks cannot connect. */
+const PATH_ATTEMPTS = 2;
+/** A room service that never answers (blocked or unreachable network) must fail visibly. */
+export const SERVICE_LIMIT_MS = 20000;
 const retryable = new Set(['network', 'server-error', 'socket-error', 'socket-closed', 'disconnected']);
 
 export function newRoomCode(kind: string) {
@@ -93,16 +109,17 @@ export async function hostPeerRoom(code: string, events: PeerRoomEvents) {
   if (typeof RTCPeerConnection !== 'function') { events.onFailure('browser'); return { destroy() {} }; }
   const { Peer } = await import('peerjs');
   let destroyed = false;
-  const peer = new Peer(code);
+  const peer = new Peer(code, { config: ICE_CONFIG });
+  const unreachable = setTimeout(() => { if (destroyed || peer.open) return; destroyed = true; stop(); peer.destroy(); events.onFailure('service'); }, SERVICE_LIMIT_MS);
   const stop = keepRegistered(peer, () => !destroyed, events.onReconnecting);
-  peer.on('open', own => { if (!destroyed) events.onReady?.(own); });
+  peer.on('open', own => { clearTimeout(unreachable); if (!destroyed) events.onReady?.(own); });
   peer.on('connection', c => { if (destroyed) c.close(); else events.onConnection?.(buffered(c), c.metadata); });
   peer.on('error', error => {
     if (destroyed) return;
     if (retryable.has(error.type)) return; // keepRegistered handles socket loss
     events.onFailure(error.type === 'unavailable-id' ? 'room-taken' : error.type === 'browser-incompatible' ? 'browser' : 'service');
   });
-  return { destroy() { if (destroyed) return; destroyed = true; stop(); peer.destroy(); } };
+  return { destroy() { clearTimeout(unreachable); if (destroyed) return; destroyed = true; stop(); peer.destroy(); } };
 }
 
 /** Guest: connect to `code`, retrying while the host is temporarily away. */
@@ -112,7 +129,8 @@ export async function joinPeerRoom(code: string, metadata: Record<string, unknow
   let destroyed = false, joined = false, retry: ReturnType<typeof setTimeout> | undefined, attemptTimer: ReturnType<typeof setTimeout> | undefined;
   let attemptConnection: DataConnection | undefined, attemptBuffer: BoardConnection | undefined;
   const started = Date.now();
-  const peer = new Peer();
+  let silentAttempts = 0;
+  const peer = new Peer({ config: ICE_CONFIG });
   const stop = keepRegistered(peer, () => !destroyed && !joined);
   const fail = (reason: PeerFailure) => { if (destroyed || joined) return; destroyed = true; clearTimeout(retry); clearTimeout(attemptTimer); stop(); peer.destroy(); events.onFailure(reason); };
   const again = () => {
@@ -128,7 +146,11 @@ export async function joinPeerRoom(code: string, metadata: Record<string, unknow
     const c = peer.connect(code, { reliable: true, metadata, serialization: 'json' });
     attemptConnection = c; attemptBuffer = buffered(c);
     // A present host whose network blocks every path never opens the channel.
-    attemptTimer = setTimeout(() => { if (attemptConnection === c && !joined) again(); }, ATTEMPT_LIMIT_MS);
+    attemptTimer = setTimeout(() => {
+      if (attemptConnection !== c || joined) return;
+      if (++silentAttempts >= PATH_ATTEMPTS) { attemptConnection = undefined; c.close(); fail('network'); return; }
+      again();
+    }, ATTEMPT_LIMIT_MS);
     c.on('open', () => {
       if (destroyed || joined || attemptConnection !== c) { c.close(); return; }
       joined = true; clearTimeout(attemptTimer); clearTimeout(retry); stop();
@@ -136,22 +158,24 @@ export async function joinPeerRoom(code: string, metadata: Record<string, unknow
     });
     c.on('error', () => { if (attemptConnection === c && !joined) again(); });
   };
-  peer.on('open', connect);
+  let reached = false;
+  const unreachable = setTimeout(() => { if (!reached) fail('service'); }, SERVICE_LIMIT_MS);
+  peer.on('open', () => { if (!reached) { reached = true; clearTimeout(unreachable); events.onService?.(); } connect(); });
   peer.on('error', error => {
     if (destroyed || joined) return;
-    if (error.type === 'peer-unavailable') { again(); return; }
+    if (error.type === 'peer-unavailable') { silentAttempts = 0; again(); return; }
     if (retryable.has(error.type)) return;
     fail(error.type === 'browser-incompatible' ? 'browser' : 'service');
   });
-  return { destroy() { if (destroyed) return; destroyed = true; clearTimeout(retry); clearTimeout(attemptTimer); stop(); peer.destroy(); } };
+  return { destroy() { clearTimeout(unreachable); if (destroyed) return; destroyed = true; clearTimeout(retry); clearTimeout(attemptTimer); stop(); peer.destroy(); } };
 }
 
 export function peerFailureMessage(reason: PeerFailure, zh: boolean) {
   return ({
-    service: zh ? '连不上房间服务。请检查网络后重试；若一直失败，可展开“连接说明”改用邀请码方式。' : 'Could not reach the room service. Check your network and retry, or open the connection notes and use invitation codes instead.',
+    service: zh ? '连不上房间服务（PeerJS 公共服务）。你的网络可能无法访问它，例如部分地区或公司网络会屏蔽。请换个网络（如手机流量）重试，或展开“连接说明”改用邀请码方式。' : 'Could not reach the room service (the PeerJS public service). Your network may block it, as some regions and workplaces do. Try another network such as mobile data, or open the connection notes and use invitation codes instead.',
     'room-taken': zh ? '房间号冲突，请重新创建房间。' : 'Room code collision. Please create the room again.',
     'host-gone': zh ? '等了 5 分钟仍找不到房主。房主可能已关闭页面；请让房主重新创建房间并发新的链接。' : 'The host could not be found for 5 minutes. They may have closed the page; ask them to create a new room and send a new link.',
-    network: zh ? '双方的网络无法建立连接。可改用同一个 Wi-Fi，或展开“连接说明”改用邀请码方式。' : 'The two networks could not connect. Try the same Wi-Fi, or open the connection notes and use invitation codes.',
+    network: zh ? '已找到房主，但双方的网络打不通。请让两台设备连同一个 Wi-Fi 再试；在微信、QQ 里打开的，请改用 Safari 或 Chrome。' : 'The host was found, but the two networks cannot reach each other. Put both devices on the same Wi-Fi and retry; if you opened the link inside a chat app, use Safari or Chrome instead.',
     browser: zh ? '这个浏览器不支持网页直连（WebRTC）。请改用最新版的 Chrome、Edge、Safari 或 Firefox；微信等应用内置浏览器请选择“在浏览器中打开”。' : 'This browser does not support direct web connections (WebRTC). Use a current Chrome, Edge, Safari or Firefox; in chat apps choose “Open in browser”.',
   } as Record<PeerFailure, string>)[reason];
 }

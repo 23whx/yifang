@@ -7,7 +7,7 @@ const Remote=require('../components/board/RemoteGame.tsx').default;
 const {siteInfo}=require('../content/site-info.ts');
 const source=fs.readFileSync(path.resolve(__dirname,'../components/board/RemoteGame.tsx'),'utf8');
 const peerBundle=fs.readFileSync(require.resolve('peerjs'),'utf8');
-for(const endpoint of ['0.peerjs.com','stun:stun.l.google.com:19302','turn:eu-0.turn.peerjs.com:3478'])assert.ok(peerBundle.includes(endpoint),`PeerJS default endpoint changed: ${endpoint}; review quick-room disclosure`);
+for(const endpoint of ['0.peerjs.com'])assert.ok(peerBundle.includes(endpoint),`PeerJS default endpoint changed: ${endpoint}; review quick-room disclosure`);
 for(const phrase of ['第三方 STUN','TURN 中继','third-party STUN','through TURN'])assert.ok(source.includes(phrase),`Public room disclosure missing: ${phrase}`);
 for(const game of ['chess','xiangqi','shogi','go'])for(const locale of ['zh','en']){
  const html=render(React.createElement(Remote,{game,locale}));

@@ -44,9 +44,11 @@ export function useFourSeatLink(kind: string, zh: boolean) {
     stop();
     let seat: number | undefined;
     try { if (checkpoint) seat = JSON.parse(checkpoint).seat; } catch { /* validated by the guest class */ }
-    setNote(zh ? '正在连接房主……如果房主暂时切到了其他应用，会自动重试，最多等 5 分钟。' : 'Connecting to the host… if they switched apps briefly, this retries automatically for up to 5 minutes.');
+    const looking = zh ? '已连上房间服务，正在寻找房主……如果房主暂时切到了其他应用，会自动重试，最多等 5 分钟。' : 'Room service reached; looking for the host… if they switched apps briefly, this retries automatically for up to 5 minutes.';
+    setNote(zh ? '正在连接房间服务…' : 'Connecting to the room service…');
     const opened = await joinPeerRoom(target, seat ? { seat } : {}, {
       onOpen: connection => { if (!current()) { connection.close(); return; } setNote(''); onOpen(new PokerPeerChannel(connection)); },
+      onService: () => { if (current()) setNote(looking); },
       onFailure: reason => { if (current()) { setNote(''); onFailure(peerFailureMessage(reason, zh)); } },
     });
     if (current()) room.current = opened; else opened.destroy();
