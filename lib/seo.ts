@@ -54,6 +54,7 @@ export function siteVerification(): Metadata['verification'] {
 /** Who runs the site: name, address and a contact point, for search engines' site details. */
 export function organizationSchema() {
   return { '@context': 'https://schema.org', '@type': 'Organization', '@id': `${SITE_URL}/#organization`, name: '弈方 · Yifang', alternateName: ['弈方', 'Yifang'], url: `${SITE_URL}/`,
+    logo: { '@type': 'ImageObject', url: `${SITE_URL}/icons/icon-512.png`, width: 512, height: 512 },
     email: contact.email, contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: contact.email, availableLanguage: ['zh-CN', 'en'] } };
 }
 

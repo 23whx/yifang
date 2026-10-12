@@ -65,6 +65,7 @@ for (const [route, doc] of documents) {
     assert.equal(data['@context'], 'https://schema.org');
     assert.ok(!JSON.stringify(data).includes('{dict.'), `Unresolved schema text: ${route}`);
     assert.ok(!['HowTo', 'FAQPage'].includes(data['@type']), `Unsupported rich-result marketing: ${route}`);
+    if (data['@type'] === 'Organization') assert.ok(fs.existsSync(path.join(output, new URL(data.logo.url).pathname)), `Organization logo missing: ${route}`);
     if (data['@type'] === 'BreadcrumbList') {
       assert.ok(data.itemListElement.length >= 2);
       for (const [index, item] of data.itemListElement.entries()) {
@@ -76,6 +77,12 @@ for (const [route, doc] of documents) {
       for (const term of data.hasDefinedTerm) assert.ok(doc.html.includes(`id="${new URL(term.url).hash.slice(1)}"`), `Missing glossary term anchor: ${route}`);
     }
     schemaCount++;
+  }
+  // Site icon: tab favicon, scalable icon, home-screen icon and manifest on every page, all served from the export.
+  for (const rel of ['icon', 'apple-touch-icon', 'manifest']) {
+    const found = doc.links.filter(link => link.rel === rel);
+    assert.ok(found.length, `Missing ${rel}: ${route}`);
+    for (const link of found) assert.ok(fs.existsSync(path.join(output, new URL(link.href, origin).pathname)), `Missing ${rel} file ${link.href}: ${route}`);
   }
   // Connected graph: one page node per page, and every bare {"@id"} reference resolves to a node on the same page.
   const nodes = new Map(), refs = [];

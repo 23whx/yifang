@@ -29,6 +29,7 @@
 - 中英双语 hreflang（`zh-CN` / `en` / `x-default`），sitemap 内同样带有语言对应关系。
 - 每页自指 canonical；带 `?room=` 的对战邀请链接也指回不带参数的页面。
 - 结构化数据：WebSite、Organization（含联系邮箱）、BreadcrumbList、CollectionPage、LearningResource、DefinedTermSet 等。
+- 网站图标：`app/icon.svg` 是源文件（方形棋盘转成菱形，中央一枚棋子）；`favicon.ico`、`apple-icon.png`、`public/icons/*.png` 由 `CHROME_PATH=<chrome.exe 路径> node scripts/generate-icons.cjs` 生成，另有 `manifest.webmanifest`。Organization 结构化数据带 `logo`。
 - 分享卡片（Open Graph 与 Twitter 大图，1200×630）：全站一张、每个游戏一张，中英各一套，共 18 张（`public/social/*.jpg`）。游戏下的所有页面（教程、实战、好友对战等）用该游戏的图。改文字在 `content/social.ts`，重新生成：`CHROME_PATH=<chrome.exe 路径> node scripts/generate-social-images.cjs`（需要 `playwright-core`）。
 - 根网址 `/` 是有实际内容的双语入口页，并按浏览器语言自动跳转到 `/zh/` 或 `/en/`。
 - `applicable-device: pc,mobile` 告诉百度同一页面同时适配手机与电脑。
