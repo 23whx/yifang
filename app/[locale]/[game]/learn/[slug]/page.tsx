@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { lessonSearch } from '@/content/seo';
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import TutorialPlayer from "@/components/cube/TutorialPlayer";
@@ -17,8 +18,9 @@ import { isBoardGame } from "@/lib/board/variants";
 import { getGame, isGameSlug } from "@/content/games";
 import { tutorials, getTutorial, localizeTutorial } from "@/content/tutorials";
 import { getDict, isLocale, locales } from "@/lib/i18n";
-import { absoluteUrl } from "@/lib/site";
-import { pageMetadata, htmlLanguage } from '@/lib/seo';
+import { absoluteUrl, SITE_URL } from "@/lib/site";
+import { pageMetadata, htmlLanguage, gameEntity } from '@/lib/seo';
+import PageSchema from '@/components/seo/PageSchema';
 import JsonLd from '@/components/seo/JsonLd';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import LessonNavigation from '@/components/seo/LessonNavigation';
@@ -36,7 +38,8 @@ export async function generateMetadata({
   const tutorial = getTutorial(slug);
   if (!isLocale(locale) || !tutorial || tutorial.game !== game) return {};
   const lt = localizeTutorial(tutorial, locale);
-  return pageMetadata(locale, `/${game}/learn/${slug}`, lt.title, lt.description);
+  const seo = lessonSearch[slug]?.[locale];
+  return pageMetadata(locale, `/${game}/learn/${slug}`, seo?.title ?? lt.title, seo?.description ?? lt.description);
 }
 
 export default async function TutorialPage({
@@ -66,7 +69,10 @@ export default async function TutorialPage({
     educationalLevel: lt.level,
     isAccessibleForFree: true,
     teaches: lt.steps.map(step => step.title),
-    isPartOf: { '@type': 'CollectionPage', url: absoluteUrl(`/${locale}/${game}/learn`) },
+    isPartOf: { '@type': 'CollectionPage', '@id': `${absoluteUrl(`/${locale}/${game}/learn`)}#webpage`, url: absoluteUrl(`/${locale}/${game}/learn`) },
+    mainEntityOfPage: { '@id': `${url}#webpage` },
+    about: gameEntity(locale, game),
+    publisher: { '@id': `${SITE_URL}/#organization` },
     hasPart: lt.steps.map((s) => ({
       "@type": "WebPageElement",
       name: s.title,
@@ -78,6 +84,8 @@ export default async function TutorialPage({
   return (
     <>
       <JsonLd data={jsonLd} />
+      <PageSchema locale={locale} path={`/${game}/learn/${slug}`} game={game} name={lessonSearch[slug]?.[locale]?.title ?? lt.title}
+        description={lessonSearch[slug]?.[locale]?.description ?? lt.description} mainEntity={{ '@id': `${url}#lesson` }} />
       <Breadcrumbs locale={locale} items={[
         {name:locale === 'zh' ? '弈方首页' : 'Yifang home',path:`/${locale}`},
         {name:g.name[locale],path:`/${locale}/${game}`},

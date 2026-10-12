@@ -9,7 +9,7 @@ import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import PageSchema from '@/components/seo/PageSchema';
 const pageCopy = {
   zh: { title: '棋类、魔方与牌桌零基础教程目录', description: '按顺序学习魔方、国际象棋、中国象棋、将棋、围棋、麻将和牌桌规则。从零基础第一课进入图文课程，边读边操作，理解每一步的原因。' },
-  en: { title: 'Beginner Game Tutorials: Chess, Go, Shogi, Mahjong & Cube', description: 'Browse English beginner lessons for the cube, chess, xiangqi, shogi, Go, mahjong and table games. Start at lesson one and follow written explanations with practice.' },
+  en: { title: 'Beginner Tutorials: Chess, Go, Mahjong & Cube', description: 'Browse English beginner lessons for the cube, chess, xiangqi, shogi, Go, mahjong and table games. Start at lesson one and follow written explanations with practice.' },
 };
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;

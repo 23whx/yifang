@@ -1,5 +1,6 @@
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
-import { pageMetadata } from '@/lib/seo';
+import { pageMetadata, webAppSchema } from '@/lib/seo';
+import PageSchema from '@/components/seo/PageSchema';
 import { gamePageCopy } from '@/content/seo';
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -38,8 +39,11 @@ export default async function PlayPage({ params }: { params: Promise<{ locale: s
   if (!isLocale(locale) || !isGameSlug(game)) notFound();
   const g = getGame(game)!;
   const dict = getDict(locale);
+  const copy = gamePageCopy(g.slug, g.name[locale], locale, 'play');
 
   return (<>
+    <PageSchema locale={locale} path={`/${game}/play`} game={game} name={copy.title} description={copy.description}
+      mainEntity={webAppSchema(locale, `/${game}/play`, copy.title, copy.description, game === 'cube' || game === 'baccarat')} />
     <Breadcrumbs locale={locale} items={[{ name: locale === 'zh' ? '弈方首页' : 'Yifang home', path: `/${locale}` }, { name: g.name[locale], path: `/${locale}/${game}` }, { name: gamePageCopy(g.slug, g.name[locale], locale, 'play').title, path: `/${locale}/${game}/play` }]} />
     <div className="mx-auto max-w-[1400px] px-5 pt-4 pb-10 sm:px-8 lg:pb-14">
       <h1 className="page-title mt-2">

@@ -64,7 +64,7 @@ for(const locale of ['zh','en']){
  }
  for(const game of ['chess','xiangqi','shogi','go']){
   const puzzle=fs.readFileSync(path.join(root,locale,game,'puzzles/index.html'),'utf8');
-  const expected=game==='go'?(locale==='zh'?'用小棋盘练习数气':'Practice liberties, captures'):(locale==='zh'?'先看本题的获胜目标':'Read the position');
+  const expected=game==='go'?(locale==='zh'?'在小棋盘上练习围棋的数气':'Practise counting liberties'):(locale==='zh'?'先看目标，亲手走出答案':'read the goal, play your answer');
   assert.ok(puzzle.includes(expected),`${locale}/${game}: missing game-specific puzzle introduction`);
   const description=puzzle.match(/<meta name="description" content="([^"]*)"/);
   assert.ok(description&&description[1].includes(expected),`${locale}/${game}: stale puzzle metadata`);

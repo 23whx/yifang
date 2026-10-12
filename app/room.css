@@ -363,3 +363,8 @@ select.room-field { min-height: 44px; }
 }
 .room-member-rename { grid-column: 2 / -1; justify-self: start; }
 form.room-member-rename { justify-self: stretch; }
+
+/* Problem report link at the foot of every room. */
+.room-feedback { font-size: 13px; line-height: 1.7; color: #6b5133; }
+.room-feedback a { display: inline-flex; min-height: 32px; align-items: center; color: #803d2b; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.room-feedback a:focus-visible { outline: 3px solid #803d2b; outline-offset: 2px; }

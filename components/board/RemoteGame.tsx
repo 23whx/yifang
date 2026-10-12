@@ -17,7 +17,7 @@ import { isBoardGame, VARIANTS } from "@/lib/board/variants";
 import { newGo, playGo, scoreGo, type GoState } from "@/lib/go/rules";
 import { newReview, changeReview, validReview, reviewDone, type Review, type ReviewAction } from '@/lib/go/review';
 import ResultDialog from '@/components/ui/ResultDialog';
-import { RoomHeader, RoleCard, Steps, SignalOutput, RoomNotes, RoomAlert, LinkShare, type StepState } from '@/components/remote/RoomKit';
+import { RoomHeader, RoleCard, Steps, SignalOutput, RoomNotes, RoomAlert, LinkShare, FeedbackLink, type StepState } from '@/components/remote/RoomKit';
 import Board from "./Board";
 import GoBoard from "../go/GoBoard";
 import { newMatch, changeMatch, validMatch, roomCode, type MatchState, type MatchAction } from "@/lib/board/remote-match";
@@ -733,7 +733,7 @@ function nameFriend(value: string) { friendName.current = value; setFriend(value
           </RoleCard>
         </div>}
         {starting && mode === 'public' && <div className="room-roles">
-          <RoleCard badge={t('房主', 'Host')} title={t('我来开房', 'Open a room')} steps={[t('点“创建房间”，得到邀请链接', 'Create a room to get an invitation link'), t('把链接发给朋友（微信、短信都行）', 'Send the link to your friend by any chat app'), t('朋友打开链接就自动进房，你执先', 'Your friend joins by opening it — you move first')]}>
+          <RoleCard badge={t('房主', 'Host')} title={t('我来开房', 'Open a room')} steps={[t('点“创建房间”，得到邀请链接', 'Create a room to get an invitation link'), t('把链接发给朋友（微信、短信都行）', 'Send the link to your friend by any chat app'), t('朋友打开链接后由你同意入座，你执先', 'Let your friend in when they open it — you move first')]}>
             <button className="rpg-button" onClick={() => start(true)}>{t('创建房间', 'Create room')}</button>
           </RoleCard>
           <RoleCard badge={t('朋友', 'Guest')} title={t('朋友邀请我', 'A friend invited me')} steps={[t('直接打开房主发来的链接，会自动加入', 'Open the host’s link — you join automatically'), t('或把链接粘贴到下面，点“加入房间”', 'Or paste the link below and choose Join room'), t('连接后开始，你执后', 'Play starts once connected — you move second')]}>
@@ -762,6 +762,7 @@ function nameFriend(value: string) { friendName.current = value; setFriend(value
             : <button className="room-link" onClick={() => setConfirmLeave(true)}>{t('离开对局', 'Leave game')}</button>}
         </div>}
         {match.resigned !== null && <ResultDialog key={match.round} locale={locale} title={match.resigned === (isHostPlayer ? 0 : 1) ? t('你已认输', 'You resigned') : t('你获胜了', 'You win')} reason={t('一方主动认输，本局结束。棋盘与棋谱保留；双方同意再来一局才会清空。', 'A player resigned, ending this game. The position and moves remain until both agree to a rematch.')}/>}
+        <FeedbackLink zh={zh} context={() => ({ game: ({ chess: t('国际象棋', 'Chess'), xiangqi: t('中国象棋', 'Xiangqi'), shogi: t('日本将棋', 'Shogi'), go: t('围棋', 'Go') } as Record<Game, string>)[game], mode: mode === 'public' ? t('邀请链接', 'Invitation link') : t('邀请码 + 回复码', 'Invitation + reply codes'), role: status === 'idle' ? t('未加入', 'Not joined') : isHostPlayer ? t('房主', 'Host') : t('朋友', 'Guest'), status: statusText + (linkNote ? ` / ${linkNote}` : ''), error: error || saveError || undefined })} />
         {starting && <RoomNotes summary={t('连接说明与常见问题', 'Connection notes and troubleshooting')}>
           <p>{mode === 'manual'
             ? t('当前为邀请码方式：不联系任何外部服务，需要双方各发一次代码。房主发出邀请码后可以切去聊天应用，回来再粘贴回复码。连接失败时，先确认双方使用同一局域网，再检查访客 Wi-Fi 隔离和防火墙，并重新交换完整连接码。不要关闭防火墙；也可以返回人机或同屏双人。', 'Code mode: no external service is contacted; each side sends one code. The host can switch to a chat app after sending the invitation and paste the reply later. If connection fails, check that both devices share a LAN, check guest Wi-Fi isolation and firewall rules, then exchange complete fresh codes. Do not disable the firewall. AI and local play remain available.')
@@ -770,7 +771,7 @@ function nameFriend(value: string) { friendName.current = value; setFriend(value
           <p>{t('邀请码和回复码里可能包含本地网络信息，只发给你信任的朋友。离开页面后它们就失效了。', 'Invitation and reply codes may contain local network details. Share them only with friends you trust; they stop working when you leave the page.')}</p>
           <p>{t('刷新或断线后：连接成功后，棋谱、座位和恢复凭证会自动保存在本标签页（sessionStorage）。双方都保留原来的标签页，点“恢复上次对局”并重新交换一次邀请码和回复码即可接着下。关闭标签页、清理浏览数据或换设备后无法恢复；不要把存档分享给别人。', 'After a refresh or disconnect: once connected, the moves, seats and a recovery credential are saved in this tab (sessionStorage). Keep both original tabs, choose Restore previous match and swap a fresh invitation and reply to continue. Closing the tab, clearing browsing data or switching devices prevents recovery; never share a save.')}</p>
           {game === 'go' && <p>{t('围棋还会保存停一手、死子标记和双方的计分确认，恢复后从原来的步骤继续。', 'Go also saves passes, dead-stone marks and scoring approvals, and resumes at the same step.')}</p>}
-          <label className="block"><span className="font-bold">{t('连接方式', 'Connection method')}</span><select className="room-field" value={mode} disabled={['connecting', 'waiting', 'connected'].includes(status)} onChange={e => { dispose(); resumeSelection.current = null; setRestoring(false); setReplaceIntent(null); setClearConfirm(false); setStatus('idle'); setError(''); setSignal(''); setAnswer(''); setInvitation(''); setMode(e.target.value as 'manual' | 'public'); }}><option value="public">{t('邀请链接 · 朋友打开即进房（推荐）', 'Invitation link · friend joins by opening it (recommended)')}</option><option value="manual">{t('邀请码 + 回复码 · 不经过任何服务', 'Invitation + reply codes · no service involved')}</option></select></label>
+          <label className="block"><span className="font-bold">{t('连接方式', 'Connection method')}</span><select className="room-field" value={mode} disabled={['connecting', 'waiting', 'connected'].includes(status)} onChange={e => { dispose(); resumeSelection.current = null; setRestoring(false); setReplaceIntent(null); setClearConfirm(false); setStatus('idle'); setError(''); setSignal(''); setAnswer(''); setInvitation(''); setMode(e.target.value as 'manual' | 'public'); }}><option value="public">{t('邀请链接 · 朋友打开后由房主同意进房（推荐）', 'Invitation link · the host lets friends in (recommended)')}</option><option value="manual">{t('邀请码 + 回复码 · 不经过任何服务', 'Invitation + reply codes · no service involved')}</option></select></label>
           {mode === 'public' && <p>{t('只有选择此模式并创建或加入房间后，才会联系 PeerJS 公共信令；其默认配置还会尝试第三方 STUN，并可能通过 TURN 中继传输对局数据。这不是完全无服务的直连，也不保证点对点传输。房间码不是密码，只发给受邀的朋友。远方朋友要打开已部署的网站，localhost 链接对方打不开。', 'Only after you select this mode and create or join a room does it contact public PeerJS signaling. Its default configuration also tries third-party STUN and may relay match data through TURN. This is not fully service-free or guaranteed peer-to-peer transport. A room code is not a password; share it only with invited players. A distant friend must open the deployed site — your localhost link will not work for them.')}</p>}
         </RoomNotes>}
       </div>

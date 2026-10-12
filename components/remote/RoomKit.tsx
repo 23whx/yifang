@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 import qrcode from 'qrcode-generator';
+import { contact } from '@/content/site-info';
+import { deviceLabel } from '@/lib/peer-room';
 import { NicknameField, VisitorList } from './Visitors';
 import { LoungePanel, WaitClock, type Lounge } from './Lounge';
 import { JOIN_LIMIT_MS } from '@/lib/peer-room';
@@ -64,6 +66,34 @@ export function RoomNotes({ summary, children, open }: { summary: string; childr
   </details>;
 }
 
+export type FeedbackContext = { game: string; mode: string; role: string; status: string; error?: string };
+/** "Something went wrong?" — opens the player's mail app with the room's state already written
+ * down, so a report says where it happened. The room code stays out: it is the room's key. */
+export function FeedbackLink({ zh, context }: { zh: boolean; context: () => FeedbackContext }) {
+  const t = (cn: string, en: string) => zh ? cn : en;
+  const open = (e: { preventDefault(): void }) => {
+    e.preventDefault();
+    const c = context(), now = new Date();
+    const offset = -now.getTimezoneOffset(), zone = `UTC${offset >= 0 ? '+' : '-'}${Math.floor(Math.abs(offset) / 60)}${offset % 60 ? ':' + String(Math.abs(offset) % 60).padStart(2, '0') : ''}`;
+    const lines = [
+      t('（请写下：你做了什么、原本期待什么、实际发生了什么）', '(Please describe: what you did, what you expected, what actually happened)'),
+      '', '', t('—— 以下信息自动附上，可以删改 ——', '— Added automatically; edit as you like —'),
+      `${t('页面', 'Page')}: ${window.location.origin}${window.location.pathname}`,
+      `${t('游戏', 'Game')}: ${c.game}`,
+      `${t('连接方式', 'Connection')}: ${c.mode}`,
+      `${t('身份', 'Role')}: ${c.role}`,
+      `${t('当时状态', 'State')}: ${c.status}`,
+      ...(c.error ? [`${t('错误提示', 'Error shown')}: ${c.error}`] : []),
+      `${t('设备', 'Device')}: ${deviceLabel() || '-'}`,
+      `${t('浏览器', 'Browser')}: ${navigator.userAgent}`,
+      `${t('时间', 'Time')}: ${now.toLocaleString(zh ? 'zh-CN' : 'en-GB')} (${zone})`,
+    ];
+    const subject = t(`【弈方反馈】${c.game}·好友对战`, `[Yifang feedback] ${c.game} · friend room`);
+    window.location.href = `mailto:${contact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
+  };
+  return <p className="room-feedback">{t('遇到问题？', 'Something wrong? ')}<a href={`mailto:${contact.email}`} onClick={open}>{t('回报给我们', 'Report it to us')}</a>{t(`（邮件会发到 ${contact.email}，已自动附上设备与连接信息）`, ` (opens an email to ${contact.email} with device and connection details filled in)`)}</p>;
+}
+
 export function RoomAlert({ children }: { children: ReactNode }) {
   return <p role="alert" className="room-alert">{children}</p>;
 }
@@ -108,6 +138,8 @@ export function FourSeatSetup(p: {
   onInvitation: (value: string) => void; onJoin: () => void;
   /** Link mode (default): one invitation link for the table instead of per-seat codes. */
   link?: FourSeatLink;
+  /** Game name used in problem reports. */
+  game?: string;
 }) {
   const linkMode = p.link?.mode === 'link';
   const t = (cn: string, en: string) => p.zh ? cn : en;
@@ -138,7 +170,7 @@ export function FourSeatSetup(p: {
     {p.replaceSave && <RoomAlert>{t('你有一个未完成的牌局存档。点“确认创建新房”或“确认加入新房”开始新局；旧存档会保留到新局真正开始并成功保存后才被覆盖，你也可以先恢复上次牌局。', 'You have an unfinished saved match. Choose Confirm new room or Confirm joining to start fresh; the old save stays until the new match starts and saves successfully, or restore it first.')}</RoomAlert>}
     {p.restoring && <p className="room-progress">{p.phase === 'playing' || p.phase === 'finished' ? t('已恢复原牌局，保留原座位、牌面和进度。', 'Original match restored, including seats, cards and progress.') : t('恢复模式：保持原座位，等待重新连接；不会重新发牌。', 'Recovery mode: keep your original seat and reconnect. No new deal.')}</p>}
     {choosing && linkMode && p.link && <div className="room-roles">
-      <RoleCard badge={t('房主 · 玩家 1', 'Host · Player 1')} title={t('我来开房', 'Open a room')} steps={[t('创建房间，你是玩家 1', 'Create the room — you are Player 1'), t('把同一个邀请链接发给三位朋友', 'Send the same invitation link to all three friends'), t('朋友打开链接就自动入座，人齐后开局', 'Friends take a seat by opening it; start when all four are in')]}>
+      <RoleCard badge={t('房主 · 玩家 1', 'Host · Player 1')} title={t('我来开房', 'Open a room')} steps={[t('创建房间，你是玩家 1', 'Create the room — you are Player 1'), t('把同一个邀请链接发给三位朋友', 'Send the same invitation link to all three friends'), t('朋友打开链接后由你逐一同意入座，人齐后开局', 'Let each friend in as they open it; start when all four are in')]}>
         <button disabled={p.busy} className="rpg-button" onClick={p.onCreate}>{p.replaceSave === 'host' ? t('确认创建新房', 'Confirm new room') : t('创建四人房间', 'Create four-player room')}</button>
       </RoleCard>
       <RoleCard badge={t('朋友', 'Guest')} title={t('作为朋友加入', 'Join as a guest')} steps={[t('直接打开房主发来的链接，会自动加入', 'Open the host’s link — you join automatically'), t('或把链接粘贴到下面，点“加入房间”', 'Or paste the link below and choose Join room'), t('等房主开局', 'Wait for the host to start')]}>
@@ -188,10 +220,11 @@ export function FourSeatSetup(p: {
       <div><button disabled={!p.connected.every(Boolean) || p.busy} className="rpg-button" onClick={p.onStart}>{p.restoring ? t('四人到齐，继续原牌局', 'All four ready — resume original match') : t('四人到齐，开始对局', 'All four ready — start match')}</button></div>
     </>}
     {p.role !== 'none' && p.phase !== 'closed' && <div className="room-actions"><button className={p.confirm ? 'rpg-button' : 'room-link'} onClick={p.onLeave}>{p.confirm ? t('确认离开，停止本场', 'Confirm leave and stop match') : t('离开房间', 'Leave room')}</button></div>}
+    <FeedbackLink zh={p.zh} context={() => ({ game: p.game ?? p.title, mode: p.link?.mode === 'code' || !p.link ? t('邀请码 + 回复码', 'Invitation + reply codes') : t('邀请链接', 'Invitation link'), role: p.role === 'host' ? t('房主', 'Host') : p.role === 'guest' ? t('朋友', 'Guest') : t('未加入', 'Not joined'), status: status + (p.link?.reconnect ? ` / ${p.link.reconnect}` : ''), error: p.error || p.saveError || undefined })} />
     {choosing && <RoomNotes summary={t('连接说明与常见问题', 'Connection notes and troubleshooting')}>
       {p.link && <>
         <p>{linkMode ? t('当前为邀请链接方式：通过 PeerJS 公共服务转交连接信息（其默认配置还会尝试第三方 STUN，必要时经 TURN 中继），连上后牌局数据在玩家之间传送。如果一直连不上（例如该服务在你的网络被屏蔽），可在下方改用“邀请码 + 回复码”。下面关于交换文本的说明只适用于邀请码方式。', 'Link mode: the PeerJS public service passes on connection details (its defaults also try third-party STUN and may relay through TURN); once connected, match data travels between the players. If it never connects (for example the service is blocked on your network), switch to invitation + reply codes below. The text-exchange notes below apply to code mode only.') : t('当前为邀请码方式：不联系任何外部服务，房主要和每位朋友各交换一次代码。', 'Code mode: no external service; the host swaps one code pair with each friend.')}</p>
-        <label className="block"><span className="font-bold">{t('连接方式', 'Connection method')}</span><select className="room-field" value={p.link.mode} onChange={e => p.link!.onMode(e.target.value as 'link' | 'code')}><option value="link">{t('邀请链接 · 朋友打开即入座（推荐）', 'Invitation link · friends join by opening it (recommended)')}</option><option value="code">{t('邀请码 + 回复码 · 不经过任何服务', 'Invitation + reply codes · no service involved')}</option></select></label>
+        <label className="block"><span className="font-bold">{t('连接方式', 'Connection method')}</span><select className="room-field" value={p.link.mode} onChange={e => p.link!.onMode(e.target.value as 'link' | 'code')}><option value="link">{t('邀请链接 · 朋友打开后由房主同意入座（推荐）', 'Invitation link · the host lets friends in (recommended)')}</option><option value="code">{t('邀请码 + 回复码 · 不经过任何服务', 'Invitation + reply codes · no service involved')}</option></select></label>
       </>}
       {p.notes}
     </RoomNotes>}

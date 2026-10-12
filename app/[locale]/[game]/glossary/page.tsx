@@ -1,4 +1,5 @@
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
+import PageSchema from '@/components/seo/PageSchema';
 import JsonLd from '@/components/seo/JsonLd';
 import { absoluteUrl } from '@/lib/site';
 import { pageMetadata } from '@/lib/seo';
@@ -41,6 +42,7 @@ export default async function GlossaryPage({ params }: { params: Promise<{ local
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "DefinedTermSet",
+    "@id": `${absoluteUrl(`/${locale}/${game}/glossary`)}#terms`,
     name: `${g.name[locale]} · ${dict.glossaryTitle}`,
     inLanguage: locale === "zh" ? "zh-CN" : "en",
     url: absoluteUrl(`/${locale}/${game}/glossary`),
@@ -56,6 +58,8 @@ export default async function GlossaryPage({ params }: { params: Promise<{ local
     <>
       <Breadcrumbs locale={locale} items={[{ name: locale === 'zh' ? '弈方首页' : 'Yifang home', path: `/${locale}` }, { name: g.name[locale], path: `/${locale}/${game}` }, { name: gamePageCopy(g.slug, g.name[locale], locale, 'glossary').title, path: `/${locale}/${game}/glossary` }]} />
       <JsonLd data={jsonLd} />
+      <PageSchema locale={locale} path={`/${game}/glossary`} game={game} name={gamePageCopy(g.slug, g.name[locale], locale, 'glossary').title}
+        description={gamePageCopy(g.slug, g.name[locale], locale, 'glossary').description} mainEntity={{ '@id': jsonLd['@id'] }} />
       <section className="border-b-2 border-ink">
         <div className="mx-auto max-w-[1400px] px-5 pt-4 pb-10 sm:px-8 lg:pb-14">
           <h1 className="page-title mt-2">{g.name[locale]} · {dict.glossaryTitle}</h1>

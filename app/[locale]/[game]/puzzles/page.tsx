@@ -1,5 +1,6 @@
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import { pageMetadata } from '@/lib/seo';
+import PageSchema from '@/components/seo/PageSchema';
 import { gamePageCopy } from '@/content/seo';
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -42,6 +43,8 @@ export default async function PuzzlesPage({ params }: { params: Promise<{ locale
   return (
     <>
       <Breadcrumbs locale={locale} items={[{ name: locale === 'zh' ? '弈方首页' : 'Yifang home', path: `/${locale}` }, { name: g.name[locale], path: `/${locale}/${game}` }, { name: gamePageCopy(g.slug, g.name[locale], locale, 'puzzles').title, path: `/${locale}/${game}/puzzles` }]} />
+      <PageSchema locale={locale} path={`/${game}/puzzles`} game={game} name={gamePageCopy(g.slug, g.name[locale], locale, 'puzzles').title}
+        description={puzzleDescription(game, locale)} />
       <section className="border-b-2 border-ink">
         <div className="mx-auto max-w-[1400px] px-5 pt-4 pb-10 sm:px-8 lg:pb-14">
           <h1 className="page-title mt-2">{g.name[locale]} · {dict.puzzlesTitle}</h1>

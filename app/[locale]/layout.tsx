@@ -9,7 +9,7 @@ import SiteFooter from "@/components/ui/SiteFooter";
 import { locales, isLocale, getDict } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
 import JsonLd from '@/components/seo/JsonLd';
-import { pageMetadata } from '@/lib/seo';
+import { pageMetadata, siteVerification, organizationSchema } from '@/lib/seo';
 import { siteSearch } from '@/content/seo';
 import "../globals.css";
 
@@ -27,7 +27,7 @@ export async function generateMetadata({
   const copy = siteSearch[locale];
   return {
     ...pageMetadata(locale, '', copy.title, copy.description),
-    verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
+    verification: siteVerification(),
   };
 }
 
@@ -47,8 +47,9 @@ export default async function LocaleLayout({
       <body className="flex min-h-screen flex-col">
         <JsonLd data={{ '@context': 'https://schema.org', '@type': 'WebSite', '@id': `${SITE_URL}/#website`,
           url: `${SITE_URL}/`, name: '弈方 · Yifang', alternateName: ['弈方', 'Yifang'],
-          description: 'Learn and practice classic board games, the Rubik’s Cube and table-game rules.', inLanguage: ['zh-CN', 'en'],
+          description: 'Learn and practice classic board games, the Rubik’s Cube and table-game rules.', inLanguage: ['zh-CN', 'en'], publisher: { '@id': `${SITE_URL}/#organization` },
         }} />
+        <JsonLd data={organizationSchema()} />
         {/* Current direction: illustrated RPG atlas; see DESIGN.md. */}
         <SiteHeader locale={locale} dict={dict} />
         <main className="flex-1">{children}</main>

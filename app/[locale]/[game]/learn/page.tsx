@@ -1,4 +1,5 @@
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
+import PageSchema from '@/components/seo/PageSchema';
 import { pageMetadata } from '@/lib/seo';
 import { gamePageCopy } from '@/content/seo';
 import type { Metadata } from "next";
@@ -30,6 +31,8 @@ export default async function LearnIndex({ params }: { params: Promise<{ locale:
 
   return (<>
     <Breadcrumbs locale={locale} items={[{ name: locale === 'zh' ? '弈方首页' : 'Yifang home', path: `/${locale}` }, { name: g.name[locale], path: `/${locale}/${game}` }, { name: gamePageCopy(g.slug, g.name[locale], locale, 'learn').title, path: `/${locale}/${game}/learn` }]} />
+    <PageSchema locale={locale} path={`/${game}/learn`} type="CollectionPage" game={game} name={gamePageCopy(g.slug, g.name[locale], locale, 'learn').title}
+      description={gamePageCopy(g.slug, g.name[locale], locale, 'learn').description} items={tuts.map(t => ({ name: t.title, path: `/${locale}/${game}/learn/${t.slug}` }))} />
     <div className="mx-auto max-w-[1400px] px-5 pt-4 pb-12 sm:px-8 lg:pb-16">
       <h1 className="page-title mt-2">
         {g.name[locale]}

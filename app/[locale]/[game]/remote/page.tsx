@@ -9,7 +9,8 @@ import { isBoardGame } from "@/lib/board/variants";
 import { getGame } from "@/content/games";
 import { isLocale, locales } from "@/lib/i18n";
 import type { Metadata } from 'next';
-import { pageMetadata } from '@/lib/seo';
+import { pageMetadata, webAppSchema } from '@/lib/seo';
+import PageSchema from '@/components/seo/PageSchema';
 import { gamePageCopy } from '@/content/seo';
 import { remoteGames } from '@/lib/seo-routes';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
@@ -35,7 +36,12 @@ export default async function Remote({
   if (!isLocale(locale) || (!isBoardGame(game) && game !== "go" && game !== "holdem" && game !== "mahjong")) notFound();
   const zh = locale === 'zh', name = getGame(game)!.name[locale];
   const table = game === 'mahjong' || game === 'holdem';
+  const copy = gamePageCopy(getGame(game)!.slug, name, locale, 'remote');
+  const features = zh ? ['发送邀请链接或二维码即可加入', '房主确认后入座', '房间内聊天', '断线自动重连', '无需注册账号']
+    : ['Join from an invitation link or QR code', 'Host admits each player', 'Room chat', 'Automatic reconnection', 'No account needed'];
   return (<>
+    <PageSchema locale={locale} path={`/${game}/remote`} game={getGame(game)!.slug} name={copy.title} description={copy.description}
+      mainEntity={webAppSchema(locale, `/${game}/remote`, copy.title, copy.description, false, features)} />
     <Breadcrumbs locale={locale} items={[
         { name: zh ? '弈方首页' : 'Yifang home', path: `/${locale}` },
         { name, path: `/${locale}/${game}` },
@@ -44,8 +50,8 @@ export default async function Remote({
     <div className="rpg-directory">
       <h1>{zh ? `${name} · 好友对战` : `${name} · Play with friends`}</h1>
       <p>{table
-        ? (zh ? '房主点“创建房间”，把邀请链接发给朋友；朋友点开链接就自动入座，人齐后开局。不用注册账号。' : 'The host creates a room and sends the invitation link; friends open it to take a seat, and play starts once everyone is in. No account needed.')
-        : (zh ? '一人点“创建房间”，把邀请链接发给朋友；朋友点开链接就自动进房，马上开始对局。不用注册账号。' : 'One player creates a room and sends the invitation link; the friend opens it, joins automatically and the game starts. No account needed.')}</p>
+        ? (zh ? '房主点“创建房间”，把邀请链接发给朋友；朋友点开链接后由房主同意入座，人齐后开局。不用注册账号。' : 'The host creates a room and sends the invitation link; friends open it and the host lets them in. Play starts once everyone is seated. No account needed.')
+        : (zh ? '一人点“创建房间”，把邀请链接发给朋友；朋友点开链接后由房主同意进房，马上开始对局。不用注册账号。' : 'One player creates a room and sends the invitation link; the friend opens it, the host lets them in and the game starts. No account needed.')}</p>
       <div className="mt-8">
       {game==='mahjong'?<RoomTabs label={zh?'选择麻将规则':'Choose mahjong rules'} tabs={[
         {id:'riichi',kind:'riichi',title:zh?'日式立直':'Japanese Riichi',note:zh?'四人同桌，先选好大家约定的规则。三种麻将分别开房，规则不混用。':'Four players. Pick the rules your table agreed on; each ruleset has its own room.',panel:<RiichiRemote locale={locale}/>},

@@ -40,7 +40,7 @@ export default async function GameHub({ params }: { params: Promise<{ locale: st
   return (
     <>
       <Breadcrumbs locale={locale} items={[{ name: locale === 'zh' ? '弈方首页' : 'Yifang home', path: `/${locale}` }, { name: g.name[locale], path: `/${locale}/${game}` }]} />
-      <PageSchema locale={locale} path={`/${game}`} name={searchTopics[game].title[locale]} description={searchTopics[game].description[locale]} type="CollectionPage" items={tuts.map(t => ({name:t.title,path:`/${locale}/${game}/learn/${t.slug}`}))} />
+      <PageSchema locale={locale} path={`/${game}`} name={searchTopics[game].title[locale]} description={searchTopics[game].description[locale]} type="CollectionPage" game={game} items={tuts.map(t => ({name:t.title,path:`/${locale}/${game}/learn/${t.slug}`}))} />
       {/* 刊头：巨字 + 示意图 */}
       <section className="rpg-hub-hero grid border-b border-ink lg:grid-cols-[3fr_2fr]">
         <div className="px-5 py-12 sm:px-8 lg:px-12 lg:py-16">

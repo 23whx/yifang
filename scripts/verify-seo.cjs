@@ -43,6 +43,11 @@ for (const [route, doc] of documents) {
   const description = doc.meta.find(meta => meta.name === 'description')?.content;
   assert.ok(description?.trim(), `Missing description: ${route}`);
   assert.ok(!descriptions.has(description), `Duplicate description: ${route}`); descriptions.add(description);
+  // Results pages cut long snippets: about 40 CJK / 66 Latin characters for titles, 100 / 165 for descriptions.
+  const cjk = route.startsWith('/zh/') || route === '/';
+  assert.ok([...doc.title].length <= (route === '/' ? 70 : cjk ? 40 : 66), `Title too long (${[...doc.title].length}): ${route}`);
+  assert.ok([...description].length <= (route === '/' ? 160 : cjk ? 100 : 165), `Description too long (${[...description].length}): ${route}`);
+  assert.ok([...description].length >= (cjk ? 25 : 60), `Description too thin: ${route}`);
   const canonical = doc.links.filter(link => link.rel === 'canonical');
   assert.equal(canonical.length, 1, `Canonical count: ${route}`);
   assert.equal(canonical[0].href, `${origin}${route}`, `Self-canonical: ${route}`);
@@ -72,6 +77,24 @@ for (const [route, doc] of documents) {
     }
     schemaCount++;
   }
+  // Connected graph: one page node per page, and every bare {"@id"} reference resolves to a node on the same page.
+  const nodes = new Map(), refs = [];
+  (function walk(value) {
+    if (Array.isArray(value)) return value.forEach(walk);
+    if (!value || typeof value !== 'object') return;
+    const keys = Object.keys(value);
+    if (keys.length === 1 && keys[0] === '@id') refs.push(value['@id']);
+    else if (value['@id']) nodes.set(value['@id'], value);
+    Object.values(value).forEach(walk);
+  })(doc.schema);
+  for (const ref of refs) assert.ok(nodes.has(ref), `Dangling schema @id ${ref}: ${route}`);
+  if (route !== '/') {
+    const page = nodes.get(`${canonical[0].href}#webpage`);
+    assert.ok(page, `Missing page schema node: ${route}`);
+    assert.equal(page.url, canonical[0].href, `Page schema URL: ${route}`);
+    if (route.split('/').length > 3) assert.ok(page.breadcrumb && nodes.get(page.breadcrumb['@id'])?.['@type'] === 'BreadcrumbList', `Page schema without breadcrumb: ${route}`);
+    if (/^\/(zh|en)\/[a-z]+\//.test(route) && fs.existsSync(path.join(output, 'social', `${route.split('/')[2]}-${route.split('/')[1]}.jpg`))) assert.equal(page.about?.['@type'], 'Game', `Game page without about: ${route}`);
+  }
   for (const match of doc.html.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)) {
     const url = new URL(decode(match[1]), `${origin}${route}`);
     if (url.origin !== origin || !/^\/(zh|en)(\/|$)/.test(url.pathname)) continue;
@@ -88,6 +111,13 @@ for (const [route, doc] of documents) {
     assert.equal(og?.content, canonical[0].href, `OG URL mismatch: ${route}`);
     const image = new URL(doc.meta.find(meta => meta.property === 'og:image')?.content);
     assert.ok(fs.existsSync(path.join(output, image.pathname)), `Missing social image: ${route}`);
+    const [, locale, game] = route.match(/^\/(zh|en)\/([a-z]+)?/) ?? [];
+    const gamePage = game && fs.existsSync(path.join(output, 'social', `${game}-${locale}.jpg`));
+    assert.equal(image.pathname, `/social/${gamePage ? `${game}-` : ''}${locale}.jpg`, `Share card does not match page: ${route}`);
+    assert.equal(doc.meta.find(meta => meta.property === 'og:image:width')?.content, '1200');
+    assert.equal(doc.meta.find(meta => meta.property === 'og:image:height')?.content, '630');
+    assert.ok(doc.meta.find(meta => meta.property === 'og:image:alt')?.content?.trim(), `Missing share card alt: ${route}`);
+    assert.equal(doc.meta.find(meta => meta.name === 'twitter:image')?.content, image.href, `Twitter image mismatch: ${route}`);
     assert.equal(doc.meta.find(meta => meta.name === 'twitter:card')?.content, 'summary_large_image');
   }
 }
