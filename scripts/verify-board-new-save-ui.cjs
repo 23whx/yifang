@@ -30,6 +30,8 @@ function button(tree,label){const n=nodes(tree).find(n=>n.type==='button'&&text(
   global.sessionStorage={getItem(k){if(mode==='read-denied')throw Error('blocked');return data.get(k)??null;},setItem(k,v){writes++;data.set(k,v);},removeItem(k){removals++;data.delete(k);}};
   function render(){cursor=0;return expandRoomKit(Remote({game,locale}));}
   render();effects.splice(0).forEach(fn=>fn());await Promise.resolve();await Promise.resolve();let tree=render();
+  // These cases cover the code-exchange fallback; the default is link mode.
+  nodes(tree).find(n=>n.type==='select').props.onChange({target:{value:'manual'}});tree=render();
   const zh=locale==='zh',label=guest?(zh?'生成回复码':'Create reply code'):(zh?'生成邀请码':'Create invitation code');
   function fill(id){const parent=nodes(render()).find(n=>n.type==='label'&&text(n)===(zh?'粘贴房主发来的邀请码':'Paste the host’s invitation code'));assert.ok(parent);nodes(parent).find(n=>n.type==='textarea').props.onChange({target:{value:JSON.stringify({v:1,game,id:id.repeat(24),type:'offer',sdp:'v=0\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\n'})}});}
   if(mode==='guest-save'&&guest){

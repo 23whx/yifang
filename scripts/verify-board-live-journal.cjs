@@ -53,6 +53,8 @@ function fill(r,label,value){const parent=nodes(render(r)).find(n=>n.type==='lab
   try{
    const oldSaves=clients.map(c=>c.store.getItem(saveKey));
    for(const c of clients)render(c);await new Promise(resolve=>setImmediate(resolve));
+   // Exercise the code-exchange fallback; the default is link mode.
+   for(const c of clients)nodes(render(c)).find(n=>n.type==='select').props.onChange({target:{value:'manual'}});
    await click(h,zh?'生成邀请码':'Create invitation code');
    assert.equal(channels.length,0,'First click must preserve the old host save');
    await click(h,zh?'生成邀请码':'Create invitation code');
@@ -83,7 +85,7 @@ function fill(r,label,value){const parent=nodes(render(r)).find(n=>n.type==='lab
     for(const c of clients){runtime=c;for(const cleanup of c.cleanup)cleanup?.();c.slots=[];c.cleanup=[];}
     channels=[];
     for(const c of clients){render(c);await new Promise(resolve=>setImmediate(resolve));assert.ok(text(render(c)).includes(zh?'发现本标签页保存的上次对局':'This tab has a saved match'));}
-    await click(h,zh?'恢复上次对局':'Restore previous match');await click(g,zh?'恢复上次对局':'Restore previous match');
+    for(const c of clients)nodes(render(c)).find(n=>n.type==='select').props.onChange({target:{value:'manual'}});await click(h,zh?'恢复上次对局':'Restore previous match');await click(g,zh?'恢复上次对局':'Restore previous match');
     fill(g,zh?'粘贴房主发来的邀请码':'Paste the host’s invitation code',signal(game,'offer'));await click(g,zh?'生成回复码':'Create reply code');
     fill(h,zh?'粘贴朋友发回的回复码':'Paste your friend’s reply code',signal(game,'answer'));await click(h,zh?'使用回复码连接':'Connect with reply code');
     const deadline=Date.now()+5000;
@@ -119,7 +121,7 @@ function fill(r,label,value){const parent=nodes(render(r)).find(n=>n.type==='lab
    for(const c of clients){runtime=c;for(const cleanup of c.cleanup)cleanup?.();c.slots=[];c.cleanup=[];}
    channels=[];journals=[];
    for(const c of clients){render(c);await new Promise(resolve=>setImmediate(resolve));assert.ok(text(render(c)).includes(zh?'发现本标签页保存的上次对局':'This tab has a saved match'));}
-   await click(h,zh?'恢复上次对局':'Restore previous match');await click(g,zh?'恢复上次对局':'Restore previous match');
+   for(const c of clients)nodes(render(c)).find(n=>n.type==='select').props.onChange({target:{value:'manual'}});await click(h,zh?'恢复上次对局':'Restore previous match');await click(g,zh?'恢复上次对局':'Restore previous match');
    fill(g,zh?'粘贴房主发来的邀请码':'Paste the host’s invitation code',signal(game,'offer'));await click(g,zh?'生成回复码':'Create reply code');
    fill(h,zh?'粘贴朋友发回的回复码':'Paste your friend’s reply code',signal(game,'answer'));await click(h,zh?'使用回复码连接':'Connect with reply code');
    const deadline=Date.now()+5000;

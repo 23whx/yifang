@@ -11,10 +11,11 @@ for(const endpoint of ['0.peerjs.com','stun:stun.l.google.com:19302','turn:eu-0.
 for(const phrase of ['第三方 STUN','TURN 中继','third-party STUN','through TURN'])assert.ok(source.includes(phrase),`Public room disclosure missing: ${phrase}`);
 for(const game of ['chess','xiangqi','shogi','go'])for(const locale of ['zh','en']){
  const html=render(React.createElement(Remote,{game,locale}));
- assert.ok(html.includes(locale==='zh'?'当前为手动直连':'Manual direct mode'));
- assert.ok(html.includes(locale==='zh'?'不要关闭防火墙':'Do not disable the firewall'));
- assert.ok(!html.includes(locale==='zh'?'当前为公共房间号模式':'Public room-code mode uses'));
- assert.ok(html.includes(locale==='zh'?'公共信令服务 · 短房间码':'Public signaling service · short room code'),'Optional mode selector discloses public service');
+ assert.ok(html.includes(locale==='zh'?'当前为邀请链接方式':'Link mode:'),'Default is the invitation-link mode');
+ assert.ok(html.includes(locale==='zh'?'PeerJS 公共服务':'PeerJS public service'),'Default mode discloses the public service');
+ assert.ok(source.includes(locale==='zh'?'不要关闭防火墙':'Do not disable the firewall'),'Fallback keeps firewall advice');
+ assert.ok(!html.includes(locale==='zh'?'当前为邀请码方式':'Code mode:'));
+ assert.ok(html.includes(locale==='zh'?'邀请码 + 回复码 · 不经过任何服务':'Invitation + reply codes · no service involved'),'Service-free fallback stays selectable');
  assert.ok(html.includes(locale==='zh'?'有效 HTTPS':'valid HTTPS'),'Cross-device manual entry must disclose HTTPS requirement');
 }
 for(const name of ['McrRemote','RiichiRemote','SichuanRemote','MultiPokerRemote','HoldemRemote']){
@@ -30,4 +31,4 @@ for(const locale of ['zh','en']){
  assert.ok(prose.includes(locale==='zh'?'局域网IP':'LAN IP'),'Privacy page must distinguish plain LAN HTTP');
  assert.ok(prose.includes(locale==='zh'?'拒绝创建或加入':'cannot create or join'),'Privacy page must disclose insecure-origin refusal');
 }
-console.log('PASS: eight initial board/Go localized renders identify manual default, safe troubleshooting, and public-service option label; quick-room copy covers packaged PeerJS signaling/STUN/TURN defaults. Mode switching/native connections not tested.');
+console.log('PASS: eight initial board/Go localized renders identify the link default, its public-service disclosure and the service-free code fallback; quick-room copy covers packaged PeerJS signaling/STUN/TURN defaults. Mode switching/native connections not tested.');

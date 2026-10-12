@@ -26,10 +26,11 @@ class Peer extends Events{
 }
 function slot(make){const tab=scope.getStore(),i=tab.cursor++;if(!(i in tab.hooks))tab.hooks[i]=make();return [tab,i];}
 Module._load=function(request,...args){
- if(request==='peerjs')return {__esModule:true,default:Peer};
+ if(request==='peerjs')return {__esModule:true,default:Peer,Peer};
  if(request==='react')return {...React,useState(initial){const [tab,i]=slot(()=>typeof initial==='function'?initial():initial);return [tab.hooks[i],v=>{tab.hooks[i]=typeof v==='function'?v(tab.hooks[i]):v;}];},useRef(initial){const [tab,i]=slot(()=>({current:initial}));return tab.hooks[i];},useEffect(effect){slot(()=>{scope.getStore().effects.push(effect);return true;});},useSyncExternalStore(){slot(()=>true);return '';}};
  return load.call(this,request,...args);
 };
+globalThis.RTCPeerConnection??=function(){};
 Object.defineProperty(global,'sessionStorage',{configurable:true,get(){return scope.getStore().storage;}});
 const Remote=require('../components/cards/HoldemRemote.tsx').default;
 function tab(locale){const data=new Map();return {locale,data,cursor:0,hooks:[],effects:[],cleanups:[],storage:{getItem:k=>data.get(k)??null,setItem:(k,v)=>data.set(k,v),removeItem:k=>data.delete(k)}};}
@@ -54,10 +55,10 @@ function save(t){return JSON.parse(t.data.get(key));}
   const h=tab(locales[0]),g=tab(locales[1]),zh=t=>t.locale==='zh';
   try{
    await mount(h);await mount(g);
-   for(const t of [h,g])for(const phrase of zh(t)?['公共信令','第三方 STUN','TURN 中继','局域网手动直连']:['public PeerJS signaling','third-party STUN','through TURN','Manual LAN connection'])assert.ok(text(render(t)).includes(phrase),`Missing ${t.locale} quick-room network disclosure: ${phrase}`);
+   for(const t of [h,g])for(const phrase of zh(t)?['PeerJS 公共服务','第三方 STUN','TURN 中继','邀请码 + 回复码']:['PeerJS public service','third-party STUN','through TURN','Invitation + reply codes'])assert.ok(text(render(t)).includes(phrase),`Missing ${t.locale} quick-room network disclosure: ${phrase}`);
    await click(h,zh(h)?'创建房间':'Create room');
    const code=nodes(render(h)).find(n=>n.type==='code');assert.ok(code);const room=text(code);
-   const input=nodes(render(g)).find(n=>n.type==='input'&&n.props['aria-label']===(zh(g)?'房间码或邀请链接':'Room code or invitation'));
+   const input=nodes(render(g)).find(n=>n.type==='input'&&n.props.placeholder==='https://…?room=…');
    scope.run(g,()=>input.props.onChange({target:{value:room}}));
    await click(g,zh(g)?'加入房间':'Join room');
    assert.ok(text(render(h)).includes(zh(h)?'双方已连接，请房主确认':'Both connected — waiting for the host'));

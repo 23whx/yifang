@@ -58,6 +58,7 @@ export class ManualRTC {
     };
   }
   get open() { return !this.stopped && this.channel?.readyState === 'open'; }
+  get signalId() { return this.id; }
   private attach(channel: RTCDataChannel) {
     this.channel = channel;
     channel.onopen = () => { if (!this.stopped) this.onopen(); };

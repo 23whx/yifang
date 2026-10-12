@@ -31,6 +31,8 @@ class Host {
 }
 function Practice(){}
 Module._load=function(request,...args){
+ // Code-mode fallback under test; link mode is covered by the browser duel scripts.
+ if(request==='@/components/remote/useFourSeatLink')return {useFourSeatLink:()=>({mode:'code',setMode(){},code:'',note:'',entry:'',setEntry(){},invited:'',canJoin:false,async host(){},async join(){},stop(){}})};
  if(request==='react')return {...React,
   useState(initial){const i=slot(()=>typeof initial==='function'?initial():initial);return [hooks[i],v=>{hooks[i]=typeof v==='function'?v(hooks[i]):v;}];},
   useRef(initial){return hooks[slot(()=>({current:initial}))];},

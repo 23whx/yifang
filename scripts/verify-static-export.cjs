@@ -83,8 +83,8 @@ for(const locale of ['zh','en']){
  for(const game of ['chess','xiangqi','shogi','go','mahjong','holdem'])assert.ok(fs.existsSync(path.join(root,locale,game,'remote/index.html')),`Missing ${locale}/${game}/remote`);
  for(const game of ['chess','xiangqi','shogi','go']){
   const remote=fs.readFileSync(path.join(root,locale,game,'remote/index.html'),'utf8');
-  assert.ok(remote.includes(locale==='zh'?'当前为手动直连':'Manual direct mode'),'Stale manual-mode explanation');
-  assert.ok(!remote.includes(locale==='zh'?'当前为公共房间号模式':'Public room-code mode uses'),'Wrong default-mode explanation');
+  assert.ok(remote.includes(locale==='zh'?'当前为邀请链接方式':'Link mode:'),'Stale default-mode explanation');
+  assert.ok(!remote.includes(locale==='zh'?'当前为邀请码方式':'Code mode:'),'Wrong default-mode explanation');
  }
 }
 assert.ok(files(path.join(root,'_next')).filter(f=>f.endsWith('.js')).some(f=>fs.readFileSync(f,'utf8').includes('Negotiation already in progress')),'Static bundle lacks shared negotiation guard');

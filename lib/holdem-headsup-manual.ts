@@ -32,9 +32,11 @@ export class ManualHeadsUpPokerHost {
     this.room=checkpoint?HeadsUpPokerRoom.restoreCheckpoint(checkpoint,onMessage):new HeadsUpPokerRoom(crypto.randomUUID(),onMessage);
     if(checkpoint)this.previousMatch=this.room.recoveryIdentity;
   }
-  async offer(id:number){
+  seatOpen(id:number){return !this.disposed&&this.room.status==='lobby'&&seat(id)&&id!==0&&!this.channels.has(id);}
+  /** `supplied` is an already negotiated link-mode channel; otherwise a manual offer is created. */
+  async offer(id:number,supplied?:Channel){
     if(this.disposed||this.room.status!=='lobby'||!seat(id)||id===0||this.channels.has(id))throw new Error('Seat unavailable');
-    const channel=this.create(true);this.channels.set(id,channel);
+    const channel=supplied??this.create(true);this.channels.set(id,channel);
     let challenge:RecoveryChallenge|undefined,authenticated=false,authenticating=false;
     let timer:ReturnType<typeof setTimeout>|undefined;
     const welcome=()=>channel.send({kind:'holdem-two-welcome',v:1,match:this.room.match,seat:id,recoveryKey:this.previousMatch?undefined:this.room.recoveryCredential(id),recoveryMatch:this.room.recoveryIdentity} satisfies Welcome);

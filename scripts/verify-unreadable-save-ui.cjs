@@ -27,6 +27,8 @@ Module._load=function(request,...args){
   useMemo(make){return make();},useSyncExternalStore(){slot(()=>true);return '';},
  };
  if(adapters[request])return adapters[request];
+ // Code-mode fallback under test; link mode is covered by the browser duel scripts.
+ if(request==='@/components/remote/useFourSeatLink')return {useFourSeatLink:()=>({mode:'code',setMode(){},code:'',note:'',entry:'',setEntry(){},invited:'',canJoin:false,async host(){},async join(){},stop(){}})};
  if(['./McrPractice','./SichuanPractice','./RiichiPractice','./MultiPokerTable'].includes(request))return {__esModule:true,default:()=>null};
  if(request==='@/lib/mahjong/mcr-match')return {mcrRemotePhase:()=> 'playing'};
  return load.call(this,request,...args);
@@ -56,6 +58,8 @@ async function flush(){await Promise.resolve();await Promise.resolve();}
     removeItem(k){if(mode==='remove-denied')throw Error('blocked');if(mode!=='remove-silent')data.delete(k);},
    };
    render(locale);effects.splice(0).forEach(fn=>fn());await flush();
+   // Heads-up keeps its own link/code state: exercise the code fallback here.
+   if(headsup){nodes(render(locale)).find(n=>n.type==='select').props.onChange({target:{value:'code'}});}
    return data;
   }
   for(const locale of ['zh','en']){
@@ -112,8 +116,9 @@ async function flush(){await Promise.resolve();await Promise.resolve();}
     cases++;
    }
    if(headsup){
-    const data=await mount(locale,'malformed');let tree=render(locale);
-    const field=()=>nodes(tree).find(n=>n.type==='input'&&n.props['aria-label']===(zh?'房间码或邀请链接':'Room code or invitation'));
+    const data=await mount(locale,'malformed');
+    nodes(render(locale)).find(n=>n.type==='select').props.onChange({target:{value:'link'}});let tree=render(locale);
+    const field=()=>nodes(tree).find(n=>n.type==='input'&&n.props.placeholder==='https://…?room=…');
     field().props.onChange({target:{value:'yf-holdem-aaaaaaaaaaaa'}});tree=render(locale);
     await button(tree,zh?'加入房间':'Join room').props.onClick();tree=render(locale);
     assert.ok(nodes(tree).some(n=>n.props?.role==='alert'&&text(n).includes(zh?'旧存档会保留':'old save stays')));

@@ -35,6 +35,8 @@ function render(locale){cursor=0;return expandRoomKit(Remote({locale}));}
   const data=new Map([[key,JSON.stringify({version:1,role:'host',checkpoint:'old-checkpoint'})]]);
   global.sessionStorage={getItem:k=>data.get(k)??null,setItem:(k,v)=>data.set(k,v),removeItem:k=>data.delete(k)};
   render(locale);effects.splice(0).forEach(fn=>fn());await Promise.resolve();let tree=render(locale);
+  // These scenarios cover the code-exchange fallback; the default is link mode.
+  nodes(tree).find(n=>n.type==='select').props.onChange({target:{value:'code'}});tree=render(locale);
   const before=hosts.length;
   await button(tree,locale==='zh'?'生成邀请码':'Create invitation code').props.onClick();tree=render(locale);
   assert.equal(hosts.length,before);assert.equal(JSON.parse(data.get(key)).checkpoint,'old-checkpoint');
