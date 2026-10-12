@@ -12,6 +12,8 @@ import {secureMultiplayerContext,insecureMultiplayerMessage} from '@/lib/network
 import {readManualSignal} from '@/lib/manual-rtc';
 import {FourSeatSetup} from '@/components/remote/RoomKit';
 import {useFourSeatLink} from '@/components/remote/useFourSeatLink';
+import {byeMessage} from '@/lib/peer-room';
+import {useLeaveGuard} from '@/components/remote/Visitors';
 
 export default function SichuanRemote({locale}:{locale:'zh'|'en'}){
   const zh=locale==='zh',host=useRef<ManualSichuanHost|null>(null),guest=useRef<ManualSichuanGuest|null>(null);
@@ -23,9 +25,10 @@ export default function SichuanRemote({locale}:{locale:'zh'|'en'}){
   const [saved,setSaved]=useState<SichuanSave|null>(null),[saveError,setSaveError]=useState(''),[replaceSave,setReplaceSave]=useState<'host'|'guest'|null>(null),[clearConfirm,setClearConfirm]=useState(false),[restoring,setRestoring]=useState(false);
   const guestRecovery=useRef<string|undefined>(undefined);
   const link=useFourSeatLink('sichuan-four',zh),autoJoin=useRef(false);
+  useLeaveGuard(phase==='playing');
   // Link mode reconnects by itself after a drop (screen lock, app switch): the host keeps the
   // room link and restarts the verified recovery; guests rejoin it; play resumes once all four are back.
-  const autoTries=useRef(0),autoRun=useRef(false),played=useRef(false),[reconnectNote,setReconnectNote]=useState('');
+  const autoTries=useRef(0),autoRun=useRef(false),played=useRef(false);
   useEffect(()=>{let active=true;queueMicrotask(()=>{if(!active)return;try{setSaved(readSichuanSave(sessionStorage));}catch{setSaveError(zh?'无法读取本标签页存档；不要假定可以恢复。':'Cannot read this tab’s save; recovery is not assured.');}});return()=>{active=false;};},[zh]);
   function persist(){
     try{const checkpoint=host.current?.room.recoveryCheckpoint()??guest.current?.recoveryCheckpoint();if(!checkpoint)return;
@@ -38,7 +41,7 @@ export default function SichuanRemote({locale}:{locale:'zh'|'en'}){
   function receive(token:number,m:SichuanRoomMessage){
     if(token!==epoch.current)return;
     const p=m.payload;
-    if(p.kind!=='lobby'&&p.kind!=='closed'&&p.kind!=='ack'){played.current=true;if(autoRun.current){autoRun.current=false;autoTries.current=0;setReconnectNote('');}}
+    if(p.kind!=='lobby'&&p.kind!=='closed'&&p.kind!=='ack'){played.current=true;if(autoRun.current){autoRun.current=false;autoTries.current=0;link.setReconnect('');}}
     if(p.kind==='closed'&&link.mode==='link'&&(played.current||autoRun.current)){autoReconnect();return;}
     if(p.kind==='lobby'&&autoRun.current&&host.current&&p.connected.every(Boolean))queueMicrotask(()=>{if(token===epoch.current)host.current?.start();});
     if(p.kind==='lobby'){setConnected(p.connected);setPhase('lobby');setOffers(o=>o.map((v,i)=>p.connected[i]?'':v));setResponses(o=>o.map((v,i)=>p.connected[i]?'':v));setAnswer('');}
@@ -58,19 +61,19 @@ export default function SichuanRemote({locale}:{locale:'zh'|'en'}){
   function createHost(checkpoint?:string,auto=false){
     if(!secureMultiplayerContext()){setError(insecureMultiplayerMessage(locale));return;}
     if(!checkpoint&&(saved||saveError)&&replaceSave!=='host'){setReplaceSave('host');return;}
-    reset(auto);if(!auto){autoTries.current=0;setReconnectNote('');}played.current=false;autoRun.current=auto;guestRecovery.current=undefined;setRestoring(!!checkpoint);setReplaceSave(null);const token=epoch.current;setRole('host');setPhase('lobby');
+    reset(auto);if(!auto){autoTries.current=0;link.setReconnect('');}played.current=false;autoRun.current=auto;guestRecovery.current=undefined;setRestoring(!!checkpoint);setReplaceSave(null);const token=epoch.current;setRole('host');setPhase('lobby');
     try{host.current=new ManualSichuanHost(m=>receive(token,m),id=>{if(token!==epoch.current)return;if(host.current?.room.status==='lobby'){setConnected(c=>c.map((v,i)=>i===id?false:v));setOffers(o=>o.map((v,i)=>i===id?'':v));setResponses(o=>o.map((v,i)=>i===id?'':v));}else disconnected(token);},undefined,checkpoint);}
     catch{setPhase('closed');setError(zh?'存档无效或版本不兼容，未创建恢复房间。原存档保留。':'Invalid or incompatible save. Recovery room not created; original save retained.');}
-    if(link.mode==='link'&&host.current)void link.host(()=>token===epoch.current,()=>host.current,message=>{if(token===epoch.current){setError(message);setPhase('closed');}},{recovering:!!checkpoint,reuse:auto,onReturning:()=>autoReconnect()});
+    if(link.mode==='link'&&host.current)void link.host(()=>token===epoch.current,()=>host.current,message=>{if(token===epoch.current){setError(message);setPhase('closed');}},{recovering:!!checkpoint,reuse:auto,onReturning:()=>autoReconnect(),onLeft:(_seat,who)=>{if(token!==epoch.current||host.current?.room.status==='lobby')return;persist();epoch.current++;link.leave('ended',who);link.setReconnect('');setPhase('closed');setError(byeMessage('ended',zh,who));}});
   }
   function restoreSaved(){if(!saved)return;if(saved.role==='host')createHost(saved.checkpoint);else{reset();guestRecovery.current=saved.checkpoint;setRestoring(true);setRole('none');setPhase('idle');if(link.mode==='link'&&link.hasStoredRoom())joinLink();}}
   function autoReconnect(){
     persist();
     let save:{role:'host'|'guest';checkpoint:string}|null=null;
     try{save=readSichuanSave(sessionStorage);}catch{/* fall through to a plain stop */}
-    if(!save||autoTries.current>=3){epoch.current++;setReconnectNote('');setPhase('closed');setError(zh?'连接已断开，牌局已保存。各位保留本页，点“恢复上次牌局”即可接着打。':'Disconnected; the match is saved. Everyone keeps this page and chooses Restore previous match to continue.');return;}
+    if(!save||autoTries.current>=3){epoch.current++;link.setReconnect('');setPhase('closed');setError(zh?'连接已断开，牌局已保存。各位保留本页，点“恢复上次牌局”即可接着打。':'Disconnected; the match is saved. Everyone keeps this page and chooses Restore previous match to continue.');return;}
     autoTries.current++;
-    setReconnectNote(save.role==='host'?(zh?'有玩家暂时断线了（手机锁屏或切到其他应用时常见）。房间仍然有效，断线的玩家回到页面后会自动接上；四人到齐后自动继续原牌局。':'A player dropped out (common when a phone locks or switches apps). The room stays open; they reconnect automatically when they return, and the original match continues once all four are back.'):(zh?'连接中断了，正在自动重新连上房主……牌局已保存，四人到齐后会自动继续。':'Connection lost; reconnecting to the host automatically… The match is saved and continues once all four are back.'));
+    link.setReconnect(save.role==='host'?(zh?'有玩家暂时断线了（手机锁屏或切到其他应用时常见）。房间仍然有效，断线的玩家回到页面后会自动接上；四人到齐后自动继续原牌局。':'A player dropped out (common when a phone locks or switches apps). The room stays open; they reconnect automatically when they return, and the original match continues once all four are back.'):(zh?'连接中断了，正在自动重新连上房主……牌局已保存，四人到齐后会自动继续。':'Connection lost; reconnecting to the host automatically… The match is saved and continues once all four are back.'));
     if(save.role==='host'){createHost(save.checkpoint,true);return;}
     const resume=save.checkpoint;
     const go=()=>{guestRecovery.current=resume;setRestoring(true);joinLink(true);};
@@ -84,11 +87,11 @@ export default function SichuanRemote({locale}:{locale:'zh'|'en'}){
     if(!secureMultiplayerContext()){setError(insecureMultiplayerMessage(locale));return;}
     const checkpoint=guestRecovery.current;
     if(!checkpoint&&(saved||saveError)&&replaceSave!=='guest'){setReplaceSave('guest');return;}
-    reset();if(!auto){autoTries.current=0;setReconnectNote('');}played.current=false;autoRun.current=auto;setReplaceSave(null);setRestoring(!!checkpoint);setRole('guest');setPhase('connecting');const token=epoch.current;
+    reset();if(!auto){autoTries.current=0;link.setReconnect('');}played.current=false;autoRun.current=auto;setReplaceSave(null);setRestoring(!!checkpoint);setRole('guest');setPhase('connecting');const token=epoch.current;
     void link.join(()=>token===epoch.current,checkpoint,channel=>{
       try{guest.current=new ManualSichuanGuest(m=>receive(token,m),()=>disconnected(token),()=>channel,checkpoint);}
       catch{channel.close();setPhase('closed');setError(zh?'存档无效或版本不兼容，未加入。原存档保留。':'Invalid or incompatible save; not joined. Original save retained.');}
-    },message=>{if(token===epoch.current){setPhase('closed');setError(message);}},auto);
+    },message=>{if(token===epoch.current){setPhase('closed');setError(message);}},auto,message=>{if(token!==epoch.current)return;epoch.current++;link.setReconnect('');setPhase('closed');setError(message);});
   }
   // Opening an invitation link joins straight away, unless this tab holds a saved match to protect.
   useEffect(()=>{
@@ -115,10 +118,10 @@ export default function SichuanRemote({locale}:{locale:'zh'|'en'}){
   }
   async function copy(value:string){try{await navigator.clipboard.writeText(value);}catch{setError(zh?'无法自动复制，请选中文本框中的全部文字手动复制。':'Copy failed; select all text in the field and copy manually.');}}
   return <>
-    <FourSeatSetup link={{mode:link.mode,onMode:mode=>{reset();setBusy(false);setRole('none');setPhase('idle');guestRecovery.current=undefined;setRestoring(false);setReplaceSave(null);link.setMode(mode);},code:link.code,note:link.note,entry:link.entry,onEntry:value=>{link.setEntry(value);setReplaceSave(null);},canJoin:link.canJoin,onJoin:()=>joinLink(),visitors:link.visitors,onAdmit:link.admit,onDeny:link.deny,reconnect:reconnectNote}} zh={zh} title={zh?'四川血战麻将 · 四人':'Four-player Sichuan Blood Battle'} role={role} phase={phase} connected={connected} offers={offers} responses={responses} invitation={invitation} answer={answer} busy={busy} error={error}
+    <FourSeatSetup link={{mode:link.mode,onMode:mode=>{reset();setBusy(false);setRole('none');setPhase('idle');guestRecovery.current=undefined;setRestoring(false);setReplaceSave(null);link.setMode(mode);},code:link.code,note:link.note,entry:link.entry,onEntry:value=>{link.setEntry(value);setReplaceSave(null);},canJoin:link.canJoin,onJoin:()=>joinLink(),visitors:link.visitors,onAdmit:link.admit,onDeny:link.deny,reconnect:link.reconnect,reconnectSince:link.reconnectSince,lounge:link.lounge,onKick:link.kick}} zh={zh} title={zh?'四川血战麻将 · 四人':'Four-player Sichuan Blood Battle'} role={role} phase={phase} connected={connected} offers={offers} responses={responses} invitation={invitation} answer={answer} busy={busy} error={error}
       saved={!!saved} saveError={saveError} replaceSave={replaceSave} clearConfirm={clearConfirm} restoring={restoring} confirm={confirm}
       notes={<><p>{zh?'不需要注册。以下为邀请码方式的说明：它不经过任何后端或信令服务。房主与三位朋友分别交换一组文本；建议同一局域网。跨公网不保证连通，因为没有中继。不同设备都需能打开有效 HTTPS 网站：localhost 只属于当前设备，直接输入 http://局域网IP 也不具备刷新恢复所需的安全上下文。连接文本含网络连接信息，只私下发给同桌朋友。':'No registration. Code mode (described here) uses no backend or signaling service. The host exchanges a separate text pair with each of three friends. LAN is recommended; cross-network success is not guaranteed without relays. Each device needs a valid HTTPS site: localhost refers only to that device, and plain HTTP on a LAN IP lacks the secure context required for refresh recovery. Share connection text privately with your table only.'}</p><p>{zh?'房主浏览器保管牌堆并执行规则，请只和信任的人对局。这不是防作弊服务器，不涉及真钱。断线会冻结对局；恢复需要原房主和全部三位玩家各自保留本标签页存档，并重新交换连接文本。':'The trusted host owns the deck and rules; this is not a cheat-proof server or a money game. Disconnection freezes play. Recovery needs the original host and all three guests, each retaining their own tab’s save and exchanging fresh connection text.'}</p><p>{zh?'进入牌局后自动保存到本标签页 sessionStorage。房主存档含完整牌墙和恢复凭证，来宾只保存本席牌面与凭证；不要导出或分享存档。刷新后先选“恢复本标签页牌局”。房主重新为原座位生成邀请，朋友先恢复，再粘贴自己的新邀请；四人到齐后房主点“继续原牌局”。关闭标签页、清理浏览器数据或存储被禁用时可能丢失，不能换设备恢复。':'After play starts, progress is saved in this tab’s sessionStorage. The host save contains the full wall and credentials; a guest saves only their view and credential. Never export or share saves. After refresh choose “Restore this tab’s match.” The host makes fresh invitations for the original seats; guests restore first, then paste their own invitation. Once all return, the host continues the original match. Closing the tab, clearing data or blocked storage can lose the save. Device migration is not supported.'}</p></>}
-      onCreate={()=>createHost()} onLeave={()=>{if(!confirm){setConfirm(true);return;}reset();setBusy(false);setRole('none');setPhase('idle');}} onRestore={restoreSaved}
+      onCreate={()=>createHost()} onLeave={()=>{if(!confirm){setConfirm(true);return;}if(link.mode==='link')link.leave();reset();setBusy(false);setRole('none');setPhase('idle');}} onRestore={restoreSaved}
       onClear={()=>{if(!clearConfirm){setClearConfirm(true);return;}if(forget()){guestRecovery.current=undefined;setRestoring(false);}}}
       onOffer={id=>work(async()=>{const h=host.current!,token=epoch.current,value=await h.offer(id);if(token===epoch.current)setOffers(o=>o.map((v,i)=>i===id?value:v));})} onCopy={copy}
       onResponse={(id,value)=>setResponses(o=>o.map((v,i)=>i===id?value:v))} onFinish={id=>work(async()=>{await host.current!.finish(id,responses[id]);})}

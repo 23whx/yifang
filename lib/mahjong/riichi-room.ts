@@ -52,11 +52,11 @@ export class RiichiRoomHost {
   resume(seat:number,key:string,lastView:string,sender:Sender){
     if(!this.restored||this.phase!=='lobby'||!this.session||!Number.isInteger(seat)||seat<1||seat>3||this.senders.has(seat)||!validRecoveryKey(key)||key!==this.keys[seat]||typeof lastView!=='string'||lastView.length>60000)return false;
     try{const seen=JSON.parse(lastView);if(!seen||JSON.stringify(this.session.viewAt(seat,seen.revision))!==lastView)return false;}catch{return false;}
-    this.senders.set(seat,sender);this.lobby();return this.senders.has(seat);
+    this.sequence[seat]=0;this.senders.set(seat,sender);this.lobby();return this.senders.has(seat);
   }
   join(seat:number,sender:Sender){
     if(this.restored||this.phase!=='lobby'||!Number.isInteger(seat)||seat<1||seat>3||this.senders.has(seat))return false;
-    this.senders.set(seat,sender);this.lobby();return this.senders.has(seat);
+    this.sequence[seat]=0;this.senders.set(seat,sender);this.lobby();return this.senders.has(seat);
   }
   start(){
     if(this.phase!=='lobby'||this.senders.size!==4)return false;

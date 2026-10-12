@@ -44,13 +44,13 @@ export class MultiPokerRoom {
   resume(seat:number,key:string,lastView:string,sender:Sender){
     if(!this.restored||this.phase!=='lobby'||!this.session||!Number.isInteger(seat)||seat<1||seat>3||this.senders.has(seat)||!validRecoveryKey(key)||key!==this.keys[seat]||typeof lastView!=='string'||lastView.length>65536)return false;
     try{const seen=JSON.parse(lastView);if(!seen||JSON.stringify(this.session.viewAt(seat,seen.revision))!==lastView)return false;}catch{return false;}
-    this.senders.set(seat,sender);this.lobby();return this.senders.has(seat);
+    this.sequences[seat]=0;this.senders.set(seat,sender);this.lobby();return this.senders.has(seat);
   }
   /** Host-private: full decks. Never include in send/payload or guest exports. */
   recoveryArchive(){if(!this.session)throw new Error('Match not started');return this.session.checkpoint();}
   join(seat:number,sender:Sender) {
     if(this.restored||this.phase!=='lobby'||!Number.isInteger(seat)||seat<1||seat>3||this.senders.has(seat))return false;
-    this.senders.set(seat,sender);this.lobby();return this.senders.has(seat);
+    this.sequences[seat]=0;this.senders.set(seat,sender);this.lobby();return this.senders.has(seat);
   }
   start(deck?:number[]) {
     if(this.phase!=='lobby'||this.senders.size!==4)return false;

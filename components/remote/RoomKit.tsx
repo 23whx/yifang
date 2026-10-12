@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react';
+import qrcode from 'qrcode-generator';
 import { NicknameField, VisitorList } from './Visitors';
+import { LoungePanel, WaitClock, type Lounge } from './Lounge';
+import { JOIN_LIMIT_MS } from '@/lib/peer-room';
 import type { Visitor } from '@/lib/peer-room';
 
 /**
@@ -72,13 +75,18 @@ export type FourSeatPhase = 'idle' | 'lobby' | 'connecting' | 'playing' | 'finis
  * The host is Player 1 and exchanges one invitation/reply pair with each other seat.
  */
 export type FourSeatLink = { mode: 'link' | 'code'; onMode: (mode: 'link' | 'code') => void; code: string; note: string; entry: string; onEntry: (value: string) => void; canJoin: boolean; onJoin: () => void;
-  visitors?: Visitor[]; onAdmit?: (id: string) => void; onDeny?: (id: string) => void; /** Shown while the table reconnects by itself. */ reconnect?: string };
+  visitors?: Visitor[]; onAdmit?: (id: string) => void; onDeny?: (id: string) => void; /** Shown while the table reconnects by itself. */ reconnect?: string;
+  reconnectSince?: number | null; lounge?: Lounge; onKick?: (id: string) => void };
 
 /** Share-or-copy box for an invitation link. */
 export function LinkShare({ zh, code, title, body, onCopied }: { zh: boolean; code: string; title: string; body: string; onCopied: (value: string) => void }) {
   const t = (cn: string, en: string) => zh ? cn : en;
   const link = () => { const url = new URL(window.location.href); url.search = ''; url.hash = ''; url.searchParams.set('room', code); return url.toString(); };
-  return <div className="room-banner">
+  // A computer host can show the room to a phone: scanning beats retyping or forwarding.
+  let qr = '';
+  if (typeof window !== 'undefined') { try { const q = qrcode(0, 'M'); q.addData(link()); q.make(); qr = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); } catch { qr = ''; } }
+  return <div className="room-banner room-share">
+    {qr && <figure className="room-qr"><div aria-hidden="true" dangerouslySetInnerHTML={{ __html: qr }} /><figcaption>{t('用手机相机扫码加入', 'Scan with a phone camera to join')}</figcaption></figure>}
     <p className="room-banner-title">{title}</p>
     <p>{body}</p>
     <div className="room-actions">
@@ -107,7 +115,7 @@ export function FourSeatSetup(p: {
   const choosing = p.role === 'none' || p.phase === 'closed' || p.phase === 'finished';
   const status = ({
     idle: t('尚未连接', 'Not connected'),
-    lobby: p.role === 'host' ? t(`等待玩家到齐（${count}/4）`, `Waiting for players (${count}/4)`) : t('已加入，等待房主开局', 'Joined — waiting for the host to start'),
+    lobby: p.role === 'host' ? (count === 4 ? t('四人到齐，可以开局', 'All four here — ready to start') : t(`等待玩家到齐（${count}/4）`, `Waiting for players (${count}/4)`)) : t('已加入，等待房主开局', 'Joined — waiting for the host to start'),
     connecting: linkMode ? t('正在加入房间…', 'Joining the room…') : p.answer ? t('等待房主连接你的回复码', 'Waiting for the host to use your reply') : t('正在生成回复码…', 'Creating your reply code…'),
     playing: t('对局中', 'Playing'),
     finished: t('本场结束', 'Match finished'),
@@ -139,7 +147,12 @@ export function FourSeatSetup(p: {
         <button disabled={p.busy || !p.link.canJoin} className="rpg-button" onClick={p.link.onJoin}>{p.replaceSave === 'guest' ? t('确认加入新房', 'Confirm joining new room') : t('加入房间', 'Join room')}</button>
       </RoleCard>
     </div>}
-    {p.link?.reconnect && p.phase !== 'playing' && <p role="status" className="room-progress">{p.link.reconnect}</p>}
+    {p.link?.reconnect && p.phase !== 'playing' && <div className="room-banner" role="status">
+      <p>{p.link.reconnect}</p>
+      {p.link.reconnectSince && <p><WaitClock zh={p.zh} since={p.link.reconnectSince} limit={p.role === 'guest' ? JOIN_LIMIT_MS : undefined} /></p>}
+      <p className="text-sm">{p.role === 'host' ? t('不想等了：点下方“离开房间”解散房间。', 'Done waiting? Choose Leave room below to close the room.') : t('不想等了：点下方“离开房间”。', 'Done waiting? Choose Leave room below.')}</p>
+    </div>}
+    {linkMode && p.link?.lounge && p.role !== 'none' && <LoungePanel zh={p.zh} lounge={p.link.lounge} compact={p.phase === 'playing'} onKick={p.role === 'host' && p.phase === 'lobby' && !p.restoring && p.link.onKick ? id => p.link?.onKick?.(id) : undefined} />}
     {p.link?.note && !p.link.reconnect && !choosing && p.phase !== 'playing' && <p role="status" className="room-progress">{p.link.note}</p>}
     {choosing && !linkMode && <div className="room-roles">
       <RoleCard badge={t('房主 · 玩家 1', 'Host · Player 1')} title={t('我来开房', 'Open a room')} steps={[t('创建房间，你是玩家 1', 'Create the room — you are Player 1'), t('分别给玩家 2、3、4 生成邀请码并发送', 'Create and send a separate invitation for Players 2, 3 and 4'), t('粘贴各自发回的回复码，人齐后开局', 'Paste each reply code, then start when all four are in')]}>
@@ -158,11 +171,11 @@ export function FourSeatSetup(p: {
     ]} />}
     {p.role === 'host' && p.phase === 'lobby' && <>
       {linkMode && p.link?.visitors && <VisitorList zh={p.zh} visitors={p.link.visitors} onAdmit={id => p.link?.onAdmit?.(id)} onDeny={id => p.link?.onDeny?.(id)} />}
-      {linkMode && p.link?.code && !p.link.reconnect && <LinkShare zh={p.zh} code={p.link.code} title={t('房间已开好，把邀请链接发给三位朋友', 'Room ready — send the invitation link to your three friends')} body={t('三人用同一个链接。有人打开后，这里会出现“有人想加入”，由你决定让不让他入座。你可以切去微信等应用发链接，房间在这个页面开着期间一直有效。', 'All three use the same link. When someone opens it, “Someone wants to join” appears here and you decide whether to seat them. You can switch to a chat app to send it; the room stays open as long as this page is open.')} onCopied={p.onCopy} />}
+      {linkMode && p.link?.code && !p.link.reconnect && count < 4 && <LinkShare zh={p.zh} code={p.link.code} title={t('房间已开好，把邀请链接发给三位朋友', 'Room ready — send the invitation link to your three friends')} body={t('三人用同一个链接。有人打开后，这里会出现“有人想加入”，由你决定让不让他入座。你可以切去微信等应用发链接，房间在这个页面开着期间一直有效。', 'All three use the same link. When someone opens it, “Someone wants to join” appears here and you decide whether to seat them. You can switch to a chat app to send it; the room stays open as long as this page is open.')} onCopied={p.onCopy} />}
       {linkMode && !p.link?.code && <p className="room-progress">{t('正在开房…', 'Opening the room…')}</p>}
       {linkMode && <p className="room-progress">{t(`已到齐 ${count}/4 人。你是玩家 1。`, `${count}/4 players in. You are Player 1.`)}</p>}
       {!linkMode && <p className="room-progress">{t(`已到齐 ${count}/4 人。你是玩家 1。每位朋友要用自己专属的邀请码，不能把同一份发给三个人。`, `${count}/4 players in. You are Player 1. Each friend needs their own invitation — do not send one to all three.`)}</p>}
-      <div className="room-seats">{[1, 2, 3].map(id => <div key={id} className={`room-seat ${p.connected[id] ? 'room-seat-ok' : ''}`}>
+      {!linkMode && <div className="room-seats">{[1, 2, 3].map(id => <div key={id} className={`room-seat ${p.connected[id] ? 'room-seat-ok' : ''}`}>
         <p className="room-seat-head"><span>{t('玩家', 'Player')} {id + 1}</span><span>{p.connected[id] ? t('✓ 已连接', '✓ Connected') : t('未连接', 'Not connected')}</span></p>
         {linkMode && !p.connected[id] && <p className="text-sm">{t('等待朋友打开链接…', 'Waiting for a friend to open the link…')}</p>}
         {!linkMode && !p.connected[id] && !p.offers[id] && <button disabled={p.busy} className="rpg-button" onClick={() => p.onOffer(id)}>{t(`生成玩家 ${id + 1} 的邀请码`, `Create invitation for Player ${id + 1}`)}</button>}
@@ -171,7 +184,7 @@ export function FourSeatSetup(p: {
           <label className="block text-sm font-bold">{t(`② 粘贴玩家 ${id + 1} 发回的回复码`, `② Paste Player ${id + 1}’s reply code`)}<textarea maxLength={65536} aria-label={`${t('回复', 'Answer')} ${id + 1}`} className="room-field" rows={3} value={p.responses[id]} onChange={e => p.onResponse(id, e.target.value)} /></label>
           <div className="room-actions"><button disabled={p.busy || !p.responses[id]} className="rpg-button" onClick={() => p.onFinish(id)}>{t(`连接玩家 ${id + 1}`, `Connect Player ${id + 1}`)}</button><button disabled={p.busy} className="room-link" onClick={() => p.onCancelOffer(id)}>{t('取消此邀请', 'Cancel this invitation')}</button></div>
         </>}
-      </div>)}</div>
+      </div>)}</div>}
       <div><button disabled={!p.connected.every(Boolean) || p.busy} className="rpg-button" onClick={p.onStart}>{p.restoring ? t('四人到齐，继续原牌局', 'All four ready — resume original match') : t('四人到齐，开始对局', 'All four ready — start match')}</button></div>
     </>}
     {p.role !== 'none' && p.phase !== 'closed' && <div className="room-actions"><button className={p.confirm ? 'rpg-button' : 'room-link'} onClick={p.onLeave}>{p.confirm ? t('确认离开，停止本场', 'Confirm leave and stop match') : t('离开房间', 'Leave room')}</button></div>}

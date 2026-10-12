@@ -66,11 +66,11 @@ export class SichuanRoom {
       const {session}=restoreSichuanRecovery(JSON.stringify(prefix));
       if(JSON.stringify(sichuanSessionView(session,id))!==lastView)return false;
     }catch{return false;}
-    this.senders.set(id,sender);this.lobby();return this.senders.has(id);
+    this.sequences[id]=0;this.senders.set(id,sender);this.lobby();return this.senders.has(id);
   }
   join(seat:number,sender:Sender) {
     if(this.restored||this.phase!=='lobby'||!Number.isInteger(seat)||seat<1||seat>3||this.senders.has(seat))return false;
-    this.senders.set(seat,sender);this.lobby();return this.senders.has(seat);
+    this.sequences[seat]=0;this.senders.set(seat,sender);this.lobby();return this.senders.has(seat);
   }
   start(deck?:number[]) {
     if(this.phase!=='lobby'||this.senders.size!==4)return false;

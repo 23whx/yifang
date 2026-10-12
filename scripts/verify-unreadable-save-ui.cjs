@@ -28,7 +28,7 @@ Module._load=function(request,...args){
  };
  if(adapters[request])return adapters[request];
  // Code-mode fallback under test; link mode is covered by the browser duel scripts.
- if(request==='@/components/remote/useFourSeatLink')return {useFourSeatLink:()=>({mode:'code',setMode(){},code:'',note:'',entry:'',setEntry(){},invited:'',canJoin:false,async host(){},async join(){},stop(){}})};
+ if(request==='@/components/remote/useFourSeatLink')return {useFourSeatLink:()=>({mode:'code',setMode(){},code:'',note:'',setNote(){},entry:'',setEntry(){},invited:'',canJoin:false,hasStoredRoom:()=>false,forgetRoom(){},visitors:[],lounge:null,reconnect:'',reconnectSince:null,setReconnect(){},admit(){},deny(){},kick(){},async host(){},async join(){},stop(){},leave(){}})};
  if(['./McrPractice','./SichuanPractice','./RiichiPractice','./MultiPokerTable'].includes(request))return {__esModule:true,default:()=>null};
  if(request==='@/lib/mahjong/mcr-match')return {mcrRemotePhase:()=> 'playing'};
  return load.call(this,request,...args);

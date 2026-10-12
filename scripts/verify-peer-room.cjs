@@ -67,6 +67,35 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   assert.ok(connects.every(c=>c.options.serialization==='json'),'JSON framing keeps undefined fields absent');
   host.destroy();}
 
+ // Session layer after admission: chat, renames, goodbyes, latency, and silent-drop detection.
+ {const target=room.newRoomCode('chess');const admitted=[];
+  const host=await room.hostPeerRoom(target,{onConnection:(c,meta,v,session)=>admitted.push({c,v,session}),onFailure:()=>{},policy:()=>'admit',profile:{name:'老王',device:'Windows · Chrome'}});await wait(5);
+  const join=name=>new Promise(done=>room.joinPeerRoom(target,{},{onOpen:(c,session,welcome)=>done({c,session,welcome}),onFailure:r=>done({failed:r})},{name}));
+  const g=await join('小明');await wait(20);
+  assert.deepEqual({name:g.welcome.name,device:g.welcome.device},{name:'老王',device:'Windows · Chrome'},'Guests learn who the host is');
+  assert.equal(g.welcome.you,admitted[0].v.id,'Guests learn their own roster id');
+  const hostHeard=[],guestHeard=[],gameSeen=[];
+  admitted[0].session.onMessage(m=>hostHeard.push(m));g.session.onMessage(m=>guestHeard.push(m));admitted[0].c.on('data',v=>gameSeen.push(v));
+  g.session.chat('  你好\u0007 ');g.session.send({kind:'yf-name',v:1,name:'小明明'});g.c.send({kind:'hello'});await wait(20);
+  assert.deepEqual(hostHeard.map(m=>m.kind),['yf-chat','yf-name']);assert.equal(hostHeard[0].text,'你好','Chat is trimmed and stripped');assert.equal(hostHeard[1].name,'小明明');
+  assert.deepEqual(gameSeen,[{kind:'hello'}],'Session messages never reach the game, game messages still do');
+  admitted[0].session.send({kind:'yf-roster',v:1,people:[{id:'host',name:'老王',device:'x',role:'host',status:'online'},{id:'evil',name:'x'.repeat(99),role:'admin',status:'weird',rtt:'fast'}]});await wait(10);
+  const roster=guestHeard.find(m=>m.kind==='yf-roster');assert.ok(roster);assert.equal(roster.people[1].name.length,24);assert.equal(roster.people[1].role,'guest');assert.equal(roster.people[1].status,'online');assert.equal(roster.people[1].rtt,null,'Roster fields are sanitised');
+  await wait(room.PING_MS+300);assert.equal(typeof admitted[0].session.rtt,'number','Heartbeat measures latency');assert.equal(typeof g.session.rtt,'number');
+  // Kicking one guest tells only them; dissolving tells everyone.
+  const g2=await join('小红');await wait(20);const g2Heard=[];g2.session.onMessage(m=>g2Heard.push(m));
+  host.kick(admitted[1].v.id);await wait(20);assert.deepEqual(g2Heard.map(m=>m.reason),['kicked']);assert.equal(guestHeard.some(m=>m.kind==='yf-bye'),false);
+  host.dissolve('ended','小明');await wait(20);const bye=guestHeard.find(m=>m.kind==='yf-bye');assert.equal(bye.reason,'ended');assert.equal(bye.name,'小明');
+  assert.equal(room.byeMessage('ended',true,'小明'),'小明离开了，本场结束（不判胜负）。');assert.equal(room.byeMessage('host-left',true),'房主已离开，房间已解散。');
+  await wait(500);}
+ // A peer that goes silent (frozen phone) is dropped by the heartbeat.
+ {const target=room.newRoomCode('go');let hostSide=null,closed=false;
+  const host=await room.hostPeerRoom(target,{onConnection:(c,m,v,session)=>{hostSide={c,session};c.on('close',()=>{closed=true;});},onFailure:()=>{},policy:()=>'admit'});await wait(5);
+  const g=await new Promise(done=>room.joinPeerRoom(target,{},{onOpen:(c,session)=>done({c,session}),onFailure:()=>done(null)}));await wait(20);
+  // Freeze the guest: it stops sending anything at all.
+  g.c.send=()=>{};g.session.send=()=>{};
+  await wait(room.DEAD_MS+room.PING_MS+500);assert.ok(closed,'Host gives up on a silent guest');host.destroy();}
+
  // A returning guest retries while the host is away, then joins once the host registers.
  {const target=room.newRoomCode('chess');const waits=[];let opened=null,failed=null,missing=0;
   const guest=await room.joinPeerRoom(target,{},{onOpen:c=>{opened=c;},onWaiting:()=>waits.push(1),onMissing:()=>missing++,onFailure:r=>{failed=r;}},{resume:true});
@@ -113,5 +142,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   assert.deepEqual(reasons.sort(),['guest service','host service']);assert.equal(services,0);g.destroy();h.destroy();}
 
  for(const reason of ['service','room-taken','host-gone','network','browser','no-room','denied','full'])for(const zh of [true,false])assert.ok(room.peerFailureMessage(reason,zh).length>5);
- console.log('PASS: link rooms parse codes per game, label devices, buffer data until handlers attach, keep newcomers at the door until the host admits or declines, turn people away when full, admit returning players, warn early about a missing room without giving up, re-register a dropped host, swap handlers on reconnect, and report an unreachable service.');
+ console.log('PASS: link rooms parse codes per game, label devices, run a session layer beside the game (chat, renames, sanitised roster, latency, kick, dissolve with reason, silent-drop detection), buffer data until handlers attach, keep newcomers at the door until the host admits or declines, turn people away when full, admit returning players, warn early about a missing room without giving up, re-register a dropped host, swap handlers on reconnect, and report an unreachable service.');
+ // Heartbeat intervals of the test sessions would keep Node alive.
+ process.exit(0);
 })().catch(e=>{console.error(e);process.exit(1);});

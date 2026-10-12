@@ -1,11 +1,11 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Visitor } from '@/lib/peer-room';
 
 const NICKNAME_KEY = 'yifang:nickname';
 /** A per-viewer convenience; joining works without it. */
 export function readNickname() { try { return localStorage.getItem(NICKNAME_KEY) ?? ''; } catch { return ''; } }
-function writeNickname(value: string) { try { localStorage.setItem(NICKNAME_KEY, value); } catch { /* not remembered */ } }
+export function writeNickname(value: string) { try { localStorage.setItem(NICKNAME_KEY, value); } catch { /* not remembered */ } }
 
 /** Optional name the host sees when this guest knocks. */
 export function NicknameField({ zh }: { zh: boolean }) {
@@ -34,16 +34,42 @@ export function VisitorList({ zh, visitors, onAdmit, onDeny }: { zh: boolean; vi
   </div>;
 }
 
-/** Flash the tab title while someone waits and the host is looking elsewhere. */
-export function useTitleAlert(count: number, zh: boolean) {
+/** Flash the tab title with `text` while the player is looking at another tab or app. */
+export function useAttention(text: string | null) {
   useEffect(() => {
-    if (!count || typeof document === 'undefined') return;
-    const original = document.title, alert = zh ? `🔔 有人想加入（${count}）` : `🔔 ${count} waiting to join`;
+    if (!text || typeof document === 'undefined') return;
+    const original = document.title;
     let on = false;
     const timer = setInterval(() => {
       if (document.visibilityState === 'visible') { if (on) { document.title = original; on = false; } return; }
-      on = !on; document.title = on ? alert : original;
+      on = !on; document.title = on ? text : original;
     }, 1000);
     return () => { clearInterval(timer); document.title = original; };
-  }, [count, zh]);
+  }, [text]);
+}
+/** A short, soft two-note chime — a lobby's "someone is here". Silent where audio is unavailable. */
+export function chime() {
+  try {
+    const Context = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!Context) return;
+    const ctx = new Context(), o = ctx.createOscillator(), g = ctx.createGain(), at = ctx.currentTime;
+    o.type = 'sine'; o.frequency.setValueAtTime(880, at); o.frequency.setValueAtTime(1320, at + 0.12);
+    g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.1, at + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.4);
+    o.connect(g).connect(ctx.destination); o.start(at); o.stop(at + 0.42); o.onended = () => { void ctx.close(); };
+  } catch { /* no sound is fine */ }
+}
+/** Ask before closing or refreshing the page while a match is running. */
+export function useLeaveGuard(active: boolean) {
+  useEffect(() => {
+    if (!active || typeof window === 'undefined') return;
+    const warn = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ''; };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [active]);
+}
+/** Flash the tab title while someone waits and the host is looking elsewhere; chime when a new knock arrives. */
+export function useTitleAlert(count: number, zh: boolean) {
+  const previous = useRef(0);
+  useEffect(() => { if (count > previous.current) chime(); previous.current = count; }, [count]);
+  useAttention(count ? (zh ? `🔔 有人想加入（${count}）` : `🔔 ${count} waiting to join`) : null);
 }

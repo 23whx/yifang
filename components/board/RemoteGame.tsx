@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { ManualBoardConnection, type BoardConnection } from '@/lib/board/manual-connection';
-import { hostPeerRoom, joinPeerRoom, newRoomCode, peerFailureMessage, invitationLink, type PeerFailure, type PeerRoomEvents, type HostRoom, type Visitor } from '@/lib/peer-room';
-import { NicknameField, VisitorList, readNickname, useTitleAlert } from '@/components/remote/Visitors';
+import { hostPeerRoom, joinPeerRoom, newRoomCode, peerFailureMessage, deviceLabel, byeMessage, JOIN_LIMIT_MS, type PeerFailure, type PeerRoomEvents, type HostRoom, type Visitor, type LinkSession, type SessionMessage } from '@/lib/peer-room';
+import { NicknameField, VisitorList, readNickname, useTitleAlert, useAttention, useLeaveGuard } from '@/components/remote/Visitors';
+import { useLounge, LoungePanel } from '@/components/remote/Lounge';
 import { readManualSignal } from '@/lib/manual-rtc';
 import {secureMultiplayerContext,insecureMultiplayerMessage} from '@/lib/network-context';
 import { loadFfish, type FfishBoard, type Ffish } from "@/lib/board/ffish";
@@ -16,7 +17,7 @@ import { isBoardGame, VARIANTS } from "@/lib/board/variants";
 import { newGo, playGo, scoreGo, type GoState } from "@/lib/go/rules";
 import { newReview, changeReview, validReview, reviewDone, type Review, type ReviewAction } from '@/lib/go/review';
 import ResultDialog from '@/components/ui/ResultDialog';
-import { RoomHeader, RoleCard, Steps, SignalOutput, RoomNotes, RoomAlert, type StepState } from '@/components/remote/RoomKit';
+import { RoomHeader, RoleCard, Steps, SignalOutput, RoomNotes, RoomAlert, LinkShare, type StepState } from '@/components/remote/RoomKit';
 import Board from "./Board";
 import GoBoard from "../go/GoBoard";
 import { newMatch, changeMatch, validMatch, roomCode, type MatchState, type MatchAction } from "@/lib/board/remote-match";
@@ -75,6 +76,7 @@ export default function RemoteGame({
   const [match, setMatch] = useState<MatchState>(newMatch);
   const [copyMessage, setCopyMessage] = useState("");
   const [confirmResign, setConfirmResign] = useState(false);
+  const [confirmLeave, setConfirmLeave] = useState(false);
   const manual = useRef<ManualBoardConnection | null>(null);
   // Default: friends join by opening a link. Manual codes remain for service-free play.
   const [mode, setMode] = useState<'manual' | 'public'>('public');
@@ -82,9 +84,39 @@ export default function RemoteGame({
   // Link mode reconnects by itself: phones drop WebRTC on screen lock or app switch.
   // The host keeps its room id; the guest rejoins it and both run the verified recovery.
   const hostRoom = useRef<HostRoom | null>(null), linkCode = useRef(''), autoTries = useRef(0);
-  const hostEvents = useRef<{ ready(code: string): void; connection(c: BoardConnection): void; failure(reason: PeerFailure): void; reconnecting(): void; policy(v: Visitor): 'admit' | 'full' | 'ask' } | null>(null);
+  const hostEvents = useRef<{ ready(code: string): void; connection(c: BoardConnection, visitor: Visitor, session: LinkSession): void; failure(reason: PeerFailure): void; reconnecting(): void; policy(v: Visitor): 'admit' | 'full' | 'ask' } | null>(null);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   useTitleAlert(visitors.filter(v => v.state === 'knocking').length, zh);
+  // Lobby: who is here, how good the connection is, and chat.
+  const lounge = useLounge(zh, { name: readNickname(), device: deviceLabel() });
+  const guestSession = useRef<LinkSession | null>(null), friendName = useRef(''), [friend, setFriend] = useState('');
+function nameFriend(value: string) { friendName.current = value; setFriend(value); }
+  // A reconnection wait has a visible clock and a way out, like a game lobby.
+  const [waitSince, setWaitSince] = useState<number | null>(null), [clock, setClock] = useState(0);
+  useEffect(() => { if (waitSince === null) return; const timer = setInterval(() => setClock(Date.now()), 1000); return () => clearInterval(timer); }, [waitSince]);
+  /** Session-level news: goodbyes end things for good; "away" warns that a drop is coming. */
+  function watchSession(session: LinkSession, isHost: boolean, token: number) {
+    session.onMessage((m: SessionMessage) => {
+      if (token !== generation.current) return;
+      if (m.kind === 'yf-bye') {
+        if (isHost) {
+          const who = friendName.current || (zh ? '朋友' : 'Your friend');
+          lounge.hostDetach('guest', true);
+          if (active.current) { fail(zh ? `${who}离开了对局，本局结束（不判胜负）。房间已关闭。` : `${who} left the game; it ends without a result. The room has closed.`); forgetRoom(); return; }
+          lounge.system(byeMessage('left', zh, friendName.current));
+          return;
+        }
+        // The host dissolved the room, removed us, or ended the match: no reconnection.
+        lounge.guestDetach('offline'); forgetRoom(); guestSession.current = null;
+        fail(byeMessage(m.reason, zh));
+      } else if (m.kind === 'yf-away') {
+        setLinkNote(isHost
+          ? (zh ? `${friendName.current || '朋友'}离开了页面（可能在刷新或切到了其他应用），正在等他回来…` : `${friendName.current || 'Your friend'} left the page (refreshing or switching apps); waiting for them…`)
+          : (zh ? '房主离开了页面（可能在刷新或切到了其他应用），正在等房主回来…' : 'The host left the page (refreshing or switching apps); waiting for them…'));
+      }
+    });
+  }
+  function forgetRoom() { linkCode.current = ''; try { sessionStorage.removeItem(roomKey); } catch { /* best effort */ } }
   const [reconnecting, setReconnecting] = useState(false);
   const roomKey = `yifang:board:${game}:room:v1`;
   function rememberRoom(value: string) { linkCode.current = value; try { sessionStorage.setItem(roomKey, value); } catch { /* reconnect still works while this page lives */ } }
@@ -222,7 +254,8 @@ export default function RemoteGame({
     }
     autoTries.current++;
     const resume = save;
-    setReconnecting(true);
+    setReconnecting(true); setWaitSince(w => w ?? Date.now());
+    if (isHost) lounge.hostDetach('guest', false); else lounge.guestDetach('offline');
     setLinkNote(isHost
       ? (zh ? '对方暂时断线了（手机锁屏或切到其他应用时常见）。房间仍然有效，对方回到页面后会自动接上，棋局已保存。' : 'Your opponent dropped out (common when a phone locks or switches apps). The room stays open; they reconnect automatically when they return. The game is saved.')
       : (zh ? '连接中断了，正在自动重新连上房主……棋局已保存，会回到原来的局面。' : 'Connection lost; reconnecting to the host automatically… The game is saved and will resume where it stopped.'));
@@ -244,7 +277,7 @@ export default function RemoteGame({
     connection.current?.close();
     peer.current?.destroy();
     if (peer.current === hostRoom.current) { hostRoom.current = null; setVisitors([]); }
-    setReconnecting(false);
+    setReconnecting(false); setWaitSince(null);
   }
   function apply(move: string | null, remote: boolean) {
     if (!active.current || matchRef.current.resigned !== null) return false;
@@ -368,7 +401,7 @@ export default function RemoteGame({
               board.current?.delete();board.current=b;journal.current?.dispose();journal.current=restored;
               matchRef.current=v.match;setMatch(v.match);const moves=v.moves.trim().split(/\s+/).filter(Boolean);sequence.current=moves.length;setHistory(moves);
               }
-              transportEpoch.current=epoch;active.current=true;autoTries.current=0;setReconnecting(false);setLinkNote('');setStatus('connected');setSignal('');setAnswer('');setInvitation('');setSignalBusy(false);
+              transportEpoch.current=epoch;active.current=true;autoTries.current=0;setReconnecting(false);setWaitSince(null);setLinkNote('');setStatus('connected');setSignal('');setAnswer('');setInvitation('');setSignalBusy(false);
               if(timeout.current)clearTimeout(timeout.current);refresh();persist();
             }catch{fail(zh?'恢复棋谱失败，原存档保留。':'Could not restore the move record; original save retained.');}
           },()=>{if(token===generation.current)fail(zh?'恢复验证失败或连接超时。请检查双方原标签页、游戏与存档；不会重新发局。':'Recovery verification failed or timed out. Check both original tabs, games and saves. No new game was started.');});
@@ -453,7 +486,7 @@ export default function RemoteGame({
             if(m.epoch!==transportEpoch.current||isBoardGame(game)&&(!journal.current||m.identity!==journal.current.view().identity))return fail(zh?'对局标识不同步。':'Match identity mismatch.');
             if(game==='go'&&(m.goJournal!==1||!goJournal.current||m.identity!==goJournal.current.view().identity))return fail(zh?'围棋对局标识或版本不匹配。':'Go identity or version mismatch.');
             active.current = true;
-            autoTries.current = 0; setReconnecting(false); setLinkNote('');
+            autoTries.current = 0; setReconnecting(false); setWaitSince(null); setLinkNote('');
             setStatus("connected");
             setSignal(''); setAnswer(''); setInvitation(''); setSignalBusy(false);
             if (timeout.current) clearTimeout(timeout.current);
@@ -488,6 +521,7 @@ export default function RemoteGame({
           if (token !== generation.current || connection.current !== c) return;
           if (linkHostWaiting()) { release(c); return; }
           if (chosenMode === 'public' && (active.current || opts.auto)) { autoReconnect(isHost); return; }
+          if (chosenMode === 'public' && isHost) lounge.hostDetach('guest', true, byeMessage('left', zh, friendName.current));
           fail(
               zh
                 ? "对手已离线，棋谱保留。双方可用原标签页存档重新交换邀请恢复。请先检查保存是否成功。"
@@ -524,9 +558,15 @@ export default function RemoteGame({
       // Link mode: the public signaling service relays only the handshake.
       if (isHost) {
         hostEvents.current = {
-          ready: own => { if (token !== generation.current) return; rememberRoom(own); setCode(own); setStatus('waiting'); if (!opts.auto) setLinkNote(''); if (timeout.current) clearTimeout(timeout.current); },
+          ready: own => { if (token !== generation.current) return; rememberRoom(own); lounge.hostOpen(); setCode(own); setStatus('waiting'); if (!opts.auto) setLinkNote(''); if (timeout.current) clearTimeout(timeout.current); },
           reconnecting: () => { if (token === generation.current && !active.current && !opts.auto) setLinkNote(zh ? '正在重新连上房间服务，房间仍然有效…' : 'Reconnecting to the room service; the room is still open…'); },
-          connection: c => { if (token === generation.current) attach(c); else c.close(); },
+          connection: (c, visitor, session) => {
+            if (token !== generation.current) { c.close(); return; }
+            nameFriend(visitor.name);
+            lounge.hostAttach('guest', session, visitor);
+            watchSession(session, true, token);
+            attach(c);
+          },
           // Returning players go straight to the verified recovery; newcomers wait for the host,
           // and nobody new is asked about once a game (or its recovery) is under way.
           policy: v => v.resume ? 'admit' : active.current || connection.current || recovery ? 'full' : 'ask',
@@ -540,7 +580,8 @@ export default function RemoteGame({
         const delegating: PeerRoomEvents = {
           onReady: own => hostEvents.current?.ready(own),
           onReconnecting: () => hostEvents.current?.reconnecting(),
-          onConnection: c => { if (hostEvents.current) hostEvents.current.connection(c); else c.close(); },
+          onConnection: (c, _meta, visitor, session) => { if (hostEvents.current) hostEvents.current.connection(c, visitor, session); else c.close(); },
+          profile: { name: readNickname(), device: deviceLabel() },
           onFailure: reason => hostEvents.current?.failure(reason),
           onVisitors: setVisitors,
           policy: v => hostEvents.current?.policy(v) ?? 'full',
@@ -566,7 +607,12 @@ export default function RemoteGame({
         let missingShown = false;
         const missingNote = zh ? '暂时找不到这个房间：房主可能已关闭页面，或暂时切到了其他应用。会继续自动尝试 2 分钟；一直找不到的话，请向房主要新的邀请链接。' : 'This room cannot be found right now: the host may have closed the page or briefly switched apps. Retrying automatically for 2 minutes; if it never appears, ask the host for a new link.';
         const room = await joinPeerRoom(target, {}, {
-          onOpen: c => { if (token !== generation.current) { c.close(); return; } rememberRoom(target); if (!opts.auto) setLinkNote(''); attach(c); },
+          onOpen: (c, session, hostProfile) => {
+            if (token !== generation.current) { c.close(); return; }
+            guestSession.current = session; nameFriend(hostProfile.name);
+            lounge.guestAttach(session, hostProfile); watchSession(session, false, token);
+            rememberRoom(target); if (!opts.auto) setLinkNote(''); attach(c);
+          },
           onService: () => { if (token === generation.current && !opts.auto) setLinkNote(lookingNote); },
           onWaiting: () => { if (token === generation.current && !opts.auto && !missingShown) setLinkNote(lookingNote); },
           onMissing: () => { if (token !== generation.current || opts.auto) return; missingShown = true; setLinkNote(missingNote); },
@@ -626,15 +672,27 @@ export default function RemoteGame({
     : myTurn ? t('轮到你了', 'Your turn') : t('等待对方落子', 'Opponent’s turn');
   const statusText = connected ? turnText
     : reconnecting ? (isHostPlayer ? t('等待对方重新连上', 'Waiting for your opponent to reconnect') : t('正在重新连线…', 'Reconnecting…'))
-    : status === 'waiting' ? (mode === 'public' ? (isHostPlayer ? t('等待朋友打开链接', 'Waiting for your friend to open the link') : t('正在加入房间…', 'Joining the room…')) : isHostPlayer ? t('等待朋友的回复码', 'Waiting for your friend’s reply code') : t('等待房主连接', 'Waiting for the host to connect'))
+    : status === 'waiting' ? (mode === 'public' ? (isHostPlayer ? (visitors.some(v => v.state === 'knocking') ? t('有人想加入', 'Someone wants to join') : t('等待朋友打开链接', 'Waiting for your friend to open the link')) : t('正在加入房间…', 'Joining the room…')) : isHostPlayer ? t('等待朋友的回复码', 'Waiting for your friend’s reply code') : t('等待房主连接', 'Waiting for the host to connect'))
     : status === 'connecting' ? t('正在连接…', 'Connecting…')
     : status === 'error' ? t('连接已中断', 'Connection stopped') : t('未连接', 'Not connected');
+  const waited = waitSince === null ? 0 : Math.max(0, Math.floor(((clock || waitSince) - waitSince) / 1000));
+  const left = Math.max(0, Math.ceil(JOIN_LIMIT_MS / 1000) - waited);
+  const mmss = (n: number) => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}`;
+  useAttention(connected && myTurn && !hasEnded ? t('♟ 轮到你了', '♟ Your turn') : lounge.unread ? t(`💬 新消息（${lounge.unread}）`, `💬 ${lounge.unread} new`) : null);
+  useLeaveGuard(connected && !hasEnded);
   const tone = connected ? 'ok' : status === 'error' ? 'warn' : status === 'idle' ? 'idle' : 'busy';
   async function copyText(value: string, done: string) {
     try { await navigator.clipboard.writeText(value); setCopyMessage(done); }
     catch { setCopyMessage(t('自动复制失败：请点一下文本框，全选后手动复制。', 'Copy failed: tap the box, select everything and copy it manually.')); }
   }
-  function leave() { dispose(); setReconnecting(false); autoTries.current = 0; setStatus('idle'); setSignal(''); setAnswer(''); setInvitation(''); setSignalBusy(false); setError(''); setCode(''); setCopyMessage(''); setLinkNote(''); }
+  /** Leaving on purpose: the host dissolves the room; a guest says goodbye. Nobody waits for a reconnection. */
+  function leave() {
+    if (mode === 'public') {
+      if (isHostPlayer && hostRoom.current) { const room = hostRoom.current; hostRoom.current = null; peer.current = null; connection.current = null; room.dissolve(); }
+      else if (guestSession.current) { const session = guestSession.current, room = peer.current; peer.current = null; connection.current = null; session.bye('left'); setTimeout(() => room?.destroy(), 500); }
+      guestSession.current = null; forgetRoom(); lounge.clear();
+    }
+    dispose(); setReconnecting(false); setWaitSince(null); autoTries.current = 0; setStatus('idle'); setSignal(''); setAnswer(''); setInvitation(''); setSignalBusy(false); setError(''); setCode(''); setCopyMessage(''); setLinkNote(''); }
   const hostSteps: { label: string; state: StepState; body?: ReactNode }[] = [
     { label: t('生成邀请码', 'Create an invitation code'), state: signal ? 'done' : 'now', body: !signal && signalBusy ? <p>{t('正在生成，通常几秒钟…', 'Creating it — usually a few seconds…')}</p> : undefined },
     { label: t('把邀请码发给朋友，再粘贴朋友发回的回复码', 'Send the invitation, then paste your friend’s reply code'), state: signal && status === 'waiting' ? 'now' : status === 'connecting' && !signalBusy ? 'done' : 'todo', body: signal && status === 'waiting' ? <>
@@ -685,23 +743,23 @@ export default function RemoteGame({
           </RoleCard>
         </div>}
         {!starting && !connected && mode === 'manual' && <Steps items={isHostPlayer ? hostSteps : guestSteps} />}
-        {!starting && !connected && !reconnecting && mode === 'public' && code && <div className="room-banner">
-          <p className="room-banner-title">{t('房间已开好，把邀请链接发给朋友', 'Room ready — send the invitation link to your friend')}</p>
-          <p>{t('朋友打开链接后，这里会出现“有人想加入”，由你决定让不让他进来。你可以切去微信等应用发链接，房间在这个页面开着期间一直有效。', 'When your friend opens the link, “Someone wants to join” appears here and you decide whether to let them in. You can switch to a chat app to send it; the room stays open as long as this page is open.')}</p>
-          <div className="room-actions">
-            <button className="rpg-button" onClick={async () => { const link = invitationLink(code); if (typeof navigator.share === 'function') { try { await navigator.share({ title: t('来下一盘棋', 'Join my game'), url: link }); return; } catch (e) { if ((e as Error).name === 'AbortError') return; } } void copyText(link, t('邀请链接已复制，发给朋友吧。', 'Invitation link copied — send it to your friend.')); }}>{t('发送邀请链接', 'Send invitation link')}</button>
-            <button className="rpg-button secondary" onClick={() => copyText(invitationLink(code), t('邀请链接已复制，发给朋友吧。本机地址（localhost）只能在这台电脑打开。', 'Invitation link copied. A localhost link only opens on this computer.'))}>{t('复制链接', 'Copy link')}</button>
-          </div>
-          <p className="text-sm">{t('房间码：', 'Room code: ')}<code className="break-all font-bold">{code}</code></p>
+        {!starting && !connected && !reconnecting && mode === 'public' && code && <LinkShare zh={zh} code={code} title={t('房间已开好，把邀请链接发给朋友', 'Room ready — send the invitation link to your friend')} body={t('朋友打开链接后，这里会出现“有人想加入”，由你决定让不让他进来。你可以切去微信等应用发链接，房间在这个页面开着期间一直有效。', 'When your friend opens the link, “Someone wants to join” appears here and you decide whether to let them in. You can switch to a chat app to send it; the room stays open as long as this page is open.')} onCopied={value => copyText(value, t('邀请链接已复制，发给朋友吧。本机地址（localhost）只能在这台电脑打开。', 'Invitation link copied. A localhost link only opens on this computer.'))} />}
+        {reconnecting && !connected && mode === 'public' && <div className="room-banner" role="status">
+          <p className="room-banner-title">{isHostPlayer ? t(`等待${friend || '对方'}重新连上`, `Waiting for ${friend || 'your opponent'} to reconnect`) : t('正在等房主回来', 'Waiting for the host to come back')}</p>
+          <p className="room-countdown">{isHostPlayer ? t(`已等待 ${mmss(waited)}。棋局已保存，对方回到页面后会自动接上。`, `Waiting ${mmss(waited)}. The game is saved; they reconnect automatically when they return.`) : t(`最多再等 ${mmss(left)}。房主回来后会自动接上；超时则视为房间已解散。`, `Up to ${mmss(left)} more. You reconnect automatically when the host returns; after that the room counts as closed.`)}</p>
+          <div className="room-actions"><button className="rpg-button secondary" onClick={leave}>{isHostPlayer ? t('不等了，解散房间', 'Stop waiting and close the room') : t('不等了，离开', 'Stop waiting and leave')}</button></div>
         </div>}
         {isHostPlayer && mode === 'public' && !connected && <VisitorList zh={zh} visitors={visitors} onAdmit={id => hostRoom.current?.admit(id)} onDeny={id => hostRoom.current?.deny(id)} />}
+        {mode === 'public' && !connected && <LoungePanel zh={zh} lounge={lounge} />}
         {linkNote && !connected && <p role="status" className="room-progress">{linkNote}</p>}
         {copyMessage && !connected && <p role="status" className="text-sm font-bold">{copyMessage}</p>}
         {!starting && !connected && <div><button className="room-link" onClick={leave}>{t('取消并离开', 'Cancel and leave')}</button></div>}
         {connected && <div className="room-bar">
           {!hasEnded && <div className="room-actions"><button className="rpg-button secondary" onClick={() => { if (confirmResign) sendMatchAction('resign'); else setConfirmResign(true); }}>{confirmResign ? t('确认认输，结束本局', 'Confirm resignation') : t('认输', 'Resign')}</button>{confirmResign && <button className="room-link" onClick={() => setConfirmResign(false)}>{t('取消', 'Cancel')}</button>}</div>}
           {hasEnded && <div className="room-actions"><button className="rpg-button" disabled={match.rematch[isHostPlayer ? 0 : 1]} onClick={() => sendMatchAction('rematch')}>{t('同意再来一局', 'Agree to a rematch')}</button><p className="text-sm">{t(`房主${match.rematch[0] ? '已同意' : '未同意'}；朋友${match.rematch[1] ? '已同意' : '未同意'}。双方同意后重新开局，房主仍然执先。`, `Host ${match.rematch[0] ? 'agreed' : 'pending'}; guest ${match.rematch[1] ? 'agreed' : 'pending'}. A new game starts once both agree; the host moves first again.`)}</p></div>}
-          <button className="room-link" onClick={leave}>{t('离开对局', 'Leave game')}</button>
+          {confirmLeave
+            ? <span className="room-actions"><button className="rpg-button secondary" onClick={() => { setConfirmLeave(false); leave(); }}>{isHostPlayer ? t('确认离开并解散房间', 'Leave and close the room') : t('确认离开（本局不判胜负）', 'Leave (no result for this game)')}</button><button className="room-link" onClick={() => setConfirmLeave(false)}>{t('继续下棋', 'Keep playing')}</button></span>
+            : <button className="room-link" onClick={() => setConfirmLeave(true)}>{t('离开对局', 'Leave game')}</button>}
         </div>}
         {match.resigned !== null && <ResultDialog key={match.round} locale={locale} title={match.resigned === (isHostPlayer ? 0 : 1) ? t('你已认输', 'You resigned') : t('你获胜了', 'You win')} reason={t('一方主动认输，本局结束。棋盘与棋谱保留；双方同意再来一局才会清空。', 'A player resigned, ending this game. The position and moves remain until both agree to a rematch.')}/>}
         {starting && <RoomNotes summary={t('连接说明与常见问题', 'Connection notes and troubleshooting')}>
@@ -770,12 +828,15 @@ export default function RemoteGame({
             </>
           ) : null}
         </div>
+        <div className="min-w-0 space-y-6">
+        {mode === 'public' && connected && <LoungePanel zh={zh} lounge={lounge} />}
         <section className="min-w-0" aria-label={t('棋谱', 'Move list')}>
           <h3 className="mb-2 font-bold">{t('棋谱', 'Moves')}</h3>
-          {history.length === 0 ? <p className="text-sm text-ink-3">{t('还没有走棋。', 'No moves yet.')}</p> : <ol className="max-h-[550px] overflow-y-auto text-sm space-y-2">
+          {history.length === 0 ? <p className="text-sm text-ink-3">{t('还没有走棋。', 'No moves yet.')}</p> : <ol className="max-h-[320px] overflow-y-auto text-sm space-y-2">
             {history.map((m, i) => <li key={i}>{i + 1}. {i % 2 === 0 ? t('房主', 'Host') : t('朋友', 'Guest')} · {m}</li>)}
           </ol>}
         </section>
+        </div>
       </div>}
     </div>
   );
