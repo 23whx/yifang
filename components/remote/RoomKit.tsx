@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import { NicknameField, VisitorList } from './Visitors';
+import type { Visitor } from '@/lib/peer-room';
 
 /**
  * Presentational building blocks shared by every friend-play room.
@@ -69,7 +71,8 @@ export type FourSeatPhase = 'idle' | 'lobby' | 'connecting' | 'playing' | 'finis
  * Shared setup panel for the four-seat tables (poker, riichi, Sichuan, MCR).
  * The host is Player 1 and exchanges one invitation/reply pair with each other seat.
  */
-export type FourSeatLink = { mode: 'link' | 'code'; onMode: (mode: 'link' | 'code') => void; code: string; note: string; entry: string; onEntry: (value: string) => void; canJoin: boolean; onJoin: () => void };
+export type FourSeatLink = { mode: 'link' | 'code'; onMode: (mode: 'link' | 'code') => void; code: string; note: string; entry: string; onEntry: (value: string) => void; canJoin: boolean; onJoin: () => void;
+  visitors?: Visitor[]; onAdmit?: (id: string) => void; onDeny?: (id: string) => void; /** Shown while the table reconnects by itself. */ reconnect?: string };
 
 /** Share-or-copy box for an invitation link. */
 export function LinkShare({ zh, code, title, body, onCopied }: { zh: boolean; code: string; title: string; body: string; onCopied: (value: string) => void }) {
@@ -131,11 +134,13 @@ export function FourSeatSetup(p: {
         <button disabled={p.busy} className="rpg-button" onClick={p.onCreate}>{p.replaceSave === 'host' ? t('确认创建新房', 'Confirm new room') : t('创建四人房间', 'Create four-player room')}</button>
       </RoleCard>
       <RoleCard badge={t('朋友', 'Guest')} title={t('作为朋友加入', 'Join as a guest')} steps={[t('直接打开房主发来的链接，会自动加入', 'Open the host’s link — you join automatically'), t('或把链接粘贴到下面，点“加入房间”', 'Or paste the link below and choose Join room'), t('等房主开局', 'Wait for the host to start')]}>
+        <NicknameField zh={p.zh} />
         <label className="block text-sm font-bold">{t('邀请链接', 'Invitation link')}<input className="room-field" placeholder="https://…?room=…" value={p.link.entry} onChange={e => p.link!.onEntry(e.target.value)} /></label>
         <button disabled={p.busy || !p.link.canJoin} className="rpg-button" onClick={p.link.onJoin}>{p.replaceSave === 'guest' ? t('确认加入新房', 'Confirm joining new room') : t('加入房间', 'Join room')}</button>
       </RoleCard>
     </div>}
-    {p.link?.note && !choosing && p.phase !== 'playing' && <p role="status" className="room-progress">{p.link.note}</p>}
+    {p.link?.reconnect && p.phase !== 'playing' && <p role="status" className="room-progress">{p.link.reconnect}</p>}
+    {p.link?.note && !p.link.reconnect && !choosing && p.phase !== 'playing' && <p role="status" className="room-progress">{p.link.note}</p>}
     {choosing && !linkMode && <div className="room-roles">
       <RoleCard badge={t('房主 · 玩家 1', 'Host · Player 1')} title={t('我来开房', 'Open a room')} steps={[t('创建房间，你是玩家 1', 'Create the room — you are Player 1'), t('分别给玩家 2、3、4 生成邀请码并发送', 'Create and send a separate invitation for Players 2, 3 and 4'), t('粘贴各自发回的回复码，人齐后开局', 'Paste each reply code, then start when all four are in')]}>
         <button disabled={p.busy} className="rpg-button" onClick={p.onCreate}>{p.replaceSave === 'host' ? t('确认创建新房', 'Confirm new room') : t('创建四人房间', 'Create four-player room')}</button>
@@ -152,7 +157,8 @@ export function FourSeatSetup(p: {
       { label: t('等房主开局', 'Wait for the host to start'), state: p.phase === 'lobby' ? 'now' : 'todo', body: p.phase === 'lobby' ? <p>{t('你已加入房间。保持本页打开，其他玩家到齐后由房主开局。', 'You are in the room. Keep this page open; the host starts once everyone has joined.')}</p> : undefined },
     ]} />}
     {p.role === 'host' && p.phase === 'lobby' && <>
-      {linkMode && p.link?.code && <LinkShare zh={p.zh} code={p.link.code} title={t('房间已开好，把邀请链接发给三位朋友', 'Room ready — send the invitation link to your three friends')} body={t('三人用同一个链接，打开就会自动入座。你可以切去微信等应用发链接，房间在这个页面开着期间一直有效。', 'All three use the same link and take a seat by opening it. You can switch to a chat app to send it; the room stays open as long as this page is open.')} onCopied={p.onCopy} />}
+      {linkMode && p.link?.visitors && <VisitorList zh={p.zh} visitors={p.link.visitors} onAdmit={id => p.link?.onAdmit?.(id)} onDeny={id => p.link?.onDeny?.(id)} />}
+      {linkMode && p.link?.code && !p.link.reconnect && <LinkShare zh={p.zh} code={p.link.code} title={t('房间已开好，把邀请链接发给三位朋友', 'Room ready — send the invitation link to your three friends')} body={t('三人用同一个链接。有人打开后，这里会出现“有人想加入”，由你决定让不让他入座。你可以切去微信等应用发链接，房间在这个页面开着期间一直有效。', 'All three use the same link. When someone opens it, “Someone wants to join” appears here and you decide whether to seat them. You can switch to a chat app to send it; the room stays open as long as this page is open.')} onCopied={p.onCopy} />}
       {linkMode && !p.link?.code && <p className="room-progress">{t('正在开房…', 'Opening the room…')}</p>}
       {linkMode && <p className="room-progress">{t(`已到齐 ${count}/4 人。你是玩家 1。`, `${count}/4 players in. You are Player 1.`)}</p>}
       {!linkMode && <p className="room-progress">{t(`已到齐 ${count}/4 人。你是玩家 1。每位朋友要用自己专属的邀请码，不能把同一份发给三个人。`, `${count}/4 players in. You are Player 1. Each friend needs their own invitation — do not send one to all three.`)}</p>}

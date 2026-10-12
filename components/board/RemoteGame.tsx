@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { ManualBoardConnection, type BoardConnection } from '@/lib/board/manual-connection';
-import { hostPeerRoom, joinPeerRoom, newRoomCode, peerFailureMessage, invitationLink, type PeerFailure } from '@/lib/peer-room';
+import { hostPeerRoom, joinPeerRoom, newRoomCode, peerFailureMessage, invitationLink, type PeerFailure, type PeerRoomEvents, type HostRoom, type Visitor } from '@/lib/peer-room';
+import { NicknameField, VisitorList, readNickname, useTitleAlert } from '@/components/remote/Visitors';
 import { readManualSignal } from '@/lib/manual-rtc';
 import {secureMultiplayerContext,insecureMultiplayerMessage} from '@/lib/network-context';
 import { loadFfish, type FfishBoard, type Ffish } from "@/lib/board/ffish";
@@ -80,8 +81,10 @@ export default function RemoteGame({
   const [linkNote, setLinkNote] = useState('');
   // Link mode reconnects by itself: phones drop WebRTC on screen lock or app switch.
   // The host keeps its room id; the guest rejoins it and both run the verified recovery.
-  const hostRoom = useRef<{ destroy(): void } | null>(null), linkCode = useRef(''), autoTries = useRef(0);
-  const hostEvents = useRef<{ ready(code: string): void; connection(c: BoardConnection): void; failure(reason: PeerFailure): void; reconnecting(): void } | null>(null);
+  const hostRoom = useRef<HostRoom | null>(null), linkCode = useRef(''), autoTries = useRef(0);
+  const hostEvents = useRef<{ ready(code: string): void; connection(c: BoardConnection): void; failure(reason: PeerFailure): void; reconnecting(): void; policy(v: Visitor): 'admit' | 'full' | 'ask' } | null>(null);
+  const [visitors, setVisitors] = useState<Visitor[]>([]);
+  useTitleAlert(visitors.filter(v => v.state === 'knocking').length, zh);
   const [reconnecting, setReconnecting] = useState(false);
   const roomKey = `yifang:board:${game}:room:v1`;
   function rememberRoom(value: string) { linkCode.current = value; try { sessionStorage.setItem(roomKey, value); } catch { /* reconnect still works while this page lives */ } }
@@ -186,7 +189,7 @@ export default function RemoteGame({
     recoveryChannel.current?.stop();recoveryChannel.current=null;recoverySecret.current='';transportEpoch.current='';
     if (timeout.current) clearTimeout(timeout.current);
     connection.current?.close();
-    if (!keepRoom || peer.current !== hostRoom.current) { peer.current?.destroy(); if (peer.current === hostRoom.current) hostRoom.current = null; }
+    if (!keepRoom || peer.current !== hostRoom.current) { peer.current?.destroy(); if (peer.current === hostRoom.current) { hostRoom.current = null; setVisitors([]); } }
     connection.current = null;
     manual.current = null;
     peer.current = null;
@@ -236,11 +239,11 @@ export default function RemoteGame({
     recoveryChannel.current?.stop();recoveryChannel.current=null;
     setStatus("error");
     setSignal(''); setAnswer(''); setInvitation(''); setSignalBusy(false);
-    setError(message);
+    setError(message); setLinkNote('');
     if (timeout.current) clearTimeout(timeout.current);
     connection.current?.close();
     peer.current?.destroy();
-    if (peer.current === hostRoom.current) hostRoom.current = null;
+    if (peer.current === hostRoom.current) { hostRoom.current = null; setVisitors([]); }
     setReconnecting(false);
   }
   function apply(move: string | null, remote: boolean) {
@@ -524,6 +527,9 @@ export default function RemoteGame({
           ready: own => { if (token !== generation.current) return; rememberRoom(own); setCode(own); setStatus('waiting'); if (!opts.auto) setLinkNote(''); if (timeout.current) clearTimeout(timeout.current); },
           reconnecting: () => { if (token === generation.current && !active.current && !opts.auto) setLinkNote(zh ? '正在重新连上房间服务，房间仍然有效…' : 'Reconnecting to the room service; the room is still open…'); },
           connection: c => { if (token === generation.current) attach(c); else c.close(); },
+          // Returning players go straight to the verified recovery; newcomers wait for the host,
+          // and nobody new is asked about once a game (or its recovery) is under way.
+          policy: v => v.resume ? 'admit' : active.current || connection.current || recovery ? 'full' : 'ask',
           failure: reason => {
             if (token !== generation.current) return;
             // After a refresh the old id may still be held briefly; fall back to a fresh link.
@@ -531,19 +537,23 @@ export default function RemoteGame({
             fail(peerFailureMessage(reason, zh));
           },
         };
+        const delegating: PeerRoomEvents = {
+          onReady: own => hostEvents.current?.ready(own),
+          onReconnecting: () => hostEvents.current?.reconnecting(),
+          onConnection: c => { if (hostEvents.current) hostEvents.current.connection(c); else c.close(); },
+          onFailure: reason => hostEvents.current?.failure(reason),
+          onVisitors: setVisitors,
+          policy: v => hostEvents.current?.policy(v) ?? 'full',
+        };
         if (hostRoom.current) {
           peer.current = hostRoom.current;
+          hostRoom.current.update(delegating);
           setCode(linkCode.current); setStatus('waiting');
           if (timeout.current) clearTimeout(timeout.current);
           if (opts.pending) attach(opts.pending);
         } else {
           const preferred = recovery && !opts.fresh ? storedRoom() : '';
-          const room = await hostPeerRoom(preferred || newRoomCode(game), {
-            onReady: own => hostEvents.current?.ready(own),
-            onReconnecting: () => hostEvents.current?.reconnecting(),
-            onConnection: c => { if (hostEvents.current) hostEvents.current.connection(c); else c.close(); },
-            onFailure: reason => hostEvents.current?.failure(reason),
-          });
+          const room = await hostPeerRoom(preferred || newRoomCode(game), delegating);
           if (token !== generation.current) { room.destroy(); return; }
           peer.current = hostRoom.current = room;
         }
@@ -553,12 +563,16 @@ export default function RemoteGame({
         if (timeout.current) clearTimeout(timeout.current);
         const lookingNote = zh ? '已连上房间服务，正在寻找房主……如果房主暂时切到了其他应用，会自动重试，最多等 5 分钟。' : 'Room service reached; looking for the host… if they switched apps briefly, this retries automatically for up to 5 minutes.';
         if (!opts.auto) setLinkNote(zh ? '正在连接房间服务…' : 'Connecting to the room service…');
+        let missingShown = false;
+        const missingNote = zh ? '暂时找不到这个房间：房主可能已关闭页面，或暂时切到了其他应用。会继续自动尝试 2 分钟；一直找不到的话，请向房主要新的邀请链接。' : 'This room cannot be found right now: the host may have closed the page or briefly switched apps. Retrying automatically for 2 minutes; if it never appears, ask the host for a new link.';
         const room = await joinPeerRoom(target, {}, {
           onOpen: c => { if (token !== generation.current) { c.close(); return; } rememberRoom(target); if (!opts.auto) setLinkNote(''); attach(c); },
           onService: () => { if (token === generation.current && !opts.auto) setLinkNote(lookingNote); },
-          onWaiting: () => { if (token === generation.current && !opts.auto) setLinkNote(lookingNote); },
+          onWaiting: () => { if (token === generation.current && !opts.auto && !missingShown) setLinkNote(lookingNote); },
+          onMissing: () => { if (token !== generation.current || opts.auto) return; missingShown = true; setLinkNote(missingNote); },
+          onKnocking: () => { if (token === generation.current && !opts.auto) setLinkNote(zh ? '已连上房主，正在等房主同意你加入……' : 'Reached the host; waiting for them to let you in…'); },
           onFailure: reason => { if (token === generation.current) fail(peerFailureMessage(reason, zh)); },
-        });
+        }, { name: readNickname(), resume: !!recovery });
         if (token !== generation.current) { room.destroy(); return; }
         peer.current = room;
       }
@@ -665,6 +679,7 @@ export default function RemoteGame({
             <button className="rpg-button" onClick={() => start(true)}>{t('创建房间', 'Create room')}</button>
           </RoleCard>
           <RoleCard badge={t('朋友', 'Guest')} title={t('朋友邀请我', 'A friend invited me')} steps={[t('直接打开房主发来的链接，会自动加入', 'Open the host’s link — you join automatically'), t('或把链接粘贴到下面，点“加入房间”', 'Or paste the link below and choose Join room'), t('连接后开始，你执后', 'Play starts once connected — you move second')]}>
+            <NicknameField zh={zh} />
             <label className="block text-sm font-bold">{t('房间码或邀请链接', 'Room code or invitation link')}<input className="room-field" placeholder={`yf-${game}-…`} value={entry ?? invited} onChange={e => { setEntry(e.target.value); setReplaceIntent(null); }} /></label>
             <button className="rpg-button" disabled={!roomCode(entry ?? invited, game)} onClick={() => start(false, resumeSelection.current?.role === 'guest' ? resumeSelection.current : null)}>{t('加入房间', 'Join room')}</button>
           </RoleCard>
@@ -672,13 +687,14 @@ export default function RemoteGame({
         {!starting && !connected && mode === 'manual' && <Steps items={isHostPlayer ? hostSteps : guestSteps} />}
         {!starting && !connected && !reconnecting && mode === 'public' && code && <div className="room-banner">
           <p className="room-banner-title">{t('房间已开好，把邀请链接发给朋友', 'Room ready — send the invitation link to your friend')}</p>
-          <p>{t('朋友打开链接就会自动进房。你可以切去微信等应用发链接，房间在这个页面开着期间一直有效，回来后会自动接上。', 'Your friend joins by opening the link. You can switch to a chat app to send it; the room stays open as long as this page is open and reconnects when you come back.')}</p>
+          <p>{t('朋友打开链接后，这里会出现“有人想加入”，由你决定让不让他进来。你可以切去微信等应用发链接，房间在这个页面开着期间一直有效。', 'When your friend opens the link, “Someone wants to join” appears here and you decide whether to let them in. You can switch to a chat app to send it; the room stays open as long as this page is open.')}</p>
           <div className="room-actions">
             <button className="rpg-button" onClick={async () => { const link = invitationLink(code); if (typeof navigator.share === 'function') { try { await navigator.share({ title: t('来下一盘棋', 'Join my game'), url: link }); return; } catch (e) { if ((e as Error).name === 'AbortError') return; } } void copyText(link, t('邀请链接已复制，发给朋友吧。', 'Invitation link copied — send it to your friend.')); }}>{t('发送邀请链接', 'Send invitation link')}</button>
             <button className="rpg-button secondary" onClick={() => copyText(invitationLink(code), t('邀请链接已复制，发给朋友吧。本机地址（localhost）只能在这台电脑打开。', 'Invitation link copied. A localhost link only opens on this computer.'))}>{t('复制链接', 'Copy link')}</button>
           </div>
           <p className="text-sm">{t('房间码：', 'Room code: ')}<code className="break-all font-bold">{code}</code></p>
         </div>}
+        {isHostPlayer && mode === 'public' && !connected && <VisitorList zh={zh} visitors={visitors} onAdmit={id => hostRoom.current?.admit(id)} onDeny={id => hostRoom.current?.deny(id)} />}
         {linkNote && !connected && <p role="status" className="room-progress">{linkNote}</p>}
         {copyMessage && !connected && <p role="status" className="text-sm font-bold">{copyMessage}</p>}
         {!starting && !connected && <div><button className="room-link" onClick={leave}>{t('取消并离开', 'Cancel and leave')}</button></div>}

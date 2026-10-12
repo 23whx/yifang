@@ -316,3 +316,7 @@ select.room-field { min-height: 44px; }
   line-height: 1.8;
   color: #6c5133;
 }
+
+/* A knock waiting for the host: stands out from informational banners. */
+.room-visitors { display: grid; gap: 12px; }
+.room-visitor { border-color: #803d2b; border-left-color: #803d2b; box-shadow: 0 0 0 3px rgba(128, 61, 43, 0.12); }

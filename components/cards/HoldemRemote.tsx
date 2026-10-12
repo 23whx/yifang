@@ -4,7 +4,9 @@ import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } fro
 import { bestHand, cardText, categories, categoriesEn, rankText } from '@/lib/holdem';
 import { type PokerView, type PokerRequest } from '@/lib/holdem-remote';
 import { PokerPeerChannel } from '@/lib/holdem-peer-channel';
-import { hostPeerRoom, joinPeerRoom, newRoomCode, peerFailureMessage } from '@/lib/peer-room';
+import { hostPeerRoom, joinPeerRoom, newRoomCode, peerFailureMessage, type HostRoom, type PeerRoomEvents, type Visitor } from '@/lib/peer-room';
+import { NicknameField, VisitorList, readNickname, useTitleAlert } from '@/components/remote/Visitors';
+import type { BoardConnection } from '@/lib/board/manual-connection';
 import { LinkShare } from '@/components/remote/RoomKit';
 import { roomCode } from '@/lib/board/remote-match';
 import ResultDialog from '@/components/ui/ResultDialog';
@@ -33,6 +35,14 @@ export default function HoldemRemote({ locale }: { locale: 'zh' | 'en' }) {
   const [linkMode, setLinkMode] = useState<'link' | 'code'>('link');
   const [linkNote, setLinkNote] = useState('');
   const autoJoin = useRef(false);
+  // Link mode reconnects by itself: phones drop WebRTC on screen lock or app switch.
+  const hostRoom = useRef<HostRoom | null>(null), roomRef = useRef(''), autoTries = useRef(0), autoContinue = useRef(false);
+  const [reconnecting, setReconnecting] = useState(false);
+  const [visitors, setVisitors] = useState<Visitor[]>([]);
+  useTitleAlert(visitors.filter(v => v.state === 'knocking').length, zh);
+  const roomKey = 'yifang:holdem-two:room:v1';
+  function rememberRoom(value: string) { roomRef.current = value; try { sessionStorage.setItem(roomKey, value); } catch { /* reconnect still works while this page lives */ } }
+  function storedRoom() { try { return roomCode(sessionStorage.getItem(roomKey) ?? '', 'holdem'); } catch { return ''; } }
   const manualHost = useRef<ManualHeadsUpPokerHost | null>(null);
   const manualGuest = useRef<ManualHeadsUpPokerGuest | null>(null);
   const manualRequest = useRef(0);
@@ -54,12 +64,12 @@ export default function HoldemRemote({ locale }: { locale: 'zh' | 'en' }) {
   const pendingRef = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  function dispose() {
+  function dispose(keepRoom = false) {
     generation.current++;
     active.current = false;
     readyRef.current = false;
     if (timer.current) clearTimeout(timer.current);
-    peer.current?.destroy();
+    if (!keepRoom || peer.current !== hostRoom.current) { peer.current?.destroy(); if (peer.current === hostRoom.current) { hostRoom.current = null; setVisitors([]); } }
     peer.current = null;
     pendingRef.current = false;
     manualHost.current?.close(); manualHost.current = null;
@@ -95,65 +105,126 @@ export default function HoldemRemote({ locale }: { locale: 'zh' | 'en' }) {
   function manualMessage(message:HeadsUpRoomMessage,token:number) {
     if(token!==generation.current)return;
     const p=message.payload;
-    if(p.kind==='lobby'){readyRef.current=p.connected.every(Boolean);setReady(readyRef.current);setStatus('waiting');if(readyRef.current&&timer.current)clearTimeout(timer.current);}
-    if(p.kind==='view'){if(timer.current)clearTimeout(timer.current);active.current=true;setStatus('connected');accept(p.view);persistManual();}
+    if(p.kind==='lobby'){readyRef.current=p.connected.every(Boolean);setReady(readyRef.current);setStatus('waiting');if(readyRef.current&&timer.current)clearTimeout(timer.current);if(readyRef.current&&autoContinue.current&&manualHost.current)queueMicrotask(()=>{if(token===generation.current)manualHost.current?.start();});}
+    if(p.kind==='view'){if(timer.current)clearTimeout(timer.current);active.current=true;autoTries.current=0;autoContinue.current=false;setReconnecting(false);setLinkNote('');setStatus('connected');accept(p.view);persistManual();}
     if(p.kind==='ack'){setPending(false);pendingRef.current=false;if(!p.accepted)setError(text('动作未执行，请按最新牌面重选。','Action not applied. Choose again from the current table.'));}
   }
   function fail(message: string, manual=false) {
     if(manualHost.current&&active.current)persistManual();
-    dispose(); setStatus('error'); setPending(false); if(manual)setManualFeedback({message,error:true});else setError(message);
+    dispose(); setReconnecting(false); setLinkNote(''); setStatus('error'); setPending(false); if(manual)setManualFeedback({message,error:true});else setError(message);
   }
   function accept(v: PokerView) {
     latest.current = v; setView(v); setPending(false); pendingRef.current = false;
     setRaise(String(v.legal ? Math.min(v.legal.minTo, v.legal.maxTo) : 20));
   }
-  async function start(isHost: boolean, recovery?: HeadsUpPokerSave) {
+  function reconnectHost(c: BoardConnection) {
+    persistManual();
+    let save: HeadsUpPokerSave | null = null;
+    try { save = readHeadsUpPokerSave(sessionStorage); } catch { /* handled below */ }
+    if (!save) { c.close(); return; }
+    setReconnecting(true);
+    void start(true, save, { auto: true, pending: c });
+  }
+  function autoReconnect(isHost: boolean) {
+    if (active.current) persistManual();
+    let save: HeadsUpPokerSave | null = null;
+    try { save = readHeadsUpPokerSave(sessionStorage); } catch { /* fall through to a plain stop */ }
+    if (!save || autoTries.current >= 3) { fail(text('连接已断开，牌局已保存；本手不自动判胜。双方保留本页，点“恢复上次牌局”即可接着打。', 'Disconnected; the match is saved and unfinished hands are not awarded. Keep this page and choose Restore previous match to continue.')); return; }
+    autoTries.current++;
+    const resume = save;
+    setReconnecting(true);
+    setLinkNote(isHost
+      ? text('对方暂时断线了（手机锁屏或切到其他应用时常见）。房间仍然有效，对方回到页面后会自动接上，牌局已保存。', 'Your opponent dropped out (common when a phone locks or switches apps). The room stays open; they reconnect automatically when they return. The match is saved.')
+      : text('连接中断了，正在自动重新连上房主……牌局已保存，会回到原来的牌面。', 'Connection lost; reconnecting to the host automatically… The match is saved and will resume where it stopped.'));
+    const go = () => { void start(isHost, resume, { auto: true }); };
+    // A hidden page cannot hold a connection on phones; rejoin when the player returns.
+    if (isHost || typeof document === 'undefined' || document.visibilityState === 'visible') { go(); return; }
+    const token = generation.current;
+    const back = () => { if (document.visibilityState !== 'visible') return; document.removeEventListener('visibilitychange', back); if (token === generation.current) go(); };
+    document.addEventListener('visibilitychange', back);
+  }
+  async function start(isHost: boolean, recovery?: HeadsUpPokerSave, opts: { auto?: boolean; pending?: BoardConnection; fresh?: boolean } = {}) {
     if(!secureMultiplayerContext()){setError(insecureMultiplayerMessage(locale));return;}
-    const target = roomCode(entry ?? invited, 'holdem');
+    const target = recovery && !isHost ? (roomRef.current || storedRoom() || roomCode(entry ?? invited, 'holdem')) : roomCode(entry ?? invited, 'holdem');
     if (!isHost && !target) { setError(text('请粘贴房主发来的邀请链接。', 'Paste the invitation link from the host.')); return; }
     if(!recovery&&!allowNew(isHost?'quick-host':'quick-guest'))return;
-    dispose(); const token = generation.current;
+    dispose(isHost && !!opts.auto); const token = generation.current;
+    if (!opts.auto) { autoTries.current = 0; setReconnecting(false); }
+    autoContinue.current = !!opts.auto && isHost;
     setReady(false);setRestoring(!!recovery);setClearArmed(false);setReplaceIntent(null);
     setIsHostSeat(isHost); latest.current = null;
     setView(null); setPending(false); setCode(''); setError(''); setStatus('connecting');
-    setManualFeedback(null); setLinkNote('');
+    setManualFeedback(null); if (!opts.auto) setLinkNote('');
     setManualStep('idle'); setSignalIn(''); setSignalOut('');
-    const closed=()=>{if(token===generation.current)fail(text('连接已断开；本手不自动判胜。请双方点“恢复上次牌局”，房主把新的邀请链接发给朋友即可接着打。','Disconnected; unfinished hands are not awarded. Both players choose Restore previous match and the host sends a new invitation link.'));};
+    const closed=()=>{
+      if(token!==generation.current)return;
+      if(active.current||opts.auto){autoReconnect(isHost);return;}
+      fail(text('连接已断开；本手不自动判胜。请双方点“恢复上次牌局”接着打。','Disconnected; unfinished hands are not awarded. Both players choose Restore previous match to continue.'));
+    };
     try {
       if (isHost) {
         const protocol = new ManualHeadsUpPokerHost(m => manualMessage(m, token), () => {
-          // A friend who drops before play starts frees the seat; the room stays open.
+          // A friend who drops before play (re)starts frees the seat; the room stays open.
           if (token === generation.current && !active.current && protocol.room.status === 'lobby') return;
           closed();
         }, undefined, recovery?.checkpoint);
         manualHost.current = protocol;
-        const room = await hostPeerRoom(newRoomCode('holdem'), {
-          onReady: own => { if (token !== generation.current) return; setCode(own); setLinkNote(''); setStatus(s => s === 'connecting' ? 'waiting' : s); },
-          onReconnecting: () => { if (token === generation.current && !active.current) setLinkNote(text('正在重新连上房间服务，房间仍然有效…', 'Reconnecting to the room service; the room is still open…')); },
+        const seat = (c: BoardConnection) => {
+          if (token !== generation.current || !protocol.seatOpen(1)) { c.close(); return; }
+          const channel = new PokerPeerChannel(c);
+          protocol.offer(1, channel).catch(() => channel.close());
+          setTimeout(() => { if (!c.open) channel.close(); }, 20000);
+        };
+        const events: PeerRoomEvents = {
+          onReady: own => { if (token !== generation.current) return; rememberRoom(own); setCode(own); if (!opts.auto) setLinkNote(''); setStatus(s => s === 'connecting' ? 'waiting' : s); },
+          onReconnecting: () => { if (token === generation.current && !active.current && !opts.auto) setLinkNote(text('正在重新连上房间服务，房间仍然有效…', 'Reconnecting to the room service; the room is still open…')); },
           onConnection: c => {
-            if (token !== generation.current || !protocol.seatOpen(1)) { c.close(); return; }
-            const channel = new PokerPeerChannel(c);
-            protocol.offer(1, channel).catch(() => channel.close());
-            setTimeout(() => { if (!c.open) channel.close(); }, 20000);
+            // The guest came back while this side still believes the old channel is alive.
+            if (token === generation.current && active.current) { reconnectHost(c); return; }
+            seat(c);
           },
-          onFailure: reason => { if (token === generation.current) fail(peerFailureMessage(reason, zh)); },
-        });
-        if (token !== generation.current) { room.destroy(); return; }
-        peer.current = room;
+          onFailure: reason => {
+            if (token !== generation.current) return;
+            // After a refresh the old id may still be held briefly; fall back to a fresh link.
+            if (reason === 'room-taken' && recovery && !opts.fresh) { hostRoom.current?.destroy(); hostRoom.current = null; peer.current = null; void start(true, recovery, { fresh: true }); return; }
+            fail(peerFailureMessage(reason, zh));
+          },
+          onVisitors: setVisitors,
+          // Returning players go straight to the verified recovery; newcomers wait for the host.
+          policy: v => v.resume ? 'admit' : active.current || recovery || !protocol.seatOpen(1) ? 'full' : 'ask',
+        };
+        if (hostRoom.current) {
+          peer.current = hostRoom.current;
+          hostRoom.current.update(events);
+          setCode(roomRef.current); setStatus('waiting');
+          if (timer.current) clearTimeout(timer.current);
+          if (opts.pending) seat(opts.pending);
+        } else {
+          const preferred = recovery && !opts.fresh ? storedRoom() : '';
+          const room = await hostPeerRoom(preferred || newRoomCode('holdem'), events);
+          if (token !== generation.current) { room.destroy(); return; }
+          peer.current = hostRoom.current = room;
+        }
       } else {
         setCode(target);
-        setLinkNote(text('正在连接房间服务…', 'Connecting to the room service…'));
+        if (!opts.auto) setLinkNote(text('正在连接房间服务…', 'Connecting to the room service…'));
+        let missing = false;
+        const looking = text('已连上房间服务，正在寻找房主……如果房主暂时切到了其他应用，会自动重试。', 'Room service reached; looking for the host… if they switched apps briefly, this retries automatically.');
         const room = await joinPeerRoom(target, {}, {
-          onService: () => { if (token === generation.current) setLinkNote(text('已连上房间服务，正在寻找房主……如果房主暂时切到了其他应用，会自动重试，最多等 5 分钟。', 'Room service reached; looking for the host… if they switched apps briefly, this retries automatically for up to 5 minutes.')); },
+          onService: () => { if (token === generation.current && !opts.auto) setLinkNote(looking); },
+          onWaiting: () => { if (token === generation.current && !opts.auto && !missing) setLinkNote(looking); },
+          onMissing: () => { if (token !== generation.current || opts.auto) return; missing = true; setLinkNote(text('暂时找不到这个房间：房主可能已关闭页面，或暂时切到了其他应用。会继续自动尝试 2 分钟；一直找不到的话，请向房主要新的邀请链接。', 'This room cannot be found right now: the host may have closed the page or briefly switched apps. Retrying automatically for 2 minutes; if it never appears, ask the host for a new link.')); },
+          onKnocking: () => { if (token === generation.current && !opts.auto) setLinkNote(text('已连上房主，正在等房主同意你加入……', 'Reached the host; waiting for them to let you in…')); },
           onOpen: c => {
             if (token !== generation.current) { c.close(); return; }
-            setLinkNote('');
+            rememberRoom(target);
+            if (!opts.auto) setLinkNote('');
             const channel = new PokerPeerChannel(c);
             try { manualGuest.current = new ManualHeadsUpPokerGuest(m => manualMessage(m, token), closed, () => channel, recovery?.checkpoint); }
             catch { channel.close(); fail(text('存档无效或版本不兼容，未加入。原存档保留。', 'Invalid or incompatible save; not joined. Original save retained.')); }
           },
           onFailure: reason => { if (token === generation.current) fail(peerFailureMessage(reason, zh)); },
-        });
+        }, { name: readNickname(), resume: !!recovery });
         if (token !== generation.current) { room.destroy(); return; }
         peer.current = room;
       }
@@ -216,7 +287,7 @@ export default function HoldemRemote({ locale }: { locale: 'zh' | 'en' }) {
     reason += text(`\n\n你获得底池 ${view.awarded[view.seat]}，余额 ${view.stacks[view.seat]}，本手净变化 ${view.stacks[view.seat] - view.start[view.seat]}。无人跟上的投入会退回，不算赢利。`, `\n\nYour pot award: ${view.awarded[view.seat]}; balance: ${view.stacks[view.seat]}; net change: ${view.stacks[view.seat] - view.start[view.seat]}. Unmatched contributions are refunded, not winnings.`);
   }
   const quick = code !== '' || manualStep === 'idle';
-  const statusText = status === 'connected' ? (pending ? text('正在等待动作确认…', 'Waiting for acknowledgement…') : view?.over ? text('本手已结束', 'Hand complete') : a ? text('轮到你了', 'Your turn') : text('等待对手行动', 'Waiting for opponent'))
+  const statusText = reconnecting && status !== 'connected' ? (isHostSeat ? text('等待对方重新连上', 'Waiting for your opponent to reconnect') : text('正在重新连线…', 'Reconnecting…')) : status === 'connected' ? (pending ? text('正在等待动作确认…', 'Waiting for acknowledgement…') : view?.over ? text('本手已结束', 'Hand complete') : a ? text('轮到你了', 'Your turn') : text('等待对手行动', 'Waiting for opponent'))
     : status === 'waiting' ? (ready ? text('双方已连接，请房主确认开始或继续原局', 'Both connected — waiting for the host to start or continue') : manualStep === 'offer' ? text('邀请码已生成：发给朋友，再粘贴朋友的回复码', 'Invitation ready: send it, then paste your friend’s reply code') : manualStep === 'answer' ? text('回复码已生成：发回给房主，等房主连接', 'Reply ready: send it to the host and wait') : manualStep === 'connecting' ? text('正在尝试局域网直连…', 'Attempting a direct LAN connection…') : text('房间已创建，等待朋友加入', 'Room created — waiting for your friend'))
     : status === 'connecting' ? text('正在连接…', 'Connecting…') : status === 'error' ? text('连接已停止', 'Connection stopped') : text('尚未连接', 'Not connected');
   const tone = status === 'connected' ? 'ok' : status === 'error' ? 'warn' : status === 'idle' ? 'idle' : 'busy';
@@ -245,7 +316,7 @@ export default function HoldemRemote({ locale }: { locale: 'zh' | 'en' }) {
         {saved && linkMode === 'link' && <p>{saved.role === 'host' ? text('想接着打：点“恢复上次牌局”，把新的邀请链接发给原来的朋友；朋友连上后点“继续原局”。', 'To continue: choose Restore previous match and send the new invitation link to the same friend; continue once they connect.') : text('想接着打：先把房主发来的新邀请链接粘贴到下方“邀请链接”框，再点“恢复上次牌局”。', 'To continue: paste the host’s new invitation link into the Invitation link box below, then choose Restore previous match.')}</p>}
         {saved && linkMode === 'code' && <p>{saved.role === 'host' ? text('想接着打：点“恢复上次牌局”，把新的邀请码发给原来的朋友，再粘贴他发回的回复码，最后点“继续原局”。', 'To continue: choose Restore previous match, send the new invitation to the same friend, paste their reply, then choose Continue.') : text('想接着打：先在下方“朋友邀请我”里粘贴房主发来的新邀请码，再点“恢复上次牌局”，把生成的回复码发回给房主。', 'To continue: paste the host’s new invitation under “A friend invited me” below, then choose Restore previous match and send the reply back.')}</p>}
         <div className="room-actions">
-          {saved && <button className="rpg-button" disabled={saved.role === 'guest' && (linkMode === 'link' ? !!!roomCode(entry ?? invited, 'holdem') : !signalIn.trim())} onClick={() => linkMode === 'link' ? start(saved.role === 'host', saved) : startManual(saved.role === 'host', saved)}>{text('恢复上次牌局', 'Restore previous match')}</button>}
+          {saved && <button className="rpg-button" disabled={saved.role === 'guest' && (linkMode === 'link' ? !(roomCode(entry ?? invited, 'holdem') || storedRoom()) : !signalIn.trim())} onClick={() => linkMode === 'link' ? start(saved.role === 'host', saved) : startManual(saved.role === 'host', saved)}>{text('恢复上次牌局', 'Restore previous match')}</button>}
           <button className="room-link" onClick={clearSave}>{clearArmed ? text('确认删除存档（无法撤销）', 'Confirm delete (cannot be undone)') : text('删除这个存档', 'Delete this save')}</button>
           {clearArmed && <button className="room-link" onClick={() => setClearArmed(false)}>{text('取消删除', 'Keep the save')}</button>}
         </div>
@@ -255,6 +326,7 @@ export default function HoldemRemote({ locale }: { locale: 'zh' | 'en' }) {
           <button className="rpg-button" onClick={() => start(true)}>{replaceIntent === 'quick-host' ? text('确认创建新房', 'Confirm new room') : text('创建房间', 'Create room')}</button>
         </RoleCard>
         <RoleCard badge={text('朋友', 'Guest')} title={text('朋友邀请我', 'A friend invited me')} steps={[text('直接打开房主发来的链接，会自动加入', 'Open the host’s link — you join automatically'), text('或把链接粘贴到下面，点“加入房间”', 'Or paste the link below and choose Join room'), text('等房主发牌', 'Wait for the host to deal')]}>
+          <NicknameField zh={zh} />
           <label className="block text-sm font-bold">{text('邀请链接', 'Invitation link')}<input className="room-field" placeholder="https://…?room=…" value={entry ?? invited} onChange={e => { setEntry(e.target.value); setReplaceIntent(null); }} /></label>
           <button className="rpg-button" disabled={!!!roomCode(entry ?? invited, 'holdem')} onClick={() => start(false)}>{replaceIntent === 'quick-guest' ? text('确认加入新房', 'Confirm joining new room') : text('加入房间', 'Join room')}</button>
         </RoleCard>
@@ -269,7 +341,8 @@ export default function HoldemRemote({ locale }: { locale: 'zh' | 'en' }) {
         </RoleCard>
       </div>}
       {busy && !quick && status !== 'connected' && <Steps items={isHostSeat ? hostSteps : guestSteps} />}
-      {busy && quick && isHostSeat && code && status !== 'connected' && !ready && <LinkShare zh={zh} code={code} title={text('房间已开好，把邀请链接发给朋友', 'Room ready — send the invitation link to your friend')} body={text('朋友打开链接就会自动进房。你可以切去微信等应用发链接，房间在这个页面开着期间一直有效，回来后会自动接上。', 'Your friend joins by opening the link. You can switch to a chat app to send it; the room stays open as long as this page is open.')} onCopied={value => { void navigator.clipboard.writeText(value).then(() => setManualFeedback({ message: text('邀请链接已复制，发给朋友吧。', 'Invitation link copied — send it to your friend.'), error: false }), () => setManualFeedback({ message: text('复制失败，请手动复制房间链接。', 'Copy failed; copy the link manually.'), error: true })); }} />}
+      {busy && isHostSeat && linkMode === 'link' && status !== 'connected' && <VisitorList zh={zh} visitors={visitors} onAdmit={id => hostRoom.current?.admit(id)} onDeny={id => hostRoom.current?.deny(id)} />}
+      {busy && quick && isHostSeat && code && status !== 'connected' && !ready && !reconnecting && <LinkShare zh={zh} code={code} title={text('房间已开好，把邀请链接发给朋友', 'Room ready — send the invitation link to your friend')} body={text('朋友打开链接后，这里会出现“有人想加入”，由你决定让不让他进来。你可以切去微信等应用发链接，房间在这个页面开着期间一直有效。', 'When your friend opens the link, “Someone wants to join” appears here and you decide whether to let them in. You can switch to a chat app to send it; the room stays open as long as this page is open.')} onCopied={value => { void navigator.clipboard.writeText(value).then(() => setManualFeedback({ message: text('邀请链接已复制，发给朋友吧。', 'Invitation link copied — send it to your friend.'), error: false }), () => setManualFeedback({ message: text('复制失败，请手动复制房间链接。', 'Copy failed; copy the link manually.'), error: true })); }} />}
       {busy && linkNote && status !== 'connected' && <p role="status" className="room-progress">{linkNote}</p>}
       {ready && status === 'waiting' && isHostSeat && <div><button className="rpg-button" onClick={() => { if (!manualHost.current?.start()) setError(text('尚不能开始，请确认双方连接。', 'Cannot start yet. Check both connections.')); }}>{restoring ? text('双方已连接，继续原局', 'Both connected — continue saved match') : text('双方已连接，开始发牌', 'Both connected — deal cards')}</button></div>}
       {status !== 'idle' && status !== 'error' && <div><button className="room-link" onClick={() => { dispose(); setStatus('idle'); setCode(''); setView(null); setPending(false); setError(''); setManualFeedback(null); setManualStep('idle'); setSignalIn(''); setSignalOut(''); }}>{text('离开房间', 'Leave room')}</button></div>}

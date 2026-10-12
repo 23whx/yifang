@@ -61,6 +61,9 @@ function save(t){return JSON.parse(t.data.get(key));}
    const input=nodes(render(g)).find(n=>n.type==='input'&&n.props.placeholder==='https://…?room=…');
    scope.run(g,()=>input.props.onChange({target:{value:room}}));
    await click(g,zh(g)?'加入房间':'Join room');
+   // The friend knocks; nothing starts until the host lets them in.
+assert.ok(text(render(h)).includes(zh(h)?'有人想加入':'Someone wants to join'));
+   await click(h,zh(h)?'让他进来':'Let them in');
    assert.ok(text(render(h)).includes(zh(h)?'双方已连接，请房主确认':'Both connected — waiting for the host'));
    assert.equal(h.data.has(key),false);assert.equal(g.data.has(key),false,'No save or deal before explicit start');
    await click(h,zh(h)?'双方已连接，开始发牌':'Both connected — deal cards');
@@ -74,7 +77,8 @@ function save(t){return JSON.parse(t.data.get(key));}
    const beforeH=JSON.stringify(save(h)),beforeG=JSON.stringify(save(g));
    scope.run(g,()=>g.cleanups.forEach(fn=>fn()));await flush();
    assert.equal(JSON.stringify(save(h)),beforeH);assert.equal(JSON.stringify(save(g)),beforeG);
-   assert.ok(text(render(h)).includes(zh(h)?'连接已停止':'Connection stopped'));
+   // Mid-match the host keeps the room open and waits for the friend to come back.
+   assert.ok(text(render(h)).includes(zh(h)?'等待对方重新连上':'Waiting for your opponent to reconnect'));
    const savedH=h.data.get(key),savedG=g.data.get(key);
    scope.run(h,()=>h.cleanups.forEach(fn=>fn()));
    for(const [t,value] of [[h,savedH],[g,savedG]]){t.hooks=[];t.effects=[];t.cleanups=[];t.data.set(key,value);await mount(t);assert.ok(text(render(t)).includes(zh(t)?'本标签页已保存上次的牌局':'This tab has a saved match'));}
