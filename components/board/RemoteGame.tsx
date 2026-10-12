@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { ManualBoardConnection, type BoardConnection } from '@/lib/board/manual-connection';
-import { hostPeerRoom, joinPeerRoom, newRoomCode, peerFailureMessage, invitationLink } from '@/lib/peer-room';
+import { hostPeerRoom, joinPeerRoom, newRoomCode, peerFailureMessage, invitationLink, type PeerFailure } from '@/lib/peer-room';
 import { readManualSignal } from '@/lib/manual-rtc';
 import {secureMultiplayerContext,insecureMultiplayerMessage} from '@/lib/network-context';
 import { loadFfish, type FfishBoard, type Ffish } from "@/lib/board/ffish";
@@ -69,7 +69,7 @@ export default function RemoteGame({
   const [replaceIntent,setReplaceIntent]=useState<'host'|'guest'|null>(null),[clearConfirm,setClearConfirm]=useState(false),[restoring,setRestoring]=useState(false);
   useEffect(()=>{let live=true;queueMicrotask(()=>{if(!live)return;try{setSaved(readBoardSave(sessionStorage,game));}catch{setSaveError(zh?'无法读取本标签页存档；请勿假定可以恢复。':'Cannot read this tab’s save; recovery is not assured.');}});return()=>{live=false;};},[game,zh]);
   function persist(){const log=game==='go'?goJournal.current:journal.current;if(!log||!recoverySecret.current)return;try{setSaved(writeBoardSave(sessionStorage,{version:1,game,role:host.current?'host':'guest',secret:recoverySecret.current,checkpoint:log.checkpoint()}));setSaveError('');}catch{setSaveError(zh?'保存失败，请保持页面开启；刷新可能丢失最新进度。':'Save failed. Keep this page open; refreshing may lose recent progress.');}}
-  function forget(){try{clearBoardSave(sessionStorage,game);setSaved(null);setSaveError('');setClearConfirm(false);resumeSelection.current=null;return true;}catch{setSaveError(zh?'无法清除存档，请检查浏览器存储设置。':'Could not clear the save. Check browser storage settings.');return false;}}
+  function forget(){try{try{sessionStorage.removeItem(`yifang:board:${game}:room:v1`);}catch{/* best effort */}clearBoardSave(sessionStorage,game);setSaved(null);setSaveError('');setClearConfirm(false);resumeSelection.current=null;return true;}catch{setSaveError(zh?'无法清除存档，请检查浏览器存储设置。':'Could not clear the save. Check browser storage settings.');return false;}}
   const matchRef = useRef<MatchState>(newMatch());
   const [match, setMatch] = useState<MatchState>(newMatch);
   const [copyMessage, setCopyMessage] = useState("");
@@ -78,6 +78,14 @@ export default function RemoteGame({
   // Default: friends join by opening a link. Manual codes remain for service-free play.
   const [mode, setMode] = useState<'manual' | 'public'>('public');
   const [linkNote, setLinkNote] = useState('');
+  // Link mode reconnects by itself: phones drop WebRTC on screen lock or app switch.
+  // The host keeps its room id; the guest rejoins it and both run the verified recovery.
+  const hostRoom = useRef<{ destroy(): void } | null>(null), linkCode = useRef(''), autoTries = useRef(0);
+  const hostEvents = useRef<{ ready(code: string): void; connection(c: BoardConnection): void; failure(reason: PeerFailure): void; reconnecting(): void } | null>(null);
+  const [reconnecting, setReconnecting] = useState(false);
+  const roomKey = `yifang:board:${game}:room:v1`;
+  function rememberRoom(value: string) { linkCode.current = value; try { sessionStorage.setItem(roomKey, value); } catch { /* reconnect still works while this page lives */ } }
+  function storedRoom() { try { return roomCode(sessionStorage.getItem(roomKey) ?? '', game); } catch { return ''; } }
   const autoJoin = useRef(false);
   const [invitation, setInvitation] = useState('');
   const [signal, setSignal] = useState('');
@@ -172,13 +180,13 @@ export default function RemoteGame({
       });
     setGoState({ ...go.current });
   }
-  function dispose() {
+  function dispose(keepRoom = false) {
     generation.current++;
     active.current = false;
     recoveryChannel.current?.stop();recoveryChannel.current=null;recoverySecret.current='';transportEpoch.current='';
     if (timeout.current) clearTimeout(timeout.current);
     connection.current?.close();
-    peer.current?.destroy();
+    if (!keepRoom || peer.current !== hostRoom.current) { peer.current?.destroy(); if (peer.current === hostRoom.current) hostRoom.current = null; }
     connection.current = null;
     manual.current = null;
     peer.current = null;
@@ -193,6 +201,35 @@ export default function RemoteGame({
     },
     [],
   );
+  function reconnectHost(c: BoardConnection) {
+    persist();
+    let save: BoardRecoverySave | null = null;
+    try { save = readBoardSave(sessionStorage, game); } catch { /* handled below */ }
+    if (!save) { c.close(); return; }
+    setReconnecting(true);
+    void start(true, save, { auto: true, pending: c });
+  }
+  function autoReconnect(isHost: boolean) {
+    if (active.current) persist();
+    let save: BoardRecoverySave | null = null;
+    try { save = readBoardSave(sessionStorage, game); } catch { /* fall through to a plain stop */ }
+    if (!save || autoTries.current >= 3) {
+      fail(zh ? '对手已离线，棋谱已保存。双方保留本页，点“恢复上次对局”即可接着下。' : 'Opponent disconnected; moves are saved. Keep this page and choose Restore previous match to continue.');
+      return;
+    }
+    autoTries.current++;
+    const resume = save;
+    setReconnecting(true);
+    setLinkNote(isHost
+      ? (zh ? '对方暂时断线了（手机锁屏或切到其他应用时常见）。房间仍然有效，对方回到页面后会自动接上，棋局已保存。' : 'Your opponent dropped out (common when a phone locks or switches apps). The room stays open; they reconnect automatically when they return. The game is saved.')
+      : (zh ? '连接中断了，正在自动重新连上房主……棋局已保存，会回到原来的局面。' : 'Connection lost; reconnecting to the host automatically… The game is saved and will resume where it stopped.'));
+    const go = () => { void start(isHost, resume, { auto: true }); };
+    // A hidden page cannot hold a connection on phones; rejoin when the player returns.
+    if (isHost || typeof document === 'undefined' || document.visibilityState === 'visible') { go(); return; }
+    const token = generation.current;
+    const back = () => { if (document.visibilityState !== 'visible') return; document.removeEventListener('visibilitychange', back); if (token === generation.current) go(); };
+    document.addEventListener('visibilitychange', back);
+  }
   function fail(message: string) {
     generation.current++;
     active.current = false;
@@ -203,6 +240,8 @@ export default function RemoteGame({
     if (timeout.current) clearTimeout(timeout.current);
     connection.current?.close();
     peer.current?.destroy();
+    if (peer.current === hostRoom.current) hostRoom.current = null;
+    setReconnecting(false);
   }
   function apply(move: string | null, remote: boolean) {
     if (!active.current || matchRef.current.resigned !== null) return false;
@@ -248,7 +287,7 @@ export default function RemoteGame({
     if (apply(move, false))
       conn.send({ v: 5, epoch:transportEpoch.current, game, round:matchRef.current.round, kind: "move", seq, move } satisfies Wire);
   }
-  async function start(isHost: boolean, recovery:BoardRecoverySave|null=null) {
+  async function start(isHost: boolean, recovery:BoardRecoverySave|null=null, opts: { auto?: boolean; pending?: BoardConnection; fresh?: boolean } = {}) {
     if(!secureMultiplayerContext()){setError(insecureMultiplayerMessage(locale));return;}
     if(recovery&&(recovery.game!==game||(recovery.role==='host')!==isHost))return;
     const chosenMode=mode;
@@ -257,7 +296,8 @@ export default function RemoteGame({
       catch{setError(zh?'邀请文本无效或不属于当前游戏。请粘贴房主发来的完整邀请，再重试。':'Invalid invitation or wrong game. Paste the complete invitation from the host and retry.');return;}
     }
     if(!recovery&&(saved||saveError)){const intent=isHost?'host':'guest';if(replaceIntent!==intent){setReplaceIntent(intent);return;}}
-    dispose();
+    dispose(isHost && !!opts.auto && chosenMode === 'public');
+    if (!opts.auto) { autoTries.current = 0; setReconnecting(false); }
     resumeSelection.current=recovery;setRestoring(!!recovery);setReplaceIntent(null);setClearConfirm(false);
     recoverySecret.current=recovery?.secret??(isHost?newBoardRecoverySecret():'');
     transportEpoch.current=isHost?crypto.randomUUID():'';
@@ -305,6 +345,8 @@ export default function RemoteGame({
       };
       const attach = (c: BoardConnection) => {
         if (connection.current) {
+          // The guest rejoined while this side still believes the old channel is alive.
+          if (isHost && chosenMode === 'public' && active.current) { reconnectHost(c); return; }
           if (!linkHostWaiting()) { c.on("open", () => c.close()); return; }
           const stale = connection.current; release(stale); stale.close();
         }
@@ -323,7 +365,7 @@ export default function RemoteGame({
               board.current?.delete();board.current=b;journal.current?.dispose();journal.current=restored;
               matchRef.current=v.match;setMatch(v.match);const moves=v.moves.trim().split(/\s+/).filter(Boolean);sequence.current=moves.length;setHistory(moves);
               }
-              transportEpoch.current=epoch;active.current=true;setStatus('connected');setSignal('');setAnswer('');setInvitation('');setSignalBusy(false);
+              transportEpoch.current=epoch;active.current=true;autoTries.current=0;setReconnecting(false);setLinkNote('');setStatus('connected');setSignal('');setAnswer('');setInvitation('');setSignalBusy(false);
               if(timeout.current)clearTimeout(timeout.current);refresh();persist();
             }catch{fail(zh?'恢复棋谱失败，原存档保留。':'Could not restore the move record; original save retained.');}
           },()=>{if(token===generation.current)fail(zh?'恢复验证失败或连接超时。请检查双方原标签页、游戏与存档；不会重新发局。':'Recovery verification failed or timed out. Check both original tabs, games and saves. No new game was started.');});
@@ -408,6 +450,7 @@ export default function RemoteGame({
             if(m.epoch!==transportEpoch.current||isBoardGame(game)&&(!journal.current||m.identity!==journal.current.view().identity))return fail(zh?'对局标识不同步。':'Match identity mismatch.');
             if(game==='go'&&(m.goJournal!==1||!goJournal.current||m.identity!==goJournal.current.view().identity))return fail(zh?'围棋对局标识或版本不匹配。':'Go identity or version mismatch.');
             active.current = true;
+            autoTries.current = 0; setReconnecting(false); setLinkNote('');
             setStatus("connected");
             setSignal(''); setAnswer(''); setInvitation(''); setSignalBusy(false);
             if (timeout.current) clearTimeout(timeout.current);
@@ -441,6 +484,7 @@ export default function RemoteGame({
         c.on("close", () => {
           if (token !== generation.current || connection.current !== c) return;
           if (linkHostWaiting()) { release(c); return; }
+          if (chosenMode === 'public' && (active.current || opts.auto)) { autoReconnect(isHost); return; }
           fail(
               zh
                 ? "对手已离线，棋谱保留。双方可用原标签页存档重新交换邀请恢复。请先检查保存是否成功。"
@@ -450,6 +494,7 @@ export default function RemoteGame({
         c.on("error", () => {
           if (token !== generation.current || connection.current !== c) return;
           if (linkHostWaiting()) { release(c); c.close(); return; }
+          if (chosenMode === 'public' && (active.current || opts.auto)) { autoReconnect(isHost); return; }
           fail(
             active.current
               ? zh
@@ -475,23 +520,43 @@ export default function RemoteGame({
       }
       // Link mode: the public signaling service relays only the handshake.
       if (isHost) {
-        const room = await hostPeerRoom(newRoomCode(game), {
-          onReady: own => { if (token !== generation.current) return; setCode(own); setStatus('waiting'); setLinkNote(''); if (timeout.current) clearTimeout(timeout.current); },
-          onReconnecting: () => { if (token === generation.current && !active.current) setLinkNote(zh ? '正在重新连上房间服务，房间仍然有效…' : 'Reconnecting to the room service; the room is still open…'); },
-          onConnection: c => { if (token === generation.current) attach(c); else c.close(); },
-          onFailure: reason => { if (token === generation.current) fail(peerFailureMessage(reason, zh)); },
-        });
-        if (token !== generation.current) { room.destroy(); return; }
-        peer.current = room;
+        hostEvents.current = {
+          ready: own => { if (token !== generation.current) return; rememberRoom(own); setCode(own); setStatus('waiting'); if (!opts.auto) setLinkNote(''); if (timeout.current) clearTimeout(timeout.current); },
+          reconnecting: () => { if (token === generation.current && !active.current && !opts.auto) setLinkNote(zh ? '正在重新连上房间服务，房间仍然有效…' : 'Reconnecting to the room service; the room is still open…'); },
+          connection: c => { if (token === generation.current) attach(c); else c.close(); },
+          failure: reason => {
+            if (token !== generation.current) return;
+            // After a refresh the old id may still be held briefly; fall back to a fresh link.
+            if (reason === 'room-taken' && recovery && !opts.fresh) { hostRoom.current?.destroy(); hostRoom.current = null; peer.current = null; void start(true, recovery, { fresh: true }); return; }
+            fail(peerFailureMessage(reason, zh));
+          },
+        };
+        if (hostRoom.current) {
+          peer.current = hostRoom.current;
+          setCode(linkCode.current); setStatus('waiting');
+          if (timeout.current) clearTimeout(timeout.current);
+          if (opts.pending) attach(opts.pending);
+        } else {
+          const preferred = recovery && !opts.fresh ? storedRoom() : '';
+          const room = await hostPeerRoom(preferred || newRoomCode(game), {
+            onReady: own => hostEvents.current?.ready(own),
+            onReconnecting: () => hostEvents.current?.reconnecting(),
+            onConnection: c => { if (hostEvents.current) hostEvents.current.connection(c); else c.close(); },
+            onFailure: reason => hostEvents.current?.failure(reason),
+          });
+          if (token !== generation.current) { room.destroy(); return; }
+          peer.current = hostRoom.current = room;
+        }
       } else {
-        const target = roomCode(entry ?? invited, game);
+        const target = recovery ? (linkCode.current || storedRoom() || roomCode(entry ?? invited, game)) : roomCode(entry ?? invited, game);
+        if (!target) { fail(zh ? '请粘贴房主发来的邀请链接。' : 'Paste the invitation link from the host.'); return; }
         if (timeout.current) clearTimeout(timeout.current);
         const lookingNote = zh ? '已连上房间服务，正在寻找房主……如果房主暂时切到了其他应用，会自动重试，最多等 5 分钟。' : 'Room service reached; looking for the host… if they switched apps briefly, this retries automatically for up to 5 minutes.';
-        setLinkNote(zh ? '正在连接房间服务…' : 'Connecting to the room service…');
+        if (!opts.auto) setLinkNote(zh ? '正在连接房间服务…' : 'Connecting to the room service…');
         const room = await joinPeerRoom(target, {}, {
-          onOpen: c => { if (token !== generation.current) { c.close(); return; } setLinkNote(''); attach(c); },
-          onService: () => { if (token === generation.current) setLinkNote(lookingNote); },
-          onWaiting: () => { if (token === generation.current) setLinkNote(lookingNote); },
+          onOpen: c => { if (token !== generation.current) { c.close(); return; } rememberRoom(target); if (!opts.auto) setLinkNote(''); attach(c); },
+          onService: () => { if (token === generation.current && !opts.auto) setLinkNote(lookingNote); },
+          onWaiting: () => { if (token === generation.current && !opts.auto) setLinkNote(lookingNote); },
           onFailure: reason => { if (token === generation.current) fail(peerFailureMessage(reason, zh)); },
         });
         if (token !== generation.current) { room.destroy(); return; }
@@ -546,6 +611,7 @@ export default function RemoteGame({
     ? (reviewDone(review) ? t('双方已确认，本局结束', 'Both confirmed — game ended') : t('双方停一手：一起核对死子与计分', 'Both passed: review dead stones and the score together'))
     : myTurn ? t('轮到你了', 'Your turn') : t('等待对方落子', 'Opponent’s turn');
   const statusText = connected ? turnText
+    : reconnecting ? (isHostPlayer ? t('等待对方重新连上', 'Waiting for your opponent to reconnect') : t('正在重新连线…', 'Reconnecting…'))
     : status === 'waiting' ? (mode === 'public' ? (isHostPlayer ? t('等待朋友打开链接', 'Waiting for your friend to open the link') : t('正在加入房间…', 'Joining the room…')) : isHostPlayer ? t('等待朋友的回复码', 'Waiting for your friend’s reply code') : t('等待房主连接', 'Waiting for the host to connect'))
     : status === 'connecting' ? t('正在连接…', 'Connecting…')
     : status === 'error' ? t('连接已中断', 'Connection stopped') : t('未连接', 'Not connected');
@@ -554,7 +620,7 @@ export default function RemoteGame({
     try { await navigator.clipboard.writeText(value); setCopyMessage(done); }
     catch { setCopyMessage(t('自动复制失败：请点一下文本框，全选后手动复制。', 'Copy failed: tap the box, select everything and copy it manually.')); }
   }
-  function leave() { dispose(); setStatus('idle'); setSignal(''); setAnswer(''); setInvitation(''); setSignalBusy(false); setError(''); setCode(''); setCopyMessage(''); setLinkNote(''); }
+  function leave() { dispose(); setReconnecting(false); autoTries.current = 0; setStatus('idle'); setSignal(''); setAnswer(''); setInvitation(''); setSignalBusy(false); setError(''); setCode(''); setCopyMessage(''); setLinkNote(''); }
   const hostSteps: { label: string; state: StepState; body?: ReactNode }[] = [
     { label: t('生成邀请码', 'Create an invitation code'), state: signal ? 'done' : 'now', body: !signal && signalBusy ? <p>{t('正在生成，通常几秒钟…', 'Creating it — usually a few seconds…')}</p> : undefined },
     { label: t('把邀请码发给朋友，再粘贴朋友发回的回复码', 'Send the invitation, then paste your friend’s reply code'), state: signal && status === 'waiting' ? 'now' : status === 'connecting' && !signalBusy ? 'done' : 'todo', body: signal && status === 'waiting' ? <>
@@ -579,12 +645,12 @@ export default function RemoteGame({
           <p className="room-banner-title">{saved ? t('发现本标签页保存的上次对局', 'This tab has a saved match') : t('存档读取失败', 'The save could not be read')}</p>
           {saved && <p>{t(`你上次是${saved.role === 'host' ? '房主' : '朋友'}。想接着下：双方都点“恢复上次对局”，${mode === 'public' ? '房主把新的邀请链接发给朋友，朋友把链接粘贴到“加入房间”' : '再像开房一样重新交换一次邀请码和回复码'}，棋局会回到断开时的局面。`, `You were the ${saved.role} last time. To continue, both players choose Restore previous match, then ${mode === 'public' ? 'the host sends a new invitation link and the guest pastes it into Join room' : 'swap a fresh invitation and reply'}; the board returns to where it stopped.`)}</p>}
           <div className="room-actions">
-            {saved && <button className="rpg-button" onClick={() => { setReplaceIntent(null); setClearConfirm(false); if (saved.role === 'host') void start(true, saved); else { resumeSelection.current = saved; setRestoring(true); setError(''); } }}>{t('恢复上次对局', 'Restore previous match')}</button>}
+            {saved && <button className="rpg-button" onClick={() => { setReplaceIntent(null); setClearConfirm(false); if (saved.role === 'host') void start(true, saved); else if (mode === 'public' && storedRoom()) void start(false, saved); else { resumeSelection.current = saved; setRestoring(true); setError(''); } }}>{t('恢复上次对局', 'Restore previous match')}</button>}
             <button className="room-link" onClick={() => { if (!clearConfirm) { setClearConfirm(true); return; } if (forget()) setRestoring(false); }}>{clearConfirm ? t('确认删除存档（无法撤销）', 'Confirm delete (cannot be undone)') : t('删除这个存档', 'Delete this save')}</button>
           </div>
         </div>}
         {replaceIntent && <RoomAlert>{t('你有一个未完成的对局存档。再点一次同一个按钮就开始新对局；旧存档会保留到新对局连上并保存后才被替换。', 'You have an unfinished saved match. Click the same button again to start a new game; the old save stays until the new game connects and saves.')}</RoomAlert>}
-        {restoring && <p className="room-progress">{connected ? t('已恢复原对局，没有重新开局。', 'Original match restored; no new game was started.') : mode === 'public' ? t('恢复模式：原房主会得到新的邀请链接，原朋友把它粘贴到“加入房间”。验证完成前不能走棋。', 'Recovery mode: the original host gets a new invitation link; the original guest pastes it into Join room. Moves stay locked until verification completes.') : t('恢复模式：原房主重新生成邀请码，原朋友粘贴后生成回复码。验证完成前不能走棋。', 'Recovery mode: the original host makes a new invitation, the original guest pastes it and replies. Moves stay locked until verification completes.')}</p>}
+        {restoring && !(reconnecting && !connected) && <p className="room-progress">{connected ? t('已恢复原对局，没有重新开局。', 'Original match restored; no new game was started.') : mode === 'public' ? t('恢复模式：原房主会得到新的邀请链接，原朋友把它粘贴到“加入房间”。验证完成前不能走棋。', 'Recovery mode: the original host gets a new invitation link; the original guest pastes it into Join room. Moves stay locked until verification completes.') : t('恢复模式：原房主重新生成邀请码，原朋友粘贴后生成回复码。验证完成前不能走棋。', 'Recovery mode: the original host makes a new invitation, the original guest pastes it and replies. Moves stay locked until verification completes.')}</p>}
         {starting && mode === 'manual' && <div className="room-roles">
           <RoleCard badge={t('房主', 'Host')} title={t('我来开房', 'Open a room')} steps={[t('生成邀请码，发给朋友', 'Create an invitation code and send it'), t('粘贴朋友发回的回复码', 'Paste the reply code your friend sends back'), t('连接成功，你执先', 'Connected — you move first')]}>
             <button className="rpg-button" disabled={signalBusy} onClick={() => start(true)}>{t('生成邀请码', 'Create invitation code')}</button>
@@ -604,7 +670,7 @@ export default function RemoteGame({
           </RoleCard>
         </div>}
         {!starting && !connected && mode === 'manual' && <Steps items={isHostPlayer ? hostSteps : guestSteps} />}
-        {!starting && !connected && mode === 'public' && code && <div className="room-banner">
+        {!starting && !connected && !reconnecting && mode === 'public' && code && <div className="room-banner">
           <p className="room-banner-title">{t('房间已开好，把邀请链接发给朋友', 'Room ready — send the invitation link to your friend')}</p>
           <p>{t('朋友打开链接就会自动进房。你可以切去微信等应用发链接，房间在这个页面开着期间一直有效，回来后会自动接上。', 'Your friend joins by opening the link. You can switch to a chat app to send it; the room stays open as long as this page is open and reconnects when you come back.')}</p>
           <div className="room-actions">
