@@ -9,6 +9,8 @@ import SiteFooter from "@/components/ui/SiteFooter";
 import { locales, isLocale, getDict } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
 import JsonLd from '@/components/seo/JsonLd';
+import AdSense from '@/components/site/AdSense';
+import CrossOriginGuard from '@/components/site/CrossOriginGuard';
 import { pageMetadata, siteVerification, organizationSchema } from '@/lib/seo';
 import { siteSearch } from '@/content/seo';
 import "../globals.css";
@@ -44,7 +46,9 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale === "zh" ? "zh-CN" : "en"}>
+      <head><AdSense /></head>
       <body className="flex min-h-screen flex-col">
+        <CrossOriginGuard />
         <JsonLd data={{ '@context': 'https://schema.org', '@type': 'WebSite', '@id': `${SITE_URL}/#website`,
           url: `${SITE_URL}/`, name: '弈方 · Yifang', alternateName: ['弈方', 'Yifang'],
           description: 'Learn and practice classic board games, the Rubik’s Cube and table-game rules.', inLanguage: ['zh-CN', 'en'], publisher: { '@id': `${SITE_URL}/#organization` },

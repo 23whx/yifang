@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SITE_URL, SITE_INDEXABLE, absoluteUrl } from '@/lib/site';
 import { languageAlternates, siteVerification, organizationSchema, socialImage } from '@/lib/seo';
 import JsonLd from '@/components/seo/JsonLd';
+import AdSense from '@/components/site/AdSense';
 
 const title = '弈方 Yifang｜象棋、围棋、国际象棋与魔方入门教程 · Learn Chess, Go & More';
 const image = socialImage('zh');
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 export default function EntryLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="zh-CN"><body>
+  return <html lang="zh-CN"><head><AdSense /></head><body>
     <JsonLd data={{ '@context': 'https://schema.org', '@type': 'WebSite', '@id': `${SITE_URL}/#website`, url: `${SITE_URL}/`,
       name: '弈方 · Yifang', alternateName: ['弈方', 'Yifang'], inLanguage: ['zh-CN', 'en'], publisher: { '@id': `${SITE_URL}/#organization` },
     }} />
