@@ -64,6 +64,8 @@ export default function BoardGame({ game, dict, locale, compact }: Props) {
     () => engineAvailable(),
     () => false
   );
+  // Only state "no engine" once the browser has actually been checked; the prerendered page must not claim it.
+  const probed = useSyncExternalStore(() => () => {}, () => true, () => false);
   const mode: Mode = engineOk ? modeChoice : "local";
 
   // 加载规则库
@@ -234,7 +236,7 @@ export default function BoardGame({ game, dict, locale, compact }: Props) {
             {dict.board.local}
           </button>
         </div>
-        {engineOk === false && <p className="text-xs leading-5 text-ink-3">{dict.board.noEngine}</p>}
+        {probed && !engineOk && <p className="text-xs leading-5 text-ink-3">{dict.board.noEngine}</p>}
 
         {mode === "ai" && (
           <>

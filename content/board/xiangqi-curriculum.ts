@@ -11,7 +11,7 @@ export function xiangqiCurriculum(first:Tutorial,old:Tutorial,demos:TutorialStep
   }};
   return [
     {...first,title:l('中国象棋第一课：认棋、走子与胜负','Xiangqi Lesson 1: Pieces, Moves and Winning'),minutes:45,
-      description:l('合并两篇旧入门课：只讲一次基本规则，配合马腿、象眼、炮架和过河案例，再亲手完成第一组着法。','One consolidated introduction: learn each basic rule once, inspect horse-leg, elephant-eye, cannon-screen and river examples, then play an opening sequence.'),
+      description:l('零基础学中国象棋：认识棋盘和七种棋子的走法，看懂蹩马腿、塞象眼、炮架和过河兵，弄清将死与困毙怎样判胜负，最后亲手走完第一组着法。','Xiangqi from zero: the board, how each piece moves, horse-leg and elephant-eye blocks, cannon screens, checkmate and stalemate, then your first moves.'),
       steps:[find('beginner-welcome'),find('beginner-board'),completePieces,find('beginner-ending'),...demos,find('pawn'),find('guided-opening')]},
     {game:'xiangqi',slug:'xiangqi-basics',title:l('第二课：读懂棋谱，走好开局六步','Lesson 2: Read Moves and Develop Your Pieces'),level:l('入门进阶','Next steps'),minutes:25,
       description:l('原第二篇入门课已合入第一课。这里改学坐标与中文记谱的区别、出子、通车路，以及每一步开局的目的。','The old introduction has been merged into Lesson 1. Learn notation, development, clear chariot routes and the purpose of an opening sequence.'),steps:[

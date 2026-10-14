@@ -13,7 +13,7 @@ export function chessCurriculum(first:Tutorial,old:Tutorial,demos:TutorialStep[]
           en:['This section practises one idea: when a rook, bishop or queen travels far, every square it passes over must be empty. Select this case and step forward one move at a time, starting with the queen on d4.','White plays Qd4–h8 with check, sliding through e5, f6 and g7. Black answers Ke8–e7, then White plays Ra1–a8 up the a-file. Notice the queen did not stop on d8 beside the king: unprotected there, it could simply be captured. Before each move, check that every square in between is empty and that the destination is safe.'],
         }},take(first,'guided-opening')]},
     {...old,title:{zh:'国际象棋第二课：特殊规则、应将与开局',en:'Chess Lesson 2: Special Rules, Check and Openings'},
-      description:{zh:'完成第一课后，进一步学习易位、吃过路兵、升变、将杀防守和和棋条件；不再重复棋盘与六种棋子的介绍。',en:'After Lesson 1, study castling, en passant, promotion, mate threats and draw conditions without repeating the board and piece introduction.'},
+      description:{zh:'完成第一课后，进一步学习易位、吃过路兵、升变、将杀防守和和棋条件；适合已经会走棋的初学者。',en:'After Lesson 1, study castling, en passant, promotion, mate threats and draw conditions for beginners who already know how the pieces move.'},
       steps:[
         {id:'prerequisites',title:{zh:'开始前：先会第一课的内容',en:'Before you start: Lesson 1 first'},body:{
           zh:['请先学完第一课：会找 e2、分得清兵的直走和斜吃、知道双方轮流走，也知道不能让自己的王留在被攻击的位置。还不熟就先回去练习。','这一课依次学：特殊走法、具体案例、看出将杀威胁、开局思路、和棋。每个案例都是单独摆好的局面，不是同一盘棋接着下；演示走完也不代表你赢了一盘棋。'],

@@ -10,6 +10,8 @@ interface L {
 export interface Game {
   slug: GameSlug;
   name: L;
+  /** One self-contained "X is…" sentence or two, shown near the top of the game's page. */
+  definition: L;
   /** 招牌上的单字/短词 */
   glyph: L;
   tagline: L;
@@ -22,6 +24,7 @@ export interface Game {
 export const games: Game[] = [
   {
     slug: "cube",
+    definition: { zh: "三阶魔方（鲁比克方块）是一种 3×3×3 的机械益智玩具：六个面各有 9 块贴纸，转动任意一层都会改变颜色排列，目标是把六个面分别还原成单一颜色。初学者常用层先法，一层一层地完成。", en: "The Rubik’s Cube is a 3×3×3 mechanical puzzle: each of its six faces has nine stickers, turning any layer rearranges the colours, and the goal is to return every face to a single colour. Beginners usually solve it layer by layer." },
     name: { zh: "魔方", en: "Rubik's Cube" },
     glyph: { zh: "方", en: "Cube" },
     tagline: { zh: "二十六块，四千三百亿亿种状态，一条回家的路。", en: "26 pieces, 43 quintillion states, one way home." },
@@ -44,6 +47,7 @@ export const games: Game[] = [
   },
   {
     slug: "chess",
+    definition: { zh: "国际象棋是两人在 8×8 棋盘上对弈的策略棋类。双方各有 16 枚棋子（王、后、车、象、马、兵），白方先走，将死对方的王即获胜。国际棋联（FIDE）制定通行的比赛规则。", en: "Chess is a two-player strategy game on an 8×8 board. Each side has 16 pieces (king, queen, rooks, bishops, knights and pawns); White moves first, and checkmating the opposing king wins. FIDE publishes the standard competition rules." },
     name: { zh: "国际象棋", en: "Chess" },
     glyph: { zh: "棋", en: "Chess" },
     tagline: { zh: "六十四格上的王国战争。", en: "War between kingdoms on sixty-four squares." },
@@ -66,6 +70,7 @@ export const games: Game[] = [
   },
   {
     slug: "xiangqi",
+    definition: { zh: "中国象棋是两人对弈的中国传统棋类。棋盘由 9 条直线和 10 条横线组成，中间以「楚河汉界」分开；双方各有 16 枚棋子，红方先走，将死或困毙对方的将（帅）即获胜。", en: "Xiangqi (Chinese chess) is a traditional Chinese two-player board game. The board has 9 files and 10 ranks divided by a river; each side has 16 pieces, Red moves first, and checkmating or stalemating the opposing general wins." },
     name: { zh: "中国象棋", en: "Xiangqi" },
     glyph: { zh: "象", en: "Xiangqi" },
     tagline: { zh: "楚河汉界，九宫之内。", en: "A river between two kingdoms, a palace on each bank." },
@@ -88,6 +93,7 @@ export const games: Game[] = [
   },
   {
     slug: "shogi",
+    definition: { zh: "日本将棋是日本的传统棋类，两人在 9×9 棋盘上对弈，双方各有 20 枚棋子。它与国际象棋、中国象棋最大的不同是「持驹」：吃掉的棋子可以作为己方棋子重新打入棋盘。将死对方的王将即获胜。", en: "Shogi is Japan’s traditional two-player board game, played on a 9×9 board with 20 pieces per side. Unlike chess or xiangqi, captured pieces can be dropped back onto the board as your own. Checkmating the opposing king wins." },
     name: { zh: "日本将棋", en: "Shogi" },
     glyph: { zh: "将", en: "Shogi" },
     tagline: { zh: "被吃的子，成为你的兵。", en: "Captured pieces return to fight for you." },
@@ -110,6 +116,7 @@ export const games: Game[] = [
   },
   {
     slug: "go",
+    definition: { zh: "围棋是两人轮流在棋盘交叉点上放置黑白棋子的策略棋类，标准棋盘为 19×19 路。没有「气」的棋子会被提走，终局时控制的地盘多者获胜。围棋起源于中国，在中国、日本、韩国都有职业比赛。", en: "Go is a two-player strategy game in which Black and White take turns placing stones on the intersections of a board, normally 19×19. Stones left without liberties are captured, and the player who controls more of the board at the end wins. Go originated in China and has professional circuits in China, Japan and Korea." },
     name: { zh: "围棋", en: "Go" },
     glyph: { zh: "围", en: "Go" },
     tagline: { zh: "黑白两色，三百六十一个交点，无穷。", en: "Two colours, 361 points, infinity." },
@@ -132,6 +139,7 @@ export const games: Game[] = [
   },
   {
     slug: "mahjong",
+    definition: { zh: "麻将是起源于中国的四人牌类游戏。玩家轮流摸牌、打牌，先把手牌组成规则要求的形状（通常是四组加一对）就能和牌。各地规则差别很大，常见的有日本立直麻将、国标麻将和四川麻将。", en: "Mahjong is a four-player tile game that originated in China. Players take turns drawing and discarding, and the first to arrange a hand into the required shape (usually four sets and a pair) wins the hand. Rules vary widely; common versions include Japanese Riichi, Chinese Official (MCR) and Sichuan." },
     name: { zh: "麻将", en: "Mahjong" },
     glyph: { zh: "麻", en: "Mahjong" },
     tagline: { zh: "先认识牌，再学组牌；日式、国标、四川分开学。", en: "Meet the tiles, build a hand; learn Riichi, Chinese Official and Sichuan separately." },
@@ -156,6 +164,7 @@ export const games: Game[] = [
   },
   {
     slug: "holdem",
+    definition: { zh: "德州扑克（Texas Hold’em）是最流行的扑克玩法：每位玩家拿两张底牌，桌面依次发出五张公共牌，经过四轮下注后，用七张牌中最好的五张比大小。本站只教规则与牌型，不涉及真钱。", en: "Texas Hold’em is the most widely played form of poker: each player gets two private cards, five community cards are dealt to the table, and after four betting rounds the best five-card hand from the seven wins. Yifang teaches the rules and hand rankings only; no real money is involved." },
     name: { zh: "德州扑克", en: "Texas Hold'em" },
     glyph: { zh: "扑", en: "Hold'em" },
     tagline: { zh: "两张底牌，五张公共牌，一桌人的心理。", en: "Two cards in hand, five on the table, a whole table of minds." },
@@ -178,6 +187,7 @@ export const games: Game[] = [
   },
   {
     slug: "baccarat",
+    definition: { zh: "百家乐是比较「庄家」与「闲家」两手牌点数的纸牌游戏：每手两到三张牌，点数只取个位数，最接近 9 的一方获胜；是否补第三张牌由固定规则决定，玩家无需选择。本站只讲规则与计分，不涉及赌博。", en: "Baccarat is a card game that compares two hands, Banker and Player: each hand has two or three cards, only the last digit of the total counts, and the hand closer to 9 wins. Whether a third card is drawn is fixed by rule, not chosen by players. Yifang explains the rules and scoring only, with no gambling." },
     name: { zh: "百家乐", en: "Baccarat" },
     glyph: { zh: "百", en: "Baccarat" },
     tagline: { zh: "庄、闲、和，规则最少的一张桌。", en: "Banker, Player, Tie — the table with the fewest rules." },

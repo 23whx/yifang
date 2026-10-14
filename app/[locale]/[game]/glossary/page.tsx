@@ -1,5 +1,7 @@
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import PageSchema from '@/components/seo/PageSchema';
+import UpdatedOn from '@/components/seo/UpdatedOn';
+import { contentDate } from '@/lib/content-dates';
 import JsonLd from '@/components/seo/JsonLd';
 import { absoluteUrl } from '@/lib/site';
 import { pageMetadata } from '@/lib/seo';
@@ -58,11 +60,12 @@ export default async function GlossaryPage({ params }: { params: Promise<{ local
     <>
       <Breadcrumbs locale={locale} items={[{ name: locale === 'zh' ? '弈方首页' : 'Yifang home', path: `/${locale}` }, { name: g.name[locale], path: `/${locale}/${game}` }, { name: gamePageCopy(g.slug, g.name[locale], locale, 'glossary').title, path: `/${locale}/${game}/glossary` }]} />
       <JsonLd data={jsonLd} />
-      <PageSchema locale={locale} path={`/${game}/glossary`} game={game} name={gamePageCopy(g.slug, g.name[locale], locale, 'glossary').title}
+      <PageSchema locale={locale} path={`/${game}/glossary`} game={game} dateModified={contentDate(`glossary:${game}`)} name={gamePageCopy(g.slug, g.name[locale], locale, 'glossary').title}
         description={gamePageCopy(g.slug, g.name[locale], locale, 'glossary').description} mainEntity={{ '@id': jsonLd['@id'] }} />
       <section className="border-b-2 border-ink">
         <div className="mx-auto max-w-[1400px] px-5 pt-4 pb-10 sm:px-8 lg:pb-14">
           <h1 className="page-title mt-2">{g.name[locale]} · {dict.glossaryTitle}</h1>
+          <p className="mt-3 text-sm text-ink-3"><UpdatedOn locale={locale} date={contentDate(`glossary:${game}`)} /></p>
           <p className="prose-yf mt-6 max-w-2xl">{gamePageCopy(g.slug, g.name[locale], locale, 'glossary').description}</p>
         </div>
       </section>

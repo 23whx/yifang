@@ -5,13 +5,14 @@ import type { GameSlug } from '@/content/games';
 import type { Locale } from '@/lib/i18n';
 
 /** The page node every indexable page carries; it links the site, its breadcrumb trail, its game and its main content by @id. */
-export default function PageSchema({ locale, path, name, description, type = 'WebPage', items, game, mainEntity }: {
+export default function PageSchema({ locale, path, name, description, type = 'WebPage', items, game, mainEntity, dateModified }: {
   locale: Locale; path: string; name: string; description: string;
   type?: 'WebPage' | 'CollectionPage' | 'AboutPage' | 'ContactPage';
   items?: { name: string; path: string }[];
   game?: GameSlug;
   /** Full node, or { '@id' } of a node published separately on the page. */
   mainEntity?: Record<string, unknown>;
+  dateModified?: string;
 }) {
   const url = absoluteUrl(`/${locale}${path}`);
   const list = items ? { '@type': 'ItemList', numberOfItems: items.length, itemListElement: items.map((item, index) => ({
@@ -22,6 +23,7 @@ export default function PageSchema({ locale, path, name, description, type = 'We
     ...(path ? { breadcrumb: { '@id': `${url}#breadcrumb` } } : {}),
     primaryImageOfPage: { '@type': 'ImageObject', url: socialImage(locale, path).url, width: 1200, height: 630 },
     ...(game ? { about: gameEntity(locale, game) } : {}),
+    ...(dateModified ? { dateModified } : {}),
     ...(mainEntity ?? list ? { mainEntity: mainEntity ?? list } : {}),
   }} />;
 }

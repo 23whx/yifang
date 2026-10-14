@@ -43,3 +43,11 @@
 | 好友对战页 | 在线好友对战、发链接就能下、麻将好友房、免注册 | play chess with friends online, online mahjong with friends |
 | 教程目录 / 单课 | 入门教程、零基础、第一课、图解 | lessons for beginners, first lesson |
 | 术语 / 历史 / 练习 | 术语大全、历史与起源、练习题 | glossary, history, puzzles |
+
+## 5. AI 可读性（AI 搜索与助手）
+
+- 不执行 JavaScript 的爬虫（GPTBot、OAI-SearchBot、ClaudeBot、Claude-SearchBot、PerplexityBot 等）都能从原始 HTML 读到完整正文；robots.txt 对所有爬虫开放。
+- 每个游戏首页开头有一句「X 是……」定义（`content/games.ts` 的 `definition`）。
+- 教程、术语、历史页显示「最后更新」并写入 `dateModified`。日期来自 git 中内容源文件的最后修改时间：`scripts/update-content-dates.cjs` 在构建前生成 `content/content-dates.json`。Vercel 的浅克隆会保留已提交的文件，所以**改了内容后请先在本机构建一次再提交**。
+- `/llms.txt` 由页面内容自动生成（Google 不使用，其他 AI 工具可能读取）。
+- `scripts/verify-ai-readability.cjs` 检查以上各项。

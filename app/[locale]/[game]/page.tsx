@@ -1,6 +1,7 @@
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import GameLearningGuide from '@/components/seo/GameLearningGuide';
 import PageSchema from '@/components/seo/PageSchema';
+import { contentDate } from '@/lib/content-dates';
 import { pageMetadata } from '@/lib/seo';
 import { searchTopics, gamePageCopy } from '@/content/seo';
 import type { Metadata } from "next";
@@ -40,7 +41,7 @@ export default async function GameHub({ params }: { params: Promise<{ locale: st
   return (
     <>
       <Breadcrumbs locale={locale} items={[{ name: locale === 'zh' ? '弈方首页' : 'Yifang home', path: `/${locale}` }, { name: g.name[locale], path: `/${locale}/${game}` }]} />
-      <PageSchema locale={locale} path={`/${game}`} name={searchTopics[game].title[locale]} description={searchTopics[game].description[locale]} type="CollectionPage" game={game} items={tuts.map(t => ({name:t.title,path:`/${locale}/${game}/learn/${t.slug}`}))} />
+      <PageSchema locale={locale} path={`/${game}`} name={searchTopics[game].title[locale]} description={searchTopics[game].description[locale]} type="CollectionPage" game={game} dateModified={contentDate(`hub:${game}`)} items={tuts.map(t => ({name:t.title,path:`/${locale}/${game}/learn/${t.slug}`}))} />
       {/* 刊头：巨字 + 示意图 */}
       <section className="rpg-hub-hero grid border-b border-ink lg:grid-cols-[3fr_2fr]">
         <div className="px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
@@ -52,6 +53,7 @@ export default async function GameHub({ params }: { params: Promise<{ locale: st
             )}
           </h1>
           <p className="mt-6 max-w-[36rem] text-xl leading-9 text-ink-2">{g.tagline[locale]}</p>
+          <p className="mt-4 max-w-[40rem] text-[17px] leading-8 text-ink">{g.definition[locale]}</p>
           <dl className="mt-10 grid max-w-xl grid-cols-3 border-t-2 border-ink">
             {g.facts.map((f) => (
               <div key={f.label.en} className="border-r border-rule py-4 pr-4 last:border-r-0">

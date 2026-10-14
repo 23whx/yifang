@@ -21,6 +21,8 @@ import { getDict, isLocale, locales } from "@/lib/i18n";
 import { absoluteUrl, SITE_URL } from "@/lib/site";
 import { pageMetadata, htmlLanguage, gameEntity } from '@/lib/seo';
 import PageSchema from '@/components/seo/PageSchema';
+import UpdatedOn from '@/components/seo/UpdatedOn';
+import { contentDate } from '@/lib/content-dates';
 import JsonLd from '@/components/seo/JsonLd';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import LessonNavigation from '@/components/seo/LessonNavigation';
@@ -56,6 +58,7 @@ export default async function TutorialPage({
   const mahjongCourse = game === "mahjong" ? getMahjongCourse(slug) : undefined;
 
   const url = absoluteUrl(`/${locale}/${game}/learn/${slug}`);
+  const updated = contentDate(`lesson:${slug}`);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "LearningResource",
@@ -68,6 +71,7 @@ export default async function TutorialPage({
     learningResourceType: 'Tutorial',
     educationalLevel: lt.level,
     isAccessibleForFree: true,
+    ...(updated ? { dateModified: updated } : {}),
     teaches: lt.steps.map(step => step.title),
     isPartOf: { '@type': 'CollectionPage', '@id': `${absoluteUrl(`/${locale}/${game}/learn`)}#webpage`, url: absoluteUrl(`/${locale}/${game}/learn`) },
     mainEntityOfPage: { '@id': `${url}#webpage` },
@@ -85,7 +89,7 @@ export default async function TutorialPage({
     <>
       <JsonLd data={jsonLd} />
       <PageSchema locale={locale} path={`/${game}/learn/${slug}`} game={game} name={lessonSearch[slug]?.[locale]?.title ?? lt.title}
-        description={lessonSearch[slug]?.[locale]?.description ?? lt.description} mainEntity={{ '@id': `${url}#lesson` }} />
+        description={lessonSearch[slug]?.[locale]?.description ?? lt.description} mainEntity={{ '@id': `${url}#lesson` }} dateModified={updated} />
       <Breadcrumbs locale={locale} items={[
         {name:locale === 'zh' ? '弈方首页' : 'Yifang home',path:`/${locale}`},
         {name:g.name[locale],path:`/${locale}/${game}`},
@@ -100,6 +104,7 @@ export default async function TutorialPage({
             <span>{dict.level} · <b className="text-ink">{lt.level}</b></span>
             <span>{lt.steps.length} {dict.stepsCount}</span>
             <span>{lt.minutes} {dict.minutes}</span>
+            <UpdatedOn locale={locale} date={updated} />
           </div>
           <p className="prose-yf mt-6">{lt.description}</p>
         </div>

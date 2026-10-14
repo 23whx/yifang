@@ -51,6 +51,7 @@ export default async function PlayPage({ params }: { params: Promise<{ locale: s
         <span className="sep">·</span><wbr />
         {game === "baccarat" ? (locale === "zh" ? "规则训练" : "Rules training") : dict.hubPlayTitle}
       </h1>
+      <p className="mt-4 max-w-3xl leading-8 text-ink-2">{copy.description}</p>
       <WinCondition game={game} locale={locale} />
       {game==='holdem' && <MultiPokerPractice locale={locale}/>}
       {game==='mahjong' && <SichuanPractice locale={locale}/>}
